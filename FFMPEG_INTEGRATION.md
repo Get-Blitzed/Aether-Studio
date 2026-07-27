@@ -45,6 +45,7 @@ without the derived metadata/preview rather than failing the whole import.
 | `analyzeLoudness()` | `ffmpeg -i <in> -af ebur128=peak=true -f null -`, parses the **final** `Summary:` block of stderr | Throws `LOUDNESS_ANALYSIS_FAILED`; see the parsing-bug note below |
 | `trimVideo()` | `ffmpeg -i <in> -ss <start> -to <end> -c:v libx264 -c:a aac <out>` | Throws `VIDEO_TRIM_FAILED` |
 | `adjustVideoSpeed()` | `ffmpeg -i <in> -filter_complex "[0:v]setpts=(1/f)*PTS[v];[0:a]atempo=f[a]" -map [v] -map [a] <out>` (f clamped to 0.5-2.0, `atempo`'s single-stage range) | Throws `VIDEO_SPEED_FAILED` |
+| `concatVideoClips()` | Single invocation, all segments as inputs: one `filter_complex` chain per segment (`trim=start=..:end=..,setpts=PTS-STARTPTS,scale=<w>:<h>:force_original_aspect_ratio=decrease,pad=<w>:<h>:(ow-iw)/2:(oh-ih)/2,setsar=1`, default 1280x720) so mismatched source resolutions don't break the join, then `concat=n=N:v=1:a=0` -- video-only, no audio track | Throws `VIDEO_TRIM_FAILED` (including a pre-check: empty segment list) |
 
 All of these were exercised in `packages/media-engine/src/mediaEngine.test.ts`
 and `audioVideoProcessing.test.ts` against **real** ffmpeg-generated test
@@ -90,11 +91,11 @@ verifying it is a Phase 8 packaging task.
 
 ## What's NOT implemented yet
 
-- No project-level/timeline video **encoding**, rendering, or delivery
-  transcoding -- Phases 3-4 read metadata, extract single frames/waveform
-  images, and perform per-clip editing operations (trim, normalize,
-  denoise, silence removal, merge, format conversion, speed adjustment).
-  Timeline rendering and export encoding are Phase 5/7.
+- No delivery-quality export encoding -- Phase 5's `concatVideoClips()`
+  produces a video-only quick preview render (fixed default resolution,
+  no audio, always re-encoded to a single codec) for confirming a timeline
+  edit, not a project-level export. Full export encoding/transcoding for
+  delivery is Phase 7.
 - No proxy (lower-resolution preview) generation.
 - No progress reporting for long-running ffmpeg operations -- everything
   Phases 3-4 do completes in a few seconds per file even for short

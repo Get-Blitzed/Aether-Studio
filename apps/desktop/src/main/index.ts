@@ -9,6 +9,8 @@ import { registerSeriesIpc } from "./ipc/seriesIpc.js";
 import { registerAssetsIpc } from "./ipc/assetsIpc.js";
 import { registerVoiceIpc } from "./ipc/voiceIpc.js";
 import { registerScreenCaptureIpc } from "./ipc/screenCaptureIpc.js";
+import { registerTimelineIpc } from "./ipc/timelineIpc.js";
+import { registerCaptionsIpc } from "./ipc/captionsIpc.js";
 
 const isDev = !app.isPackaged;
 
@@ -93,6 +95,14 @@ app.whenReady().then(async () => {
     registerScreenCaptureIpc({
       logger,
       settingsRepo: new SettingsRepository(database),
+    });
+    registerTimelineIpc({
+      logger,
+      settingsRepo: new SettingsRepository(database),
+    });
+    registerCaptionsIpc({
+      logger,
+      getWindow: () => mainWindow,
     });
   }
 

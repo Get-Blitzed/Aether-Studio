@@ -7,5 +7,8 @@ export * from "./prompt.js";
 export * from "./series.js";
 export * from "./asset.js";
 export * from "./voice.js";
+export * from "./timeline.js";
+export * from "./overlay.js";
+export * from "./caption.js";
 export * from "./appSettings.js";
 export * from "./projectManifest.js";

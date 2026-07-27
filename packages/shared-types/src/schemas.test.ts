@@ -6,6 +6,11 @@ import {
   AssetSchema,
   VoiceProfileSchema,
   VoiceTakeSchema,
+  TimelineSchema,
+  TimelineTrackSchema,
+  TimelineClipSchema,
+  OverlayTemplateSchema,
+  CaptionSchema,
   ProjectManifestSchema,
 } from "./index.js";
 
@@ -154,8 +159,106 @@ describe("VoiceTakeSchema", () => {
   });
 });
 
-describe("ProjectManifestSchema (Phase 2-4 fields)", () => {
-  it("defaults storyboardFrames, prompts, assets, voiceProfiles, and voiceTakes to empty arrays", () => {
+describe("TimelineTrackSchema and TimelineClipSchema", () => {
+  it("fills in defaults for a minimal track", () => {
+    const track = TimelineTrackSchema.parse({ id: "track_1", type: "primary-video", name: "Primary Video", order: 0 });
+    expect(track.muted).toBe(false);
+    expect(track.solo).toBe(false);
+    expect(track.locked).toBe(false);
+  });
+
+  it("rejects an invalid track type", () => {
+    expect(() => TimelineTrackSchema.parse({ id: "track_1", type: "not-a-real-type", name: "X", order: 0 })).toThrow();
+  });
+
+  it("fills in defaults for a minimal clip", () => {
+    const clip = TimelineClipSchema.parse({
+      id: "clip_1",
+      trackId: "track_1",
+      assetId: "asset_1",
+      timelineStartSeconds: 0,
+      timelineDurationSeconds: 5,
+      createdAt: "2026-01-01T00:00:00.000Z",
+      modifiedAt: "2026-01-01T00:00:00.000Z",
+    });
+    expect(clip.sourceInSeconds).toBe(0);
+    expect(clip.volume).toBe(1);
+    expect(clip.opacity).toBe(1);
+    expect(clip.fadeInSeconds).toBe(0);
+  });
+});
+
+describe("TimelineSchema", () => {
+  it("validates a timeline with tracks, clips, and markers", () => {
+    const timeline = TimelineSchema.parse({
+      id: "timeline_1",
+      name: "Main Timeline",
+      tracks: [{ id: "track_1", type: "primary-video", name: "Primary Video", order: 0 }],
+      clips: [
+        {
+          id: "clip_1",
+          trackId: "track_1",
+          assetId: "asset_1",
+          timelineStartSeconds: 0,
+          timelineDurationSeconds: 5,
+          createdAt: "2026-01-01T00:00:00.000Z",
+          modifiedAt: "2026-01-01T00:00:00.000Z",
+        },
+      ],
+      markers: [{ id: "marker_1", timeSeconds: 2, label: "Cold open ends" }],
+      createdAt: "2026-01-01T00:00:00.000Z",
+      modifiedAt: "2026-01-01T00:00:00.000Z",
+    });
+    expect(timeline.aspectRatio).toBe("16:9");
+    expect(timeline.frameRate).toBe(30);
+    expect(timeline.tracks).toHaveLength(1);
+    expect(timeline.clips).toHaveLength(1);
+    expect(timeline.markers).toHaveLength(1);
+  });
+});
+
+describe("OverlayTemplateSchema", () => {
+  it("fills in defaults for a minimal template", () => {
+    const template = OverlayTemplateSchema.parse({
+      id: "overlay_1",
+      kind: "blitz-tip",
+      name: "BLITZ TIP",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      modifiedAt: "2026-01-01T00:00:00.000Z",
+    });
+    expect(template.position).toBe("bottom-center");
+    expect(template.entryAnimation).toBe("fade");
+  });
+
+  it("rejects an invalid overlay kind", () => {
+    expect(() =>
+      OverlayTemplateSchema.parse({
+        id: "overlay_1",
+        kind: "not-a-real-kind",
+        name: "X",
+        createdAt: "2026-01-01T00:00:00.000Z",
+        modifiedAt: "2026-01-01T00:00:00.000Z",
+      }),
+    ).toThrow();
+  });
+});
+
+describe("CaptionSchema", () => {
+  it("fills in defaults for a minimal caption", () => {
+    const caption = CaptionSchema.parse({
+      id: "caption_1",
+      startSeconds: 0,
+      endSeconds: 3,
+      text: "Busy is not the same as productive.",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      modifiedAt: "2026-01-01T00:00:00.000Z",
+    });
+    expect(caption.isSoundDescription).toBe(false);
+  });
+});
+
+describe("ProjectManifestSchema (Phase 2-5 fields)", () => {
+  it("defaults storyboardFrames, prompts, assets, voiceProfiles, voiceTakes, timelines, overlayTemplates, and captions to empty arrays", () => {
     const manifest = ProjectManifestSchema.parse({
       applicationVersion: "0.1.0-test",
       projectId: "proj_1",
@@ -168,9 +271,12 @@ describe("ProjectManifestSchema (Phase 2-4 fields)", () => {
     expect(manifest.assets).toEqual([]);
     expect(manifest.voiceProfiles).toEqual([]);
     expect(manifest.voiceTakes).toEqual([]);
+    expect(manifest.timelines).toEqual([]);
+    expect(manifest.overlayTemplates).toEqual([]);
+    expect(manifest.captions).toEqual([]);
   });
 
-  it("still validates a manifest saved before Phase 2 (no storyboardFrames/prompts/assets keys at all)", () => {
+  it("still validates a manifest saved before Phase 2 (no storyboardFrames/prompts/assets/timelines keys at all)", () => {
     const legacyManifest = {
       formatVersion: 1,
       applicationVersion: "0.1.0-phase1",

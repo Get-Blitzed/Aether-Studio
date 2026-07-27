@@ -9,3 +9,4 @@ export * from "./generateWaveformImage.js";
 export * from "./assetKind.js";
 export * from "./audioProcessing.js";
 export * from "./videoProcessing.js";
+export * from "./concatVideoClips.js";

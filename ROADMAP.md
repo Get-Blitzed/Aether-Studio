@@ -1,9 +1,9 @@
 # Roadmap
 
-Phases 1 (Foundation), 2 (Preproduction), 3 (Media Management), and 4
-(Audio and Screen Capture) are complete -- see IMPLEMENTATION_STATUS.md.
-The phases below follow the spec's own phasing (section 42) and are not
-started.
+Phases 1 (Foundation), 2 (Preproduction), 3 (Media Management), 4
+(Audio and Screen Capture), and 5 (Timeline and Graphics) are complete --
+see IMPLEMENTATION_STATUS.md. The phases below follow the spec's own
+phasing (section 42) and are not started.
 
 ## Phase 2 -- Preproduction: COMPLETE
 
@@ -74,9 +74,39 @@ consent/rights-warning screen is needed yet.
 - A pronunciation *dictionary* (per-word overrides) -- `pronunciationNotes`
   is a free-text field on `VoiceProfile`, not a structured word list.
 
-## Phase 5 -- Timeline and Graphics
-`packages/timeline-engine`, multitrack editor, overlays/titles/captions,
-audio mixer, render preview via the Phase 3 FFmpeg layer.
+## Phase 5 -- Timeline and Graphics: COMPLETE
+
+Timeline/track/clip/marker schemas and overlay/caption schemas
+(`@aether/shared-types`), `concatVideoClips()` quick-preview-render function
+(`@aether/media-engine`, alongside Phase 3/4's other FFmpeg operations --
+no separate `packages/timeline-engine` was needed, see
+IMPLEMENTATION_STATUS.md's architecture note), the Timeline Editor screen
+(multitrack add/remove, numeric-control clip placement, mute/solo/lock,
+shared playback clock with drift-corrected video/audio elements, overlay/
+caption preview rendering, undo/redo, Quick Preview Render), and the
+Caption Studio screen (generate-from-script, manual edit, warnings,
+hand-written SRT/VTT export/import).
+
+**Deferred out of Phase 5, moved later:**
+- Mouse drag-based clip placement/trim/move on the timeline -- clips are
+  positioned via numeric Start/Duration/Source-In fields instead, a
+  deliberate choice given this environment's demonstrated GUI-automation
+  coordinate issues (Phase 4), not a technical blocker to building it later.
+- A dedicated Audio Mixer screen -- audio tracks (narration/music/
+  sound-effects) live inside the Timeline Editor's track list with per-track
+  mute/solo/volume already, but there's no separate mixing-console view with
+  level meters yet.
+- Real-time frame-accurate broadcast sync -- the playback clock is a
+  wall-clock `requestAnimationFrame` loop with periodic drift correction
+  (media elements re-seek if they drift >0.3s from the expected position),
+  not a frame-locked scheduler. Adequate for a preview editor, not for
+  frame-accurate output.
+- Full project-level export encoding -- `concatVideoClips()` produces a
+  video-only quick preview at a fixed default resolution (1280x720); it is
+  explicitly not the delivery export pipeline, which is Phase 7's job.
+- Click indicators, transition effects between clips, and keyframe-based
+  animation on overlays -- overlays currently support only fixed position +
+  a single entry animation (fade/slide), no keyframing.
 
 ## Phase 6 -- AI Providers
 `packages/ai-providers`, `packages/plugin-sdk`, Windows credential-store

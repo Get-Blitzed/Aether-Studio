@@ -1,6 +1,6 @@
 # Implementation Status
 
-Last updated: 2026-07-27 (Phase 4 checkpoint)
+Last updated: 2026-07-27 (Phase 5 checkpoint)
 
 ## Phase 1 -- Foundation: COMPLETE
 
@@ -141,10 +141,44 @@ Actually clicking through Screen Capture Studio's live recording flow (start →
 
 Earlier phases worked around unreliable clicks by preferring keyboard navigation. This phase found the actual root cause for the mouse case: **`System.Windows.Forms.Cursor.Position` (used via PowerShell) does not land where `user32.dll`'s `GetWindowRect`/`CopyFromScreen` say it should** -- confirmed by setting a position via `Cursor.Position` and immediately reading it back via the raw `GetCursorPos` Win32 call, which reported a different, non-uniform offset. Calling the raw `SetCursorPos` Win32 function directly instead of going through WinForms' `Cursor.Position` produces an exact match with `GetCursorPos`/`GetWindowRect`, and clicks landed correctly afterward. The practical failure mode before this fix: a click aimed at a button inside the target app's window could land anywhere on the (very large, multi-window, 5120px-wide) desktop instead, including on unrelated windows. Future sessions automating this app's GUI via PowerShell should use `SetCursorPos`/`GetCursorPos`, never `System.Windows.Forms.Cursor.Position`, for coordinate-based clicks.
 
-## Phases 5-8: NOT STARTED
+## Phase 5 -- Timeline and Graphics: COMPLETE
 
-See [ROADMAP.md](ROADMAP.md). Nothing in Timeline, Motion
-Graphics, Captions, Audio Mixer, Review, Quality
+| Area | Status | Notes |
+|---|---|---|
+| Timeline data model (shared-types) | Done | `TimelineTrackSchema` (11 track types: primary/secondary video, screen-capture, character-animation, graphics, titles, overlays, captions, narration, music, sound-effects), `TimelineClipSchema` (source in/out, timeline position, volume, opacity, fade in/out, mute/lock), `TimelineMarkerSchema`, `TimelineSchema` |
+| Overlay/caption data model | Done | `OverlayTemplateSchema` (16 kinds from spec section 20, 7 positions, 4 entry animations), `CaptionSchema` (start/end/text/speaker/sound-description flag) |
+| `concatVideoClips()` (media-engine) | Done | Trims each clip to its in/out range, scales + letterboxes every clip to a common resolution (default 1280x720), concatenates via `filter_complex concat` -- video-only, explicitly scoped as a quick preview render, not a delivery export |
+| Timeline Editor screen | Done | Multitrack editor: add/remove tracks and clips via numeric controls (start/duration/source-in/volume/fades), mute/solo/lock per track, a shared rAF playback clock driving a `<video>` + one `<audio>` per audio track with drift correction, overlay/graphics/title clips rendered as positioned preview divs with fade opacity, a bottom caption bar, undo/redo (in-memory snapshot stack), zoom, "+ Marker at Playhead", "Load Standard Overlays," and "Quick Preview Render" (calls `concatVideoClips` on the primary-video track and registers the result as a new Asset in the `exports` category) |
+| Caption Studio screen | Done | Generate captions from a script's segments (`generateCaptionsFromScript()`), manual add, inline per-caption start/end/text editing, warnings (line-length >42 chars, reading speed >180 wpm, overlaps, end<=start), SRT/VTT export and import (hand-written parse/format functions, no external subtitle library) |
+| Nav + cross-links | Done | Timeline and Audio both enabled and route to the same Timeline Editor screen (audio mixing lives in the timeline's audio tracks, not a separate mixer screen yet); Captions enabled; Production Overview links to both |
+
+### New shared-types schemas (Phase 5)
+
+`TimelineTrackTypeSchema`, `TimelineTrackSchema`, `TimelineClipSchema`, `TimelineMarkerSchema`, `TimelineSchema`, `OverlayTemplateKindSchema`, `OverlayPositionSchema`, `OverlayAnimationSchema`, `OverlayTemplateSchema`, `CaptionSchema`. `ProjectManifestSchema` gained `timelines`, `overlayTemplates`, and `captions` arrays (all default to `[]`, covered by the same backward-compatibility test pattern as prior phases).
+
+### Architecture note: no separate `packages/timeline-engine`
+
+The Roadmap originally named a dedicated `packages/timeline-engine` for this phase. In practice, the timeline's actual logic split cleanly across existing packages without needing a new one: the data model lives in `@aether/shared-types` (schemas above), the only real *processing* step (concatenating clips into a preview render) is one function (`concatVideoClips()`) that belongs naturally alongside Phase 3/4's other FFmpeg operations in `@aether/media-engine`, and everything else (playback clock, drift correction, track/clip editing, undo/redo) is UI state that lives in the renderer (`apps/desktop/src/renderer/src/screens/TimelineEditor.tsx` and `lib/timelineHelpers.ts`). Introducing an empty intermediate package for these would have added an indirection layer with no code of its own.
+
+### Verified manually (Phase 5, this session)
+
+1. `npm test` (72/72 passing, including 13 new tests: 10 for the Phase 5 schema additions in `schemas.test.ts`, 3 for `concatVideoClips()` against real ffmpeg-generated clips of different resolutions), `npm run typecheck`, `electron-vite build` all succeed.
+2. Fresh launches complete startup with no errors both before and after all Phase 5 changes.
+3. **Full Timeline Editor flow verified interactively against the real running app**: imported three freshly ffmpeg-generated test files (a 4s 640x360 video, a 3s 640x360 video, a 5s narration WAV) into the Asset Library, created a new timeline, added a clip to the Primary Video track and another to the Narration track via the track asset-picker + "+ Add Clip," confirmed the Clip Inspector showed the correct real probed duration for each (4s and 5s respectively), pressed Play and watched the playhead advance in real time with the preview `<video>` showing the actual animating test-pattern frame (not a static placeholder), and pressed "Quick Preview Render," which produced a real rendered `.mp4` and added it to the Asset Library under the `exports` category with the notice "Preview rendered and added to the Asset Library (Exports category)" -- confirmed by re-opening the Asset Library and seeing the new export asset with a real thumbnail.
+4. **A real bug was found and fixed during this pass**: the playback clock (a `requestAnimationFrame` loop advancing `playheadSeconds` by wall-clock delta) never checked the loop against the timeline's total duration, so playback continued advancing indefinitely past the end of the timeline (observed running to `0:35.19` against a `0:30.00` total) instead of stopping. Fixed in `TimelineEditor.tsx` by clamping the next playhead value to `totalDuration` and calling `setIsPlaying(false)` once it's reached; verified the fix by seeking near the end and confirming playback now stops exactly at `0:30.00` with the Play/Pause button correctly reverting to "Play."
+5. Test assets (the three imported files, the generated `preview-*.mp4` export, their cache thumbnails/waveform images, and the `Timeline 1` timeline itself) were removed from the real sample project's `project.aether` and asset folders before finishing, consistent with every prior phase's cleanup practice -- confirmed by relaunching and seeing the Production Overview report "0 Assets" and no timeline again.
+
+### What wasn't interactively verified this session, and why
+
+Caption Studio's generate/edit/export/import flow was exercised only through its unit-tested helper functions (`generateCaptionsFromScript`, `captionWarnings`, `findOverlappingCaptionIds`, the SRT/VTT format/parse round-trip), not by clicking through the live screen, given diminishing returns from continued coordinate-based GUI automation after the Timeline Editor flow above was already confirmed working end-to-end (see the GUI-automation note below). The underlying functions are the same ones the screen calls directly, so this is lower-risk than an unverified code path, but it is not the same as watching the actual screen generate and export captions.
+
+### A further note on GUI-automation reliability (new finding this phase)
+
+Building on Phase 4's fix (use raw `SetCursorPos`/`GetCursorPos`, not `System.Windows.Forms.Cursor.Position`), this phase found a second, distinct failure mode: **a click reliably lands on the wrong window if `SetForegroundWindow` isn't called again immediately before that specific click.** Focus does not stay on the target Electron window between separate tool invocations in this environment -- something else (this session's own terminal/app window) can reclaim the foreground in between, and a click sent without re-asserting focus first can land on whatever now occupies that screen region instead (observed landing on this very session's own app window twice, never on unrelated personal content). The fix is mechanical: call `ShowWindow`/`SetForegroundWindow` on the target window's handle immediately before every single click, not just once at the start of a click sequence. A handful of clicks in this phase (a "Remove from Library" button, a couple of nav-sidebar items) intermittently missed even with this in place, landing as text-selection drags instead of clicks for reasons not fully root-caused -- retrying once after re-asserting focus resolved all of them. Opening Chromium DevTools (`Ctrl+Shift+I`, sent via `SendKeys` to the focused window) was useful this phase for confirming a click actually registered (via the button's own text changing, e.g. to "Rendering...") when screenshots alone left it ambiguous.
+
+## Phases 6-8: NOT STARTED
+
+See [ROADMAP.md](ROADMAP.md). Nothing in AI Providers, Review, Quality
 Control, Export, Templates, Providers, Tasks, Analytics, or Learning Center
 is implemented beyond the Zod schema placeholders already present in
 `@aether/shared-types` (`tasks` and `providerReferences` arrays exist on the

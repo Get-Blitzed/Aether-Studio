@@ -130,6 +130,24 @@ const api = {
     ) => ipcRenderer.invoke("screencapture:process-clip", args) as Promise<ProjectResult>,
   },
 
+  timeline: {
+    renderPreview: (args: { projectDir: string; timelineId: string }) =>
+      ipcRenderer.invoke("timeline:render-preview", args) as Promise<
+        { ok: true; manifest: ProjectManifest; assetId: string } | { ok: false; error?: AppErrorPayload }
+      >,
+  },
+
+  captions: {
+    export: (args: { projectDir: string; format: "srt" | "vtt" }) =>
+      ipcRenderer.invoke("captions:export", args) as Promise<
+        { ok: true; exportedPath: string } | { ok: false; error?: AppErrorPayload; canceled?: boolean }
+      >,
+    import: (projectDir: string) =>
+      ipcRenderer.invoke("captions:import", projectDir) as Promise<
+        (ProjectResult & { canceled?: boolean; imported?: number })
+      >,
+  },
+
   ffmpeg: {
     status: () =>
       ipcRenderer.invoke("ffmpeg:status") as Promise<{

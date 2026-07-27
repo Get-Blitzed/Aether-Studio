@@ -5,7 +5,8 @@
 ```mermaid
 flowchart TB
     subgraph Renderer["Renderer (React, sandboxed)"]
-        UI[Screens: Splash, Onboarding, Home, ProductionOverview, Settings]
+        UI[Screens: Splash, Onboarding, Home, ProductionOverview, Settings, ...,
+TimelineEditor, CaptionStudio]
         Store[Zustand app store]
     end
 
@@ -24,6 +25,7 @@ flowchart TB
         Types["@aether/shared-types: Zod schemas"]
         DB["@aether/database: SQLite (sql.js) + migrations"]
         Engine["@aether/project-engine: .aether format"]
+        Media["@aether/media-engine: FFmpeg ops + concatVideoClips"]
     end
 
     UI --> Store --> Bridge --> IPC
@@ -46,10 +48,15 @@ stack minus FFmpeg (deferred to Phase 3, where it's actually exercised).
   from a single config and gives the renderer real Vite HMR in dev, which
   plain `electron` + hand-rolled Vite config does not.
 - **npm workspaces monorepo**: `apps/desktop` + `packages/*`, matching the
-  spec's package boundaries (core, database, project-engine, shared-types
-  today; media-engine, timeline-engine, export-engine, ai-providers,
-  plugin-sdk, security, testing arrive with the phases that need them --
-  see [ROADMAP.md](ROADMAP.md)).
+  spec's package boundaries (core, database, project-engine, shared-types,
+  and media-engine today; export-engine, ai-providers, plugin-sdk, security,
+  testing arrive with the phases that need them -- see
+  [ROADMAP.md](ROADMAP.md). A dedicated `timeline-engine` package named in
+  the original roadmap turned out not to be needed -- Phase 5's timeline
+  logic split cleanly across the existing `shared-types` (data model),
+  `media-engine` (the one real processing step, `concatVideoClips()`), and
+  renderer-local UI state, with no leftover code that would justify an empty
+  intermediate package).
 - **Zod everywhere data crosses a boundary**: the `.aether` manifest, IPC
   payloads, and the app-settings blob are all defined once in
   `@aether/shared-types` and validated on read, not just on write.
@@ -168,21 +175,36 @@ same pattern Phase 1 already established for `character_library` and
 still unused by any screen -- promoting a project-local character/brand to
 that shared library is a natural Phase 3+ extension of the same pattern).
 
+## Key decision: the timeline's playback clock is wall-clock, not frame-locked
+
+`TimelineEditor.tsx` drives `playheadSeconds` from a `requestAnimationFrame`
+loop advancing by wall-clock delta time, and the preview `<video>` plus one
+`<audio>` element per audio track follow that shared clock -- seeking on
+clip change, then periodically re-seeking only if they drift more than 0.3s
+from where they should be, rather than the playhead being derived from any
+one media element's own `currentTime`. This keeps multiple independent
+media elements (one video, several audio tracks) in acceptable sync for a
+preview editor with a simple mental model, at the cost of not being
+frame-accurate. See KNOWN_LIMITATIONS.md.
+
 ## What's still deliberately not built (see ROADMAP.md / KNOWN_LIMITATIONS.md)
 
-- No project-level video encoding/rendering/export (Phase 5/7) -- FFmpeg is
-  used for real editing operations (Phase 3-4) but not yet a full timeline
-  render.
+- No delivery-quality project export encoding (Phase 7) -- Phase 5's
+  `concatVideoClips()` produces a video-only quick preview render for
+  confirming a timeline edit, not the final export pipeline.
 - No AI provider calls of any kind (Phase 6). There is no network code in
   this codebase at all yet -- Prompt Workshop stores and assembles prompt
   text for you to paste elsewhere, it doesn't call anything. Voice cloning
   in particular is not built at all, by design (see KNOWN_LIMITATIONS.md).
-- No timeline, no animation generation, no OS-level input-hook overlays
-  (click indicators, keystroke display) during screen capture.
+- No animation generation, no OS-level input-hook overlays (click
+  indicators, keystroke display) during screen capture, no dedicated Audio
+  Mixer screen (audio tracks live inside the Timeline Editor instead), no
+  drag-and-drop clip editing (numeric controls only, see
+  KNOWN_LIMITATIONS.md).
 - The persistent nav sidebar lists all the modules from the spec. As of
-  Phase 4, Home, Settings, Series, Knowledge, Scripts, Storyboards, Prompts,
-  Characters, Brands, Assets, Voice, and Screen Capture are wired up; the
-  remaining items (Timeline, Animation, Audio, Captions, Review, Export,
+  Phase 5, Home, Settings, Series, Knowledge, Scripts, Storyboards, Prompts,
+  Characters, Brands, Assets, Voice, Screen Capture, Timeline, Audio, and
+  Captions are wired up; the remaining items (Animation, Review, Export,
   Templates, Providers, Learning Center) are disabled buttons with a tooltip
   naming the phase they arrive in. This is intentional -- see spec section 44
   ("prepare clean interfaces for future expansion without filling the

@@ -1,4 +1,4 @@
-# Known Limitations (Phase 1-4)
+# Known Limitations (Phase 1-5)
 
 ## Database engine: sql.js, not better-sqlite3
 
@@ -83,19 +83,51 @@ currently has nothing to disable.
 
 ## Nav sidebar still lists some modules that don't work yet
 
-As of Phase 4, Series, Knowledge, Scripts, Storyboards, Prompts, Characters,
-Brands, Assets, Voice, and Screen Capture are real, working screens.
-Timeline, Animation, Audio, Captions, Review, Export, Templates, Providers,
-and Learning Center remain disabled buttons with a tooltip naming the phase
-they arrive in. This is deliberate (see ARCHITECTURE.md), not an oversight.
+As of Phase 5, Series, Knowledge, Scripts, Storyboards, Prompts, Characters,
+Brands, Assets, Voice, Screen Capture, Timeline, Audio, and Captions are
+real, working screens. Animation, Review, Export, Templates, Providers, and
+Learning Center remain disabled buttons with a tooltip naming the phase they
+arrive in. This is deliberate (see ARCHITECTURE.md), not an oversight.
 
 ## Asset Library has no video playback or proxy generation
 
-The Asset Library shows a static thumbnail frame for video assets (and a
-waveform image for audio), not an actual playable preview. Full transport
-controls belong with Phase 5's timeline/preview work, where the same
-playback surface will be reused rather than building a one-off video player
-here first.
+The Asset Library itself still shows only a static thumbnail frame for
+video assets (and a waveform image for audio) -- not an actual playable
+preview in the grid. Real transport controls (play/pause/scrub) now exist,
+but only inside the Timeline Editor's preview player, which is scoped to
+clips placed on a timeline rather than to browsing the library directly.
+
+## Timeline playback is a wall-clock preview, not frame-accurate
+
+The Timeline Editor's playback clock is a `requestAnimationFrame` loop that
+advances the playhead by wall-clock delta time; the preview `<video>` and
+each audio track's `<audio>` element follow it with periodic drift
+correction (re-seeking if they drift more than 0.3s from the expected
+position) rather than the media elements themselves driving a frame-locked
+clock. This is adequate for previewing edit decisions but is not
+frame-accurate broadcast sync, and "Quick Preview Render" (via
+`concatVideoClips()`) is a fixed-resolution (default 1280x720), video-only
+quick render for confirming an edit -- not the delivery export pipeline,
+which is Phase 7's job.
+
+## Timeline clip editing is numeric-only, not drag-and-drop
+
+Clips are added, trimmed, and repositioned via numeric Start/Duration/
+Source-In fields in the Clip Inspector, not by dragging on the timeline
+canvas. This was a deliberate choice for Phase 5, made explicitly because of
+this environment's demonstrated GUI-automation coordinate-mapping issues
+(see the note below and Phase 4's entry) -- numeric controls are reliably
+testable with keyboard input, whereas drag gestures would inherit the same
+coordinate risk already documented. It is not a technical limitation of the
+timeline data model, which supports arbitrary clip positions.
+
+## No dedicated Audio Mixer screen yet
+
+Narration/music/sound-effects tracks live inside the Timeline Editor's track
+list with per-track mute/solo and per-clip volume already wired up, but
+there is no separate mixing-console view (level meters, master bus, etc.).
+The "Audio" nav item intentionally routes to the Timeline Editor rather than
+a stub screen.
 
 ## Script/Storyboard/Prompt views are partial
 
@@ -152,3 +184,16 @@ issues came up across phases, both now understood and fixed:
 This is a limitation of the verification environment, not of the app --
 but it's worth a future session's time to read before doing more GUI
 automation here, to avoid repeating the same failure mode.
+
+- **Focus does not persist between separate tool invocations** (found in
+  Phase 5): even with the `SetCursorPos` fix above, a click can land on the
+  wrong window if `SetForegroundWindow` isn't called again *immediately*
+  before that specific click -- something else can reclaim the foreground
+  in between separate automation calls. Fix: re-assert
+  `ShowWindow`/`SetForegroundWindow` on the target window's handle right
+  before every click, not just once at the start of a sequence. A few clicks
+  still intermittently missed (registering as a text-selection drag instead
+  of a click) even with this in place; retrying once resolved all of them.
+  Opening Chromium DevTools (`Ctrl+Shift+I`) and checking whether a button's
+  own text changed (e.g. to "Rendering...") was a more reliable way to
+  confirm a click actually registered than screenshots alone.

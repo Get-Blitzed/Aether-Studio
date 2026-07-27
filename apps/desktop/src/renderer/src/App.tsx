@@ -14,6 +14,8 @@ import { PromptWorkshop } from "./screens/PromptWorkshop";
 import { AssetLibrary } from "./screens/AssetLibrary";
 import { VoiceStudio } from "./screens/VoiceStudio";
 import { ScreenCaptureStudio } from "./screens/ScreenCaptureStudio";
+import { TimelineEditor } from "./screens/TimelineEditor";
+import { CaptionStudio } from "./screens/CaptionStudio";
 
 export function App(): JSX.Element {
   return (
@@ -33,6 +35,8 @@ export function App(): JSX.Element {
         <Route path="/assets" element={<AssetLibrary />} />
         <Route path="/voice" element={<VoiceStudio />} />
         <Route path="/screen-capture" element={<ScreenCaptureStudio />} />
+        <Route path="/timeline" element={<TimelineEditor />} />
+        <Route path="/captions" element={<CaptionStudio />} />
         <Route path="/settings" element={<SettingsScreen />} />
       </Routes>
     </HashRouter>
