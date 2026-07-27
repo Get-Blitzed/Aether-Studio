@@ -125,16 +125,37 @@ every save.
   `/api[_-]?key|token|secret|password|authorization/i` before writing to
   disk, and writes to `%APPDATA%/Aether Studio Suite/logs/aether-YYYY-MM-DD.log`.
 
-## What Phase 1 deliberately does not do
+## Key decision: cross-project entities live in the app database, not a manifest
+
+Most of what Phase 2 adds (brands, characters, scripts, storyboard frames,
+prompts, knowledge sources) belongs to one production and lives as an array
+inside that production's `project.aether` -- edited in place via
+`useAppStore.updateAndSave()`, which mutates the in-memory manifest and
+calls the existing `projects:save` IPC handler from Phase 1. No new IPC was
+needed for any of those.
+
+The **Series & Curriculum Planner** is the one Phase 2 exception: a series
+spans multiple productions/episodes, so it doesn't belong inside any single
+project.aether. It's stored globally in the app database instead
+(`series_plans` table, migration `0002_series_plans.sql`), following the
+same pattern Phase 1 already established for `character_library` and
+`brand_library` (present in the schema since migration `0001_init.sql` but
+still unused by any screen -- promoting a project-local character/brand to
+that shared library is a natural Phase 3+ extension of the same pattern).
+
+## What's still deliberately not built (see ROADMAP.md / KNOWN_LIMITATIONS.md)
 
 - No FFmpeg integration (nothing to encode yet -- Phase 3).
 - No AI provider calls of any kind (Phase 6). There is no network code in
-  this codebase at all yet.
+  this codebase at all yet -- Prompt Workshop stores and assembles prompt
+  text for you to paste elsewhere, it doesn't call anything.
 - No timeline, no media import, no voice/animation generation.
-- The persistent nav sidebar lists all the modules from the spec (Series,
-  Knowledge, Scripts, ...) but only Home and Settings are wired up; the rest
-  are disabled buttons with a tooltip naming the phase they arrive in. This
-  is intentional -- see spec section 44 ("prepare clean interfaces for
-  future expansion without filling the interface with nonfunctional
-  placeholders"); a full click-through experience for unbuilt modules would
-  be exactly that kind of placeholder.
+- The persistent nav sidebar lists all the modules from the spec. As of
+  Phase 2, Home, Settings, Series, Knowledge, Scripts, Storyboards, Prompts,
+  Characters, and Brands are wired up; the remaining items (Timeline,
+  Assets, Voice, Animation, Screen Capture, Audio, Captions, Review, Export,
+  Templates, Providers, Learning Center) are disabled buttons with a tooltip
+  naming the phase they arrive in. This is intentional -- see spec section 44
+  ("prepare clean interfaces for future expansion without filling the
+  interface with nonfunctional placeholders"); a full click-through
+  experience for unbuilt modules would be exactly that kind of placeholder.

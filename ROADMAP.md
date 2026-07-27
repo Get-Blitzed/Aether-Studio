@@ -1,16 +1,31 @@
 # Roadmap
 
-Phase 1 (Foundation) is complete -- see IMPLEMENTATION_STATUS.md. The phases
-below follow the spec's own phasing (section 42) and are not started.
+Phases 1 (Foundation) and 2 (Preproduction) are complete -- see
+IMPLEMENTATION_STATUS.md. The phases below follow the spec's own phasing
+(section 42) and are not started.
 
-## Phase 2 -- Preproduction
-Production Hub (full fields: stages, views, warnings, activity feed), Series
-& Curriculum Planner (with the sample A.I. Blitz Mission 001-010 curriculum),
-Brand Studio (validation rules, override-with-note), Character Studio (full
-reference gallery, consistency locks UI, version comparison), Knowledge
-Library (source ingestion + citation linking), Script Studio (outline /
-treatment / two-column / teleprompter views, AI-assist actions), Storyboard
-Studio, Prompt Workshop.
+## Phase 2 -- Preproduction: COMPLETE
+
+Series & Curriculum Planner (global, DB-backed, with the editable sample
+A.I. Blitz Mission 001-010 curriculum), Brand Studio, Character Studio
+(reference gallery + consistency locks), Knowledge Library, Script Studio
+(scene/segment editor with real duration math), Storyboard Studio, Prompt
+Workshop -- all built and manually verified against the running app.
+
+**Deferred out of Phase 2, moved later:**
+- Production Hub's fuller view set (Kanban/calendar/dashboard views,
+  activity feed, pending-tasks/warnings surfacing) -- the current Production
+  Overview screen covers the core fields and cross-links but not every view
+  mode from spec section 7. Revisit alongside Phase 7's review workflow,
+  since "warnings" overlaps with the Quality-Control Engine.
+- Script Studio's outline/treatment/two-column/teleprompter *views* -- only
+  the full-script segment-card view is built. The AI-assist actions (generate
+  outline, improve hook, etc.) explicitly wait for Phase 6's provider layer.
+- Character version comparison (side-by-side diffing of reference sets) --
+  `versionHistory` exists on the schema but has no UI yet.
+- Knowledge Library's citation-linking UI (script segments already store
+  `sourceCitationIds`, but there's no picker to attach them from either
+  screen yet).
 
 ## Phase 3 -- Media Management
 `packages/media-engine`, Asset Library, media import + metadata, thumbnails,

@@ -14,12 +14,13 @@ The included sample production -- **A.I. Blitz, Mission 001: Welcome to A.I.
 Blitz** -- is a template, not a hard-coded special case. The application is
 built to support other characters, brands, clients, and production types.
 
-> **Status: Phase 1 (Foundation) complete.** See
+> **Status: Phases 1 (Foundation) and 2 (Preproduction) complete.** See
 > [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) for exactly what works
-> today versus what's planned. Phases 2-8 (scripting, media, timeline, AI
-> providers, review/export, polish) are not yet built -- this is a real,
-> running application, not a mockup, but it currently covers production
-> setup, character/brand data, and project persistence only.
+> today versus what's planned. Series planning, brand/character management,
+> knowledge sources, scriptwriting, storyboarding, and prompt authoring are
+> all real and working. Phases 3-8 (media import, timeline, AI providers,
+> review/export, polish) are not yet built -- this is a real, running
+> application, not a mockup, at every stage.
 
 ## Quick start (development)
 

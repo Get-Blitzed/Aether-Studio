@@ -1,4 +1,4 @@
-# Known Limitations (Phase 1)
+# Known Limitations (Phase 1-2)
 
 ## Database engine: sql.js, not better-sqlite3
 
@@ -34,13 +34,25 @@ Zero network calls exist in this codebase. "Offline mode" exists as a
 Settings toggle because the schema was designed for Phase 6 up front, but it
 currently has nothing to disable.
 
-## Nav sidebar lists modules that don't work yet
+## Nav sidebar still lists some modules that don't work yet
 
-Series, Knowledge, Scripts, Storyboards, Timeline, Characters (full studio),
-Brands (full studio), Assets, Voice, Animation, Screen Capture, Audio,
-Captions, Review, Export, Templates, Providers, and Learning Center all
-appear in the left nav as disabled buttons with a tooltip naming the phase
-they arrive in. This is deliberate (see ARCHITECTURE.md), not an oversight.
+As of Phase 2, Series, Knowledge, Scripts, Storyboards, Prompts, Characters,
+and Brands are real, working screens. Timeline, Assets, Voice, Animation,
+Screen Capture, Audio, Captions, Review, Export, Templates, Providers, and
+Learning Center remain disabled buttons with a tooltip naming the phase they
+arrive in. This is deliberate (see ARCHITECTURE.md), not an oversight.
+
+## Script/Storyboard/Prompt views are partial
+
+Script Studio only implements the full-script segment-card view -- not the
+outline, treatment, two-column audiovisual, or teleprompter views from spec
+section 12. None of the AI-assisted script actions (generate outline,
+improve hook, estimate duration via AI, etc.) exist; duration/word-count
+math is deterministic local calculation, not AI-assisted. Storyboard Studio
+has grid and scene-list views but not the animatic, contact-sheet, or
+presentation views. Prompt Workshop stores and assembles prompts as text but
+has no connection to an actual image/video generation provider (there are
+none yet -- see Phase 6).
 
 ## No migration exercised beyond format version 1
 
