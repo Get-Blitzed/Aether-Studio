@@ -10,6 +10,7 @@ import type { Plugin } from "vite";
 const workspacePackages = [
   "@aether/core",
   "@aether/database",
+  "@aether/media-engine",
   "@aether/project-engine",
   "@aether/shared-types",
 ];

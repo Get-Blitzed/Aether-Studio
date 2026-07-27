@@ -1,11 +1,12 @@
 import path from "node:path";
 import { app, BrowserWindow, ipcMain } from "electron";
 import { Logger, getLogsDir } from "@aether/core";
-import { openDatabase, type AetherDatabase } from "@aether/database";
+import { openDatabase, SettingsRepository, type AetherDatabase } from "@aether/database";
 import { runStartupSequence, clearRunMarker, type StartupResult } from "./startup.js";
 import { registerSettingsIpc } from "./ipc/settingsIpc.js";
 import { registerProjectsIpc } from "./ipc/projectsIpc.js";
 import { registerSeriesIpc } from "./ipc/seriesIpc.js";
+import { registerAssetsIpc } from "./ipc/assetsIpc.js";
 
 const isDev = !app.isPackaged;
 
@@ -77,6 +78,11 @@ app.whenReady().then(async () => {
       getWindow: () => mainWindow,
     });
     registerSeriesIpc(database, logger);
+    registerAssetsIpc({
+      logger,
+      settingsRepo: new SettingsRepository(database),
+      getWindow: () => mainWindow,
+    });
   }
 
   createWindow();

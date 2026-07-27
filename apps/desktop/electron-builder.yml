@@ -22,3 +22,6 @@ nsis:
   createStartMenuShortcut: true
   shortcutName: Aether Studio Suite
 asar: true
+asarUnpack:
+  - "**/node_modules/ffmpeg-static/**"
+  - "**/node_modules/ffprobe-static/**"

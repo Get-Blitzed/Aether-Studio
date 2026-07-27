@@ -1,6 +1,6 @@
 # Implementation Status
 
-Last updated: 2026-07-27 (Phase 2 checkpoint)
+Last updated: 2026-07-27 (Phase 3 checkpoint)
 
 ## Phase 1 -- Foundation: COMPLETE
 
@@ -73,9 +73,42 @@ hypothetical risks -- listed so they aren't reintroduced:
   automatically -> added a `closeBundle` plugin hook in
   `electron.vite.config.ts` to copy them into `out/main/migrations`.
 
-## Phases 3-8: NOT STARTED
+## Phase 3 -- Media Management: COMPLETE
 
-See [ROADMAP.md](ROADMAP.md). Nothing in Asset Library, Voice Studio, Screen
+| Area | Status | Notes |
+|---|---|---|
+| `packages/media-engine` | Done | Real FFmpeg 6.1.1 (via `ffmpeg-static`/`ffprobe-static`) -- not a stub. Checksum (sha256), media probing (duration/resolution/codec), video thumbnail extraction, audio waveform image generation, `execFile`-based process invocation (no shell, injection-safe by construction) |
+| Asset Library screen | Done | Grid view, category + text/tag search + favorites filters, detail panel with tags/collections/license fields, per-asset remove/relink/reveal-in-folder |
+| Media import | Done | Copy-into-project or link-to-original storage modes; sha256-based duplicate detection warns and skips re-importing a file already in the library |
+| Missing-file detection | Done | `assets:check-missing` scans on load; missing assets show a badge and a "Relink..." action in the detail panel |
+| FFmpeg status in Settings | Done | Path override field + "Test FFmpeg" button that actually invokes `ffmpeg -version`, not just a path-exists check |
+| Nav + cross-links | Done | Assets enabled in the sidebar; Production Overview has an Assets stat card and quick link |
+
+### New shared-types schema (Phase 3)
+
+`AssetSchema`/`AssetCategorySchema` (19 categories per spec section 15)/`AssetStorageModeSchema`. `ProjectManifestSchema` gained an `assets` array (defaults to `[]`, covered by the same backward-compatibility test pattern as Phase 2's fields).
+
+### Verified manually (Phase 3, this session)
+
+1. `npm test` (46/46 passing, including 10 media-engine tests that invoke the real FFmpeg binary against ffmpeg-generated test video/audio), `npm run typecheck`, `electron-vite build` all succeed.
+2. Fresh launch with no errors; Asset Library renders correctly scoped to the open production.
+3. **Real end-to-end import**, driven through the actual native Windows file-picker dialog (not simulated): imported a real JPEG, confirmed "Imported 1 asset," confirmed the thumbnail rendered as the actual image content via a `file://` URL, confirmed the copied file and updated `project.aether` existed on disk afterward.
+4. **A real bug was found and fixed during this pass**: the asset preview picked its rendering mode (image/video/audio/generic) from the asset's user-assigned `category` rather than the file's actual extension. Importing a `.mp4` and a `.wav` under the "images" category (an easy real-world mistake, and exactly what happened during this test) produced broken image previews. Fixed by deriving preview kind from the file extension (`previewKindForFileName()`) instead -- category remains a free organizational label, independent of how the file previews.
+5. Test artifacts (`.jpeg`/`.mp4`/`.wav` test files and their imported records) were created and then removed from the real sample project and `%APPDATA%` data before finishing, consistent with the Phase 2 cleanup practice.
+
+### A note on native dialog automation
+
+Automating the native Windows "Choose File" dialog required finding its
+actual top-level window handle (`EnumWindows`, matching by title) and
+calling `SetForegroundWindow` on *that* handle specifically --
+`SendKeys` sent to the Electron main window's handle while the file dialog
+was open leaked keystrokes to whatever window actually had focus (in one
+case, this session's own terminal window). Scoping `SetForegroundWindow` to
+the dialog's own `hWnd` fixed it reliably.
+
+## Phases 4-8: NOT STARTED
+
+See [ROADMAP.md](ROADMAP.md). Nothing in Voice Studio, Screen
 Capture, Timeline, Motion Graphics, Captions, Audio Mixer, Review, Quality
 Control, Export, Templates, Providers, Tasks, Analytics, or Learning Center
 is implemented beyond the Zod schema placeholders already present in

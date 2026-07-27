@@ -3,6 +3,7 @@ import {
   StoryboardFrameSchema,
   PromptSchema,
   SeriesPlanSchema,
+  AssetSchema,
   ProjectManifestSchema,
 } from "./index.js";
 
@@ -66,8 +67,54 @@ describe("SeriesPlanSchema", () => {
   });
 });
 
-describe("ProjectManifestSchema (Phase 2 fields)", () => {
-  it("defaults storyboardFrames and prompts to empty arrays", () => {
+describe("AssetSchema", () => {
+  it("fills in defaults for a minimal managed asset", () => {
+    const asset = AssetSchema.parse({
+      id: "asset_1",
+      category: "images",
+      storageMode: "managed",
+      filePath: "assets/images/blitz.jpg",
+      originalFileName: "blitz.jpg",
+      importedAt: "2026-01-01T00:00:00.000Z",
+      modifiedAt: "2026-01-01T00:00:00.000Z",
+    });
+    expect(asset.tags).toEqual([]);
+    expect(asset.collections).toEqual([]);
+    expect(asset.isFavorite).toBe(false);
+    expect(asset.usageCount).toBe(0);
+  });
+
+  it("rejects an invalid category", () => {
+    expect(() =>
+      AssetSchema.parse({
+        id: "asset_1",
+        category: "not-a-real-category",
+        storageMode: "managed",
+        filePath: "x.jpg",
+        originalFileName: "x.jpg",
+        importedAt: "2026-01-01T00:00:00.000Z",
+        modifiedAt: "2026-01-01T00:00:00.000Z",
+      }),
+    ).toThrow();
+  });
+
+  it("rejects an invalid storage mode", () => {
+    expect(() =>
+      AssetSchema.parse({
+        id: "asset_1",
+        category: "images",
+        storageMode: "cloud",
+        filePath: "x.jpg",
+        originalFileName: "x.jpg",
+        importedAt: "2026-01-01T00:00:00.000Z",
+        modifiedAt: "2026-01-01T00:00:00.000Z",
+      }),
+    ).toThrow();
+  });
+});
+
+describe("ProjectManifestSchema (Phase 2-3 fields)", () => {
+  it("defaults storyboardFrames, prompts, and assets to empty arrays", () => {
     const manifest = ProjectManifestSchema.parse({
       applicationVersion: "0.1.0-test",
       projectId: "proj_1",
@@ -77,9 +124,10 @@ describe("ProjectManifestSchema (Phase 2 fields)", () => {
     });
     expect(manifest.storyboardFrames).toEqual([]);
     expect(manifest.prompts).toEqual([]);
+    expect(manifest.assets).toEqual([]);
   });
 
-  it("still validates a manifest saved before Phase 2 (no storyboardFrames/prompts keys at all)", () => {
+  it("still validates a manifest saved before Phase 2 (no storyboardFrames/prompts/assets keys at all)", () => {
     const legacyManifest = {
       formatVersion: 1,
       applicationVersion: "0.1.0-phase1",

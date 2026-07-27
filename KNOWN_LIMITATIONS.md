@@ -1,4 +1,4 @@
-# Known Limitations (Phase 1-2)
+# Known Limitations (Phase 1-3)
 
 ## Database engine: sql.js, not better-sqlite3
 
@@ -22,11 +22,14 @@ need revisiting if the app ever tracked, say, millions of activity-log rows
 without pruning. `ARCHITECTURE.md` documents the swap-back path if a build
 toolchain becomes available and native performance matters.
 
-## No FFmpeg yet
+## FFmpeg is integrated, but only for metadata/preview, not encoding
 
-Nothing in Phase 1 touches media, so there's no FFmpeg integration to speak
-of. The "output format," "aspect ratio," and "frame rate" fields on a
-production's settings are stored but not yet acted on by anything.
+As of Phase 3, FFmpeg is real and working (see FFMPEG_INTEGRATION.md) --
+probing, single-frame thumbnail extraction, and waveform image generation
+all run against the actual bundled binary. What's still missing: any actual
+video **encoding** or transcoding. The "output format," "aspect ratio," and
+"frame rate" fields on a production's settings are stored but not yet acted
+on by anything -- that's Phase 5 (timeline render) and Phase 7 (export).
 
 ## No AI provider code at all
 
@@ -36,11 +39,19 @@ currently has nothing to disable.
 
 ## Nav sidebar still lists some modules that don't work yet
 
-As of Phase 2, Series, Knowledge, Scripts, Storyboards, Prompts, Characters,
-and Brands are real, working screens. Timeline, Assets, Voice, Animation,
+As of Phase 3, Series, Knowledge, Scripts, Storyboards, Prompts, Characters,
+Brands, and Assets are real, working screens. Timeline, Voice, Animation,
 Screen Capture, Audio, Captions, Review, Export, Templates, Providers, and
 Learning Center remain disabled buttons with a tooltip naming the phase they
 arrive in. This is deliberate (see ARCHITECTURE.md), not an oversight.
+
+## Asset Library has no video playback or proxy generation
+
+The Asset Library shows a static thumbnail frame for video assets (and a
+waveform image for audio), not an actual playable preview. Full transport
+controls belong with Phase 5's timeline/preview work, where the same
+playback surface will be reused rather than building a one-off video player
+here first.
 
 ## Script/Storyboard/Prompt views are partial
 
@@ -77,4 +88,9 @@ synthetic mouse/keyboard events (there's no browser-based preview for a
 native Electron window). Mouse-coordinate clicks were flaky here due to a
 window-position/DPI mismatch between screenshots; keyboard navigation
 (Tab/Shift+Tab/Space) proved reliable and was used for the final verified
-run. This is a limitation of the verification environment, not of the app.
+run. Native OS dialogs (the file-open picker) needed their own top-level
+window handle found via `EnumWindows` and targeted directly with
+`SetForegroundWindow` -- sending keys to the main window's handle while a
+native dialog was open let the keystrokes go to whatever window actually
+had focus instead (see IMPLEMENTATION_STATUS.md's Phase 3 notes). This is a
+limitation of the verification environment, not of the app.

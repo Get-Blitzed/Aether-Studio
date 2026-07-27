@@ -3,13 +3,30 @@ import { NavSidebar } from "../components/NavSidebar";
 import { useAppStore } from "../state/appStore";
 import type { AppSettings } from "@aether/shared-types";
 
+interface FfmpegStatus {
+  ffmpegFound: boolean;
+  ffmpegPath: string | null;
+  ffprobeFound: boolean;
+  ffprobePath: string | null;
+  version: string | null;
+}
+
 export function SettingsScreen(): JSX.Element {
   const settings = useAppStore((s) => s.settings);
   const setSettings = useAppStore((s) => s.setSettings);
   const [local, setLocal] = useState<AppSettings | null>(settings);
   const [saved, setSaved] = useState(false);
+  const [ffmpegStatus, setFfmpegStatus] = useState<FfmpegStatus | null>(null);
+  const [checkingFfmpeg, setCheckingFfmpeg] = useState(false);
 
   useEffect(() => setLocal(settings), [settings]);
+
+  async function handleTestFfmpeg() {
+    setCheckingFfmpeg(true);
+    const status = await window.aether.ffmpeg.status();
+    setFfmpegStatus(status);
+    setCheckingFfmpeg(false);
+  }
 
   if (!local) return <div className="p-8 text-cream">Loading...</div>;
 
@@ -92,6 +109,40 @@ export function SettingsScreen(): JSX.Element {
               Work offline (no external provider calls)
             </label>
           </Field>
+
+          <div className="border-t border-white/10 pt-6">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-silver">Advanced</h2>
+
+            <Field
+              label="FFmpeg path override"
+              help="Leave blank to use the bundled FFmpeg. Only set this if you need a specific FFmpeg build."
+            >
+              <input
+                value={local.ffmpegPath ?? ""}
+                onChange={(e) => setLocal({ ...local, ffmpegPath: e.target.value || undefined })}
+                placeholder="(using bundled FFmpeg)"
+                className="w-full rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
+              />
+            </Field>
+
+            <div className="mt-3 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleTestFfmpeg}
+                disabled={checkingFfmpeg}
+                className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-cream hover:bg-white/5 disabled:opacity-50"
+              >
+                {checkingFfmpeg ? "Checking..." : "Test FFmpeg"}
+              </button>
+              {ffmpegStatus && (
+                <span className={`text-xs ${ffmpegStatus.ffmpegFound ? "text-emerald-300" : "text-red-300"}`}>
+                  {ffmpegStatus.ffmpegFound
+                    ? `Found: ${ffmpegStatus.version ?? ffmpegStatus.ffmpegPath}`
+                    : "FFmpeg not found -- video thumbnails and audio waveforms will be unavailable."}
+                </span>
+              )}
+            </div>
+          </div>
 
           <button
             type="button"

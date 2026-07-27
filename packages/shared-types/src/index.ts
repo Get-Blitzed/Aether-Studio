@@ -5,5 +5,6 @@ export * from "./script.js";
 export * from "./storyboard.js";
 export * from "./prompt.js";
 export * from "./series.js";
+export * from "./asset.js";
 export * from "./appSettings.js";
 export * from "./projectManifest.js";

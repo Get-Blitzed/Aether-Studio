@@ -1,8 +1,8 @@
 # Roadmap
 
-Phases 1 (Foundation) and 2 (Preproduction) are complete -- see
-IMPLEMENTATION_STATUS.md. The phases below follow the spec's own phasing
-(section 42) and are not started.
+Phases 1 (Foundation), 2 (Preproduction), and 3 (Media Management) are
+complete -- see IMPLEMENTATION_STATUS.md. The phases below follow the
+spec's own phasing (section 42) and are not started.
 
 ## Phase 2 -- Preproduction: COMPLETE
 
@@ -27,11 +27,25 @@ Workshop -- all built and manually verified against the running app.
   `sourceCitationIds`, but there's no picker to attach them from either
   screen yet).
 
-## Phase 3 -- Media Management
-`packages/media-engine`, Asset Library, media import + metadata, thumbnails,
-waveforms, video preview, proxy generation, missing-media detection, the
-FFmpeg service layer (isolated behind a typed interface, never raw shell
-strings built ad hoc in UI code).
+## Phase 3 -- Media Management: COMPLETE
+
+`packages/media-engine` (real FFmpeg via `ffmpeg-static`/`ffprobe-static`:
+checksum, probe, video thumbnail, audio waveform image), Asset Library
+(import with copy/link modes, duplicate detection, missing-file detection
+and relink, tags/collections/favorites), FFmpeg status surfaced in
+Settings. See FFMPEG_INTEGRATION.md for the full design.
+
+**Deferred out of Phase 3, moved later:**
+- Video **preview playback** in the Asset Library (an actual `<video>`
+  scrubber) -- current preview is a static thumbnail frame only.
+- Proxy (lower-resolution) generation for smoother timeline editing --
+  waits until Phase 5 actually has a timeline to serve proxies to.
+- A background-job queue with progress/cancel UI -- not needed yet because
+  every Phase 3 operation (checksum, probe, single-frame extraction)
+  completes in well under a second per file; revisit once Phase 5/7 export
+  operations are slow enough to need one.
+- Asset versioning (spec section 15 mentions it) -- no UI or schema support
+  yet beyond the single current file per asset.
 
 ## Phase 4 -- Audio and Screen Capture
 Voice Studio (takes, trim, normalize), Screen Capture Studio (privacy

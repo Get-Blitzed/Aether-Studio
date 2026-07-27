@@ -17,7 +17,7 @@ const NAV_ITEMS: NavItemDef[] = [
   { label: "Timeline", disabledReason: "Timeline Editor arrives in Phase 5." },
   { label: "Characters", path: "/characters" },
   { label: "Brands", path: "/brands" },
-  { label: "Assets", disabledReason: "Asset Library arrives in Phase 3." },
+  { label: "Assets", path: "/assets" },
   { label: "Voice", disabledReason: "Voice Studio arrives in Phase 4." },
   { label: "Animation", disabledReason: "Animation & Shot Lab arrives in Phase 6." },
   { label: "Screen Capture", disabledReason: "Screen Capture Studio arrives in Phase 4." },

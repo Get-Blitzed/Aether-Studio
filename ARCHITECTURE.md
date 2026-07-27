@@ -110,6 +110,18 @@ with a standard set of subdirectories and a `project.aether` JSON manifest,
 written atomically (temp file + rename) and snapshotted to `/backups` before
 every save.
 
+## Key decision: media processing isolated in packages/media-engine
+
+Every FFmpeg/ffprobe interaction (probing, thumbnail extraction, waveform
+image generation) lives behind `packages/media-engine`'s typed function
+exports -- nothing else in the codebase builds an FFmpeg argument list or
+spawns that process directly. `runProcess()` always uses
+`child_process.execFile` with an argument array, never a shell string, so
+no filename or user input can be reinterpreted as shell syntax regardless
+of its content. See [FFMPEG_INTEGRATION.md](FFMPEG_INTEGRATION.md) for the
+full design, including how the `ffmpeg-static`/`ffprobe-static` binaries are
+located and what happens when FFmpeg genuinely isn't available.
+
 ## Process boundaries
 
 - **Renderer**: `contextIsolation: true`, `nodeIntegration: false`, `sandbox:

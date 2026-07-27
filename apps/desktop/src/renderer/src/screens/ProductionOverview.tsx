@@ -60,7 +60,7 @@ export function ProductionOverview(): JSX.Element {
     await window.aether.shell.openPath(currentProjectDir!);
   }
 
-  const { productionSettings, characters, brands, scripts } = currentManifest;
+  const { productionSettings, characters, brands, scripts, assets } = currentManifest;
 
   return (
     <div className="flex h-screen bg-navy">
@@ -105,10 +105,11 @@ export function ProductionOverview(): JSX.Element {
           </div>
         )}
 
-        <section className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <section className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-5">
           <StatCard label="Characters" value={characters.length} onClick={() => navigate("/characters")} />
           <StatCard label="Brands" value={brands.length} onClick={() => navigate("/brands")} />
           <StatCard label="Scripts" value={scripts.length} onClick={() => navigate("/scripts")} />
+          <StatCard label="Assets" value={assets.length} onClick={() => navigate("/assets")} />
           <StatCard label="Backups" value={backups.length} />
         </section>
 
@@ -121,6 +122,7 @@ export function ProductionOverview(): JSX.Element {
             { label: "Knowledge Library", path: "/knowledge" },
             { label: "Prompt Workshop", path: "/prompts" },
             { label: "Series Planner", path: "/series" },
+            { label: "Asset Library", path: "/assets" },
           ].map((link) => (
             <button
               key={link.path}

@@ -5,6 +5,7 @@ import { BrandSchema } from "./brand.js";
 import { ScriptSchema } from "./script.js";
 import { StoryboardFrameSchema } from "./storyboard.js";
 import { PromptSchema } from "./prompt.js";
+import { AssetSchema } from "./asset.js";
 
 export const AETHER_PROJECT_FORMAT_VERSION = 1;
 
@@ -75,6 +76,7 @@ export const ProjectManifestSchema = z.object({
   scripts: z.array(ScriptSchema).default([]),
   storyboardFrames: z.array(StoryboardFrameSchema).default([]),
   prompts: z.array(PromptSchema).default([]),
+  assets: z.array(AssetSchema).default([]),
   tasks: z.array(TaskItemSchema).default([]),
   providerReferences: z.array(z.string()).default([]),
 });

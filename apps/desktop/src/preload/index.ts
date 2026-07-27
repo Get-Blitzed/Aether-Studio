@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { AppSettings, ProductionSettings, ProjectManifest, SeriesPlan } from "@aether/shared-types";
+import type { AppSettings, Asset, AssetCategory, ProductionSettings, ProjectManifest, SeriesPlan } from "@aether/shared-types";
 
 export interface AppErrorPayload {
   title: string;
@@ -55,6 +55,38 @@ const api = {
       >,
     remove: (id: string) =>
       ipcRenderer.invoke("series:remove", id) as Promise<{ ok: true } | { ok: false; error?: AppErrorPayload }>,
+  },
+
+  assets: {
+    chooseFiles: () => ipcRenderer.invoke("assets:choose-files") as Promise<string[] | null>,
+    import: (args: { projectDir: string; filePaths: string[]; category: AssetCategory; storageMode: "managed" | "linked" }) =>
+      ipcRenderer.invoke("assets:import", args) as Promise<
+        | { ok: true; manifest: ProjectManifest; added: number; duplicates: Array<{ fileName: string; existingAssetId: string }> }
+        | { ok: false; error?: AppErrorPayload }
+      >,
+    checkMissing: (projectDir: string) =>
+      ipcRenderer.invoke("assets:check-missing", projectDir) as Promise<
+        { ok: true; missingIds: string[] } | { ok: false; error?: AppErrorPayload }
+      >,
+    relink: (projectDir: string, assetId: string) =>
+      ipcRenderer.invoke("assets:relink", projectDir, assetId) as Promise<ProjectResult & { canceled?: boolean }>,
+    remove: (projectDir: string, assetId: string) =>
+      ipcRenderer.invoke("assets:remove", projectDir, assetId) as Promise<ProjectResult>,
+    updateMetadata: (projectDir: string, assetId: string, patch: Partial<Asset>) =>
+      ipcRenderer.invoke("assets:update-metadata", projectDir, assetId, patch) as Promise<ProjectResult>,
+    reveal: (projectDir: string, assetId: string) =>
+      ipcRenderer.invoke("assets:reveal", projectDir, assetId) as Promise<{ ok: boolean; error?: AppErrorPayload }>,
+  },
+
+  ffmpeg: {
+    status: () =>
+      ipcRenderer.invoke("ffmpeg:status") as Promise<{
+        ffmpegFound: boolean;
+        ffmpegPath: string | null;
+        ffprobeFound: boolean;
+        ffprobePath: string | null;
+        version: string | null;
+      }>,
   },
 
   shell: {
