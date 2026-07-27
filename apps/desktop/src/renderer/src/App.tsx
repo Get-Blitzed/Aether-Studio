@@ -1,0 +1,34 @@
+import { HashRouter, Routes, Route } from "react-router-dom";
+import { Splash } from "./screens/Splash";
+import { Onboarding } from "./screens/Onboarding";
+import { Home } from "./screens/Home";
+import { ProductionOverview } from "./screens/ProductionOverview";
+import { SettingsScreen } from "./screens/SettingsScreen";
+import { SeriesPlanner } from "./screens/SeriesPlanner";
+import { BrandStudio } from "./screens/BrandStudio";
+import { CharacterStudio } from "./screens/CharacterStudio";
+import { KnowledgeLibrary } from "./screens/KnowledgeLibrary";
+import { ScriptStudio } from "./screens/ScriptStudio";
+import { StoryboardStudio } from "./screens/StoryboardStudio";
+import { PromptWorkshop } from "./screens/PromptWorkshop";
+
+export function App(): JSX.Element {
+  return (
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<Splash />} />
+        <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/production" element={<ProductionOverview />} />
+        <Route path="/series" element={<SeriesPlanner />} />
+        <Route path="/brands" element={<BrandStudio />} />
+        <Route path="/characters" element={<CharacterStudio />} />
+        <Route path="/knowledge" element={<KnowledgeLibrary />} />
+        <Route path="/scripts" element={<ScriptStudio />} />
+        <Route path="/storyboards" element={<StoryboardStudio />} />
+        <Route path="/prompts" element={<PromptWorkshop />} />
+        <Route path="/settings" element={<SettingsScreen />} />
+      </Routes>
+    </HashRouter>
+  );
+}

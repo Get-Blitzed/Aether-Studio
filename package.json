@@ -1,0 +1,24 @@
+{
+  "name": "aether-studio-suite",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Aether Studio Suite - AI-assisted production system for animated product-training videos.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@aether/desktop",
+    "build": "npm run build --workspaces --if-present",
+    "test": "vitest run",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "vitest": "^2.1.9"
+  }
+}

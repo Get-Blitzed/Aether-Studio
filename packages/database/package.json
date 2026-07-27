@@ -1,0 +1,21 @@
+{
+  "name": "@aether/database",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aether/core": "*",
+    "@aether/shared-types": "*",
+    "sql.js": "^1.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "@types/sql.js": "^1.4.11",
+    "typescript": "^5.5.4"
+  }
+}

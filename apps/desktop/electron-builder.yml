@@ -1,0 +1,24 @@
+appId: com.aetherstudiosuite.desktop
+productName: Aether Studio Suite
+directories:
+  output: ../../release
+  buildResources: build
+files:
+  - out/**/*
+  - package.json
+extraResources:
+  - from: ../../resources
+    to: resources
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: Aether-Studio-Suite-Setup.exe
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Aether Studio Suite
+asar: true

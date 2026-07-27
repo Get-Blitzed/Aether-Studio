@@ -1,0 +1,13 @@
+node_modules/
+dist/
+dist-electron/
+release/
+*.log
+.DS_Store
+Thumbs.db
+/apps/desktop/dist/
+/apps/desktop/dist-electron/
+/apps/desktop/out/
+/packages/*/dist/
+.aether-cache/
+*.tsbuildinfo

@@ -1,0 +1,50 @@
+import { z } from "zod";
+
+export const ShotTypeSchema = z.enum([
+  "extreme-wide",
+  "wide",
+  "full-body",
+  "medium",
+  "medium-close-up",
+  "close-up",
+  "extreme-close-up",
+  "over-the-shoulder",
+  "point-of-view",
+  "screen-insert",
+  "interface-close-up",
+  "product-demonstration",
+  "split-screen",
+  "montage",
+  "title-card",
+  "end-card",
+]);
+export type ShotType = z.infer<typeof ShotTypeSchema>;
+
+export const StoryboardFrameSchema = z.object({
+  id: z.string(),
+  sceneNumber: z.number(),
+  shotNumber: z.number(),
+  thumbnailPath: z.string().optional(),
+  sceneDescription: z.string().optional(),
+  shotType: ShotTypeSchema.default("medium"),
+  composition: z.string().optional(),
+  cameraAngle: z.string().optional(),
+  lensSuggestion: z.string().optional(),
+  cameraMovement: z.string().optional(),
+  characterPlacement: z.string().optional(),
+  background: z.string().optional(),
+  lighting: z.string().optional(),
+  props: z.array(z.string()).default([]),
+  interfaceElements: z.array(z.string()).default([]),
+  animationNotes: z.string().optional(),
+  transition: z.string().optional(),
+  durationSeconds: z.number().optional(),
+  linkedScriptSegmentId: z.string().optional(),
+  generationPrompt: z.string().optional(),
+  negativePrompt: z.string().optional(),
+  continuityNotes: z.string().optional(),
+  productionStatus: z.enum(["draft", "in-progress", "approved"]).default("draft"),
+  createdAt: z.string(),
+  modifiedAt: z.string(),
+});
+export type StoryboardFrame = z.infer<typeof StoryboardFrameSchema>;
