@@ -1,4 +1,4 @@
-# Known Limitations (Phase 1-5)
+# Known Limitations (Phase 1-6)
 
 ## Database engine: sql.js, not better-sqlite3
 
@@ -75,19 +75,55 @@ silently falls back to video-only (plus microphone, if enabled) --
 surfaced to the user via the saved recording's notes field, not a
 blocking error.
 
-## No AI provider code at all
+## No real AI provider has been exercised end-to-end
 
-Zero network calls exist in this codebase. "Offline mode" exists as a
-Settings toggle because the schema was designed for Phase 6 up front, but it
-currently has nothing to disable.
+`OpenAiCompatibleProvider` and `GenericRestProvider` (Phase 6) are real
+`fetch`-based HTTP clients, not stubs, and offline mode now genuinely gates
+every call either of them would make -- but there are no API credentials
+available in this development environment, so neither has actually talked
+to a live server. Only their config-validation error paths (missing API
+key, missing base URL) are unit-tested. The `MockProvider` is fully
+exercised (including its real ffmpeg-rendered image output), since it's
+the only provider kind designed to need no credentials at all.
+
+## AI-assist actions are wired into three buttons, not every screen
+
+Script Studio (Generate Outline, Improve Hook) and Storyboard Studio
+(Generate Frame Image) call into the Phase 6 provider layer; Prompt
+Workshop, Character Studio, Knowledge Library, and other screens named in
+the spec as candidates for AI assistance do not have equivalent buttons
+yet. The provider layer itself is generic (any screen could call
+`window.aether.providers.runJob()` with its own job type and structured
+prompt), so adding more is a UI-wiring exercise per screen, not a new
+architecture.
+
+## Providers are global, not gated per project
+
+`ProviderConfig` records live in the app database (like series plans),
+not inside any single project's `project.aether`. The manifest's
+`providerReferences: string[]` field (present since Phase 1, always empty)
+was designed for a project to opt into a subset of configured providers,
+but that gating was not implemented this phase -- every enabled provider
+is available to every open project.
+
+## No real plugin loader
+
+`packages/plugin-sdk` defines and validates the manifest shape a plugin
+must have (id, version, capabilities, entry point) but there is no code to
+discover, load, sandbox, or execute a third-party plugin's actual logic.
+This is deliberate -- loading and running arbitrary third-party code is a
+significant security surface that deserves its own design pass, not
+something to open casually while building the provider abstraction it
+would eventually plug into.
 
 ## Nav sidebar still lists some modules that don't work yet
 
-As of Phase 5, Series, Knowledge, Scripts, Storyboards, Prompts, Characters,
-Brands, Assets, Voice, Screen Capture, Timeline, Audio, and Captions are
-real, working screens. Animation, Review, Export, Templates, Providers, and
-Learning Center remain disabled buttons with a tooltip naming the phase they
-arrive in. This is deliberate (see ARCHITECTURE.md), not an oversight.
+As of Phase 6, Series, Knowledge, Scripts, Storyboards, Prompts, Characters,
+Brands, Assets, Voice, Screen Capture, Timeline, Audio, Captions, and
+Providers are real, working screens. Animation, Review, Export, Templates,
+and Learning Center remain disabled buttons with a tooltip naming the phase
+they arrive in (or, for Animation, no scheduled phase yet). This is
+deliberate (see ARCHITECTURE.md), not an oversight.
 
 ## Asset Library has no video playback or proxy generation
 
@@ -197,3 +233,17 @@ automation here, to avoid repeating the same failure mode.
   Opening Chromium DevTools (`Ctrl+Shift+I`) and checking whether a button's
   own text changed (e.g. to "Rendering...") was a more reliable way to
   confirm a click actually registered than screenshots alone.
+- **A single Alt-key press before `SetForegroundWindow` made it noticeably
+  more reliable** (found in Phase 6): Windows enforces a "foreground lock"
+  that can silently ignore `SetForegroundWindow` calls from a background
+  process, and confirming the actual foreground window via
+  `GetForegroundWindow()` sometimes showed this session's own Claude desktop
+  app still in front even after the call. Sending a bare Alt keypress
+  (`SendKeys::SendWait("%")`) immediately before `ShowWindow`/
+  `SetForegroundWindow` is a well-known workaround for this specific Windows
+  behavior and resolved it when a plain `SetForegroundWindow` call alone did
+  not. Even so, one screen region proved persistently unreachable this phase
+  (see IMPLEMENTATION_STATUS.md's Phase 6 notes on the offline-mode gate) --
+  when a specific coordinate keeps failing after several refocus retries, it
+  is often faster to rely on the equivalent unit test than to keep fighting
+  the click.

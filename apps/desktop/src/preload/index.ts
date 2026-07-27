@@ -1,5 +1,14 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { AppSettings, Asset, AssetCategory, ProductionSettings, ProjectManifest, SeriesPlan } from "@aether/shared-types";
+import type {
+  AppSettings,
+  Asset,
+  AssetCategory,
+  BackgroundJob,
+  ProductionSettings,
+  ProjectManifest,
+  ProviderConfig,
+  SeriesPlan,
+} from "@aether/shared-types";
 
 type AudioExportFormat = "wav" | "mp3";
 
@@ -145,6 +154,32 @@ const api = {
     import: (projectDir: string) =>
       ipcRenderer.invoke("captions:import", projectDir) as Promise<
         (ProjectResult & { canceled?: boolean; imported?: number })
+      >,
+  },
+
+  providers: {
+    list: () => ipcRenderer.invoke("providers:list") as Promise<ProviderConfig[]>,
+    listJobs: () => ipcRenderer.invoke("providers:list-jobs") as Promise<BackgroundJob[]>,
+    save: (args: { config: Omit<ProviderConfig, "hasSecret">; secret?: string }) =>
+      ipcRenderer.invoke("providers:save", args) as Promise<
+        { ok: true; config: ProviderConfig } | { ok: false; error?: AppErrorPayload }
+      >,
+    remove: (id: string) => ipcRenderer.invoke("providers:remove", id) as Promise<{ ok: boolean; error?: AppErrorPayload }>,
+    test: (id: string) =>
+      ipcRenderer.invoke("providers:test", id) as Promise<
+        { ok: true; result: { ok: boolean; message: string } } | { ok: false; error?: AppErrorPayload }
+      >,
+    runJob: (args: {
+      jobType: string;
+      providerId: string;
+      input: Record<string, string | number | undefined>;
+      projectDir?: string;
+      imageWidth?: number;
+      imageHeight?: number;
+    }) =>
+      ipcRenderer.invoke("providers:run-job", args) as Promise<
+        | { ok: true; job: BackgroundJob; text?: string; asset?: Asset; imagePath?: string; manifest?: ProjectManifest }
+        | { ok: false; error?: AppErrorPayload; job?: BackgroundJob }
       >,
   },
 

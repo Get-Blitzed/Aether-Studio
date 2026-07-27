@@ -8,9 +8,11 @@ import type { Plugin } from "vite";
 // step of their own), so they must be bundled -- not externalized -- into
 // the main/preload output, or Node tries to `require()` raw .ts/ESM syntax.
 const workspacePackages = [
+  "@aether/ai-providers",
   "@aether/core",
   "@aether/database",
   "@aether/media-engine",
+  "@aether/plugin-sdk",
   "@aether/project-engine",
   "@aether/shared-types",
 ];

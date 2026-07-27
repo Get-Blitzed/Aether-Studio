@@ -11,4 +11,6 @@ export * from "./timeline.js";
 export * from "./overlay.js";
 export * from "./caption.js";
 export * from "./appSettings.js";
+export * from "./providerConfig.js";
+export * from "./backgroundJob.js";
 export * from "./projectManifest.js";

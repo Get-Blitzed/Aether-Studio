@@ -17,6 +17,10 @@ export function ScriptStudio(): JSX.Element {
   const updateAndSave = useAppStore((s) => s.updateAndSave);
   const isSaving = useAppStore((s) => s.isSaving);
   const [selectedId, setSelectedId] = useState<string | null>(currentManifest?.scripts[0]?.id ?? null);
+  const [outlineSceneCount, setOutlineSceneCount] = useState(5);
+  const [generatingOutline, setGeneratingOutline] = useState(false);
+  const [aiNotice, setAiNotice] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   if (!currentManifest) return <NoProjectOpen what="scripts" />;
 
@@ -77,6 +81,51 @@ export function ScriptStudio(): JSX.Element {
       .filter((s) => s.id !== segId)
       .map((s, i) => ({ ...s, sceneNumber: i + 1 }));
     void updateScript({ segments });
+  }
+
+  async function handleGenerateOutline() {
+    if (!selected) return;
+    setGeneratingOutline(true);
+    setAiNotice(null);
+    setAiError(null);
+    const providers = await window.aether.providers.list();
+    const candidates = providers.filter((p) => p.capability === "text" && p.enabled);
+    const provider = candidates.find((p) => p.isDefaultForCapability) ?? candidates[0];
+    if (!provider) {
+      setGeneratingOutline(false);
+      setAiError("No text provider configured. Add one in the Provider & Plugin Manager (a Mock provider works offline).");
+      return;
+    }
+    const result = await window.aether.providers.runJob({
+      jobType: "outline",
+      providerId: provider.id,
+      input: { title: selected.title, scene_count: outlineSceneCount },
+    });
+    setGeneratingOutline(false);
+    if (!result.ok || !result.text) {
+      setAiError(!result.ok ? result.error?.detail ?? "Generation failed." : "Provider returned no text.");
+      return;
+    }
+    const newSegments: ScriptSegment[] = result.text
+      .split("\n")
+      .map((line) => line.split("|"))
+      .filter((parts): parts is [string, string] => parts.length === 2)
+      .map(([role, narration], i) => ({
+        id: generateId("seg"),
+        sceneNumber: selected.segments.length + i + 1,
+        sceneTitle: role.trim(),
+        narration: narration.trim(),
+        soundEffects: [],
+        sourceCitationIds: [],
+        unverifiedClaim: false,
+        approvalStatus: "draft" as const,
+      }));
+    if (newSegments.length === 0) {
+      setAiError("Could not parse the provider's response into scenes.");
+      return;
+    }
+    await updateScript({ segments: [...selected.segments, ...newSegments] });
+    setAiNotice(`Added ${newSegments.length} scene${newSegments.length === 1 ? "" : "s"} from ${provider.name} (${provider.kind}).`);
   }
 
   function moveSegment(index: number, direction: -1 | 1) {
@@ -171,16 +220,39 @@ export function ScriptStudio(): JSX.Element {
                 <ScriptStats script={selected} />
               </div>
 
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="font-medium text-cream">Scenes ({selected.segments.length})</h2>
-                <button
-                  type="button"
-                  onClick={addSegment}
-                  className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-cream hover:bg-white/5"
-                >
-                  + Add Scene
-                </button>
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-1 text-xs text-silver">
+                    Scenes to generate
+                    <input
+                      type="number"
+                      min={1}
+                      max={20}
+                      value={outlineSceneCount}
+                      onChange={(e) => setOutlineSceneCount(Number(e.target.value) || 5)}
+                      className="w-14 rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleGenerateOutline}
+                    disabled={generatingOutline}
+                    className="rounded-md border border-electric-blue/50 px-3 py-1.5 text-xs text-electric-blue hover:bg-electric-blue/10 disabled:opacity-50"
+                  >
+                    {generatingOutline ? "Generating..." : "Generate Outline (AI)"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={addSegment}
+                    className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-cream hover:bg-white/5"
+                  >
+                    + Add Scene
+                  </button>
+                </div>
               </div>
+              {aiNotice && <p className="text-xs text-emerald-300">{aiNotice}</p>}
+              {aiError && <p className="text-xs text-red-300">{aiError}</p>}
 
               <div className="space-y-3">
                 {selected.segments.map((seg, index) => (
@@ -245,6 +317,37 @@ function SegmentCard({
   onMove: (dir: -1 | 1) => void;
 }): JSX.Element {
   const words = countWords(segment.narration);
+  const [improving, setImproving] = useState(false);
+  const [improveError, setImproveError] = useState<string | null>(null);
+
+  async function handleImproveHook() {
+    if (!segment.narration?.trim()) {
+      setImproveError("Add narration text first.");
+      return;
+    }
+    setImproving(true);
+    setImproveError(null);
+    const providers = await window.aether.providers.list();
+    const candidates = providers.filter((p) => p.capability === "text" && p.enabled);
+    const provider = candidates.find((p) => p.isDefaultForCapability) ?? candidates[0];
+    if (!provider) {
+      setImproving(false);
+      setImproveError("No text provider configured.");
+      return;
+    }
+    const result = await window.aether.providers.runJob({
+      jobType: "improve-hook",
+      providerId: provider.id,
+      input: { current: segment.narration },
+    });
+    setImproving(false);
+    if (!result.ok || !result.text) {
+      setImproveError(!result.ok ? result.error?.detail ?? "Generation failed." : "Provider returned no text.");
+      return;
+    }
+    onChange({ narration: result.text });
+  }
+
   return (
     <div className={`rounded-lg border p-4 ${segment.unverifiedClaim ? "border-bronze/50 bg-bronze/5" : "border-white/10 bg-charcoal"}`}>
       <div className="mb-2 flex items-start justify-between gap-3">
@@ -278,8 +381,19 @@ function SegmentCard({
         onChange={(e) => onChange({ narration: e.target.value })}
         placeholder="Narration"
         rows={2}
-        className="mb-2 w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+        className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
       />
+      <div className="mb-2 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={handleImproveHook}
+          disabled={improving}
+          className="rounded border border-electric-blue/50 px-2 py-1 text-xs text-electric-blue hover:bg-electric-blue/10 disabled:opacity-50"
+        >
+          {improving ? "Improving..." : "Improve Hook (AI)"}
+        </button>
+        {improveError && <span className="text-xs text-red-300">{improveError}</span>}
+      </div>
       <div className="mb-2 grid grid-cols-2 gap-2">
         <input
           value={segment.onScreenAction ?? ""}

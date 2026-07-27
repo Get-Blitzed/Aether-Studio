@@ -1,9 +1,9 @@
 # Roadmap
 
 Phases 1 (Foundation), 2 (Preproduction), 3 (Media Management), 4
-(Audio and Screen Capture), and 5 (Timeline and Graphics) are complete --
-see IMPLEMENTATION_STATUS.md. The phases below follow the spec's own
-phasing (section 42) and are not started.
+(Audio and Screen Capture), 5 (Timeline and Graphics), and 6 (AI Providers)
+are complete -- see IMPLEMENTATION_STATUS.md. The phases below follow the
+spec's own phasing (section 42) and are not started.
 
 ## Phase 2 -- Preproduction: COMPLETE
 
@@ -108,12 +108,42 @@ hand-written SRT/VTT export/import).
   animation on overlays -- overlays currently support only fixed position +
   a single entry animation (fade/slide), no keyframing.
 
-## Phase 6 -- AI Providers
-`packages/ai-providers`, `packages/plugin-sdk`, Windows credential-store
-integration for secrets, mock providers for tests, OpenAI-compatible +
-generic REST adapters, background job queue, usage/cost estimate surfacing.
-Offline mode (already a Settings field in Phase 1) must actually gate every
-network call once there is a network call to gate.
+## Phase 6 -- AI Providers: COMPLETE
+
+`packages/ai-providers` (provider interface, `MockProvider` with real
+deterministic text templates and ffmpeg-rendered placeholder images,
+`OpenAiCompatibleProvider` and `GenericRestProvider` real `fetch`-based
+adapters, offline-mode gate), `packages/plugin-sdk` (manifest schema +
+validator, no runtime loader yet), Electron `safeStorage`-based secret
+storage (DPAPI-backed, no native credential-manager module), the Provider &
+Plugin Manager screen (CRUD, test connection, usage/cost estimate
+surfacing via a background-jobs list), and AI-assist wiring into Script
+Studio (Generate Outline, Improve Hook) and Storyboard Studio (Generate
+Frame Image). Offline mode (a Settings field since Phase 1) now actually
+gates every provider call that isn't the mock kind.
+
+**Deferred out of Phase 6, moved later:**
+- No real network provider has been exercised end-to-end -- there are no
+  API credentials available in this development environment.
+  `OpenAiCompatibleProvider`/`GenericRestProvider` are real HTTP clients,
+  not stubs, but only their config-validation paths are tested.
+- Per-project provider gating -- the manifest's `providerReferences: string[]`
+  field (present since Phase 1, always empty) was not wired up; every
+  enabled global provider is available to every project.
+- A real plugin loader -- `packages/plugin-sdk` defines and validates the
+  manifest contract a plugin must satisfy, but there is no mechanism to
+  discover, load, or execute third-party plugin code yet (a real security
+  surface deliberately not opened this phase).
+- AI-assist actions beyond the three wired this phase (generate storyboard
+  image, generate outline, improve hook) -- e.g. generate/critique prompts
+  in Prompt Workshop, suggest character bios, auto-tag knowledge sources --
+  are not built; the provider layer supports them, but adding UI buttons
+  for every action named across the spec would be its own multi-session
+  effort.
+- A visible per-job progress bar / cancel button -- jobs run synchronously
+  from the renderer's perspective (the mock provider completes in
+  well under a second; a real network call could take much longer) and are
+  only recorded, not streamed, to the Recent Jobs list.
 
 ## Phase 7 -- Review and Export
 `packages/export-engine`, review/approval workflow, the full Quality-Control

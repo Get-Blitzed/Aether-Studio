@@ -11,6 +11,8 @@ import { registerVoiceIpc } from "./ipc/voiceIpc.js";
 import { registerScreenCaptureIpc } from "./ipc/screenCaptureIpc.js";
 import { registerTimelineIpc } from "./ipc/timelineIpc.js";
 import { registerCaptionsIpc } from "./ipc/captionsIpc.js";
+import { registerProvidersIpc } from "./ipc/providersIpc.js";
+import { createSecretsStore } from "./secretsStore.js";
 
 const isDev = !app.isPackaged;
 
@@ -103,6 +105,12 @@ app.whenReady().then(async () => {
     registerCaptionsIpc({
       logger,
       getWindow: () => mainWindow,
+    });
+    registerProvidersIpc({
+      db: database,
+      settingsRepo: new SettingsRepository(database),
+      secretsStore: createSecretsStore(logger),
+      logger,
     });
   }
 

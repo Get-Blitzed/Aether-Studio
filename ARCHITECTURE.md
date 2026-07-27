@@ -6,7 +6,7 @@
 flowchart TB
     subgraph Renderer["Renderer (React, sandboxed)"]
         UI[Screens: Splash, Onboarding, Home, ProductionOverview, Settings, ...,
-TimelineEditor, CaptionStudio]
+TimelineEditor, CaptionStudio, ProvidersScreen]
         Store[Zustand app store]
     end
 
@@ -26,6 +26,8 @@ TimelineEditor, CaptionStudio]
         DB["@aether/database: SQLite (sql.js) + migrations"]
         Engine["@aether/project-engine: .aether format"]
         Media["@aether/media-engine: FFmpeg ops + concatVideoClips"]
+        AI["@aether/ai-providers: provider interface + Mock/OpenAI/REST adapters"]
+        Plugin["@aether/plugin-sdk: plugin manifest schema"]
     end
 
     UI --> Store --> Bridge --> IPC
@@ -49,7 +51,7 @@ stack minus FFmpeg (deferred to Phase 3, where it's actually exercised).
   plain `electron` + hand-rolled Vite config does not.
 - **npm workspaces monorepo**: `apps/desktop` + `packages/*`, matching the
   spec's package boundaries (core, database, project-engine, shared-types,
-  and media-engine today; export-engine, ai-providers, plugin-sdk, security,
+  media-engine, ai-providers, and plugin-sdk today; export-engine, security,
   testing arrive with the phases that need them -- see
   [ROADMAP.md](ROADMAP.md). A dedicated `timeline-engine` package named in
   the original roadmap turned out not to be needed -- Phase 5's timeline
@@ -175,6 +177,29 @@ same pattern Phase 1 already established for `character_library` and
 still unused by any screen -- promoting a project-local character/brand to
 that shared library is a natural Phase 3+ extension of the same pattern).
 
+Phase 6's `provider_configurations` and `background_jobs` tables follow the
+identical pattern for the same reason: an AI provider you've configured
+(and paid for) is a property of your whole installation, not of any one
+production, so it belongs in the app database rather than duplicated (or
+worse, its API key duplicated) across every `project.aether` a user
+creates.
+
+## Key decision: provider secrets never leave the main process in plaintext
+
+`ProviderConfigRepository` stores only ciphertext (base64 of Electron
+`safeStorage.encryptString()`'s output) in `provider_configurations.encrypted_secret`
+-- it has no encrypt/decrypt methods of its own, by design, so there is no
+code path in that class that could accidentally persist or return a
+plaintext secret. `apps/desktop/src/main/secretsStore.ts` is the only place
+encryption/decryption happens. The renderer's `ProviderConfig` type (what
+`providers:list` returns) has no secret field at all, only a `hasSecret`
+boolean -- a provider's API key is write-only from the renderer's
+perspective: you can set it or clear it when saving a config, but the
+renderer can never read one back. `@aether/ai-providers`'s provider
+implementations receive an already-decrypted secret string as a
+constructor argument from the IPC handler; they never touch the database
+or `safeStorage` themselves.
+
 ## Key decision: the timeline's playback clock is wall-clock, not frame-locked
 
 `TimelineEditor.tsx` drives `playheadSeconds` from a `requestAnimationFrame`
@@ -192,21 +217,31 @@ frame-accurate. See KNOWN_LIMITATIONS.md.
 - No delivery-quality project export encoding (Phase 7) -- Phase 5's
   `concatVideoClips()` produces a video-only quick preview render for
   confirming a timeline edit, not the final export pipeline.
-- No AI provider calls of any kind (Phase 6). There is no network code in
-  this codebase at all yet -- Prompt Workshop stores and assembles prompt
-  text for you to paste elsewhere, it doesn't call anything. Voice cloning
-  in particular is not built at all, by design (see KNOWN_LIMITATIONS.md).
+- No real AI provider has been exercised against a live network endpoint
+  (Phase 6's `OpenAiCompatibleProvider`/`GenericRestProvider` are real
+  clients, not stubs, but there are no API credentials in this
+  environment). Voice cloning in particular is not built at all, by design
+  (see KNOWN_LIMITATIONS.md).
+- No real plugin loader -- `@aether/plugin-sdk` validates the manifest
+  contract a plugin must satisfy but does not discover, load, or execute
+  third-party plugin code; that's a deliberately separate, later effort
+  given the security surface involved.
+- AI-assist actions exist for exactly three buttons (Script Studio's
+  Generate Outline/Improve Hook, Storyboard Studio's Generate Frame Image)
+  -- the provider layer is generic enough to support more, but wiring every
+  AI-assist action named across the spec into every screen is future work.
 - No animation generation, no OS-level input-hook overlays (click
   indicators, keystroke display) during screen capture, no dedicated Audio
   Mixer screen (audio tracks live inside the Timeline Editor instead), no
   drag-and-drop clip editing (numeric controls only, see
   KNOWN_LIMITATIONS.md).
 - The persistent nav sidebar lists all the modules from the spec. As of
-  Phase 5, Home, Settings, Series, Knowledge, Scripts, Storyboards, Prompts,
-  Characters, Brands, Assets, Voice, Screen Capture, Timeline, Audio, and
-  Captions are wired up; the remaining items (Animation, Review, Export,
-  Templates, Providers, Learning Center) are disabled buttons with a tooltip
-  naming the phase they arrive in. This is intentional -- see spec section 44
-  ("prepare clean interfaces for future expansion without filling the
-  interface with nonfunctional placeholders"); a full click-through
-  experience for unbuilt modules would be exactly that kind of placeholder.
+  Phase 6, Home, Settings, Series, Knowledge, Scripts, Storyboards, Prompts,
+  Characters, Brands, Assets, Voice, Screen Capture, Timeline, Audio,
+  Captions, and Providers are wired up; the remaining items (Animation,
+  Review, Export, Templates, Learning Center) are disabled buttons with a
+  tooltip naming the phase they arrive in. This is intentional -- see spec
+  section 44 ("prepare clean interfaces for future expansion without
+  filling the interface with nonfunctional placeholders"); a full
+  click-through experience for unbuilt modules would be exactly that kind
+  of placeholder.

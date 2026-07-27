@@ -11,6 +11,8 @@ import {
   TimelineClipSchema,
   OverlayTemplateSchema,
   CaptionSchema,
+  ProviderConfigSchema,
+  BackgroundJobSchema,
   ProjectManifestSchema,
 } from "./index.js";
 
@@ -254,6 +256,61 @@ describe("CaptionSchema", () => {
       modifiedAt: "2026-01-01T00:00:00.000Z",
     });
     expect(caption.isSoundDescription).toBe(false);
+  });
+});
+
+describe("ProviderConfigSchema", () => {
+  it("fills in defaults for a minimal mock text provider", () => {
+    const config = ProviderConfigSchema.parse({
+      id: "provider_1",
+      name: "Local Mock",
+      kind: "mock",
+      capability: "text",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      modifiedAt: "2026-01-01T00:00:00.000Z",
+    });
+    expect(config.enabled).toBe(true);
+    expect(config.isDefaultForCapability).toBe(false);
+    expect(config.hasSecret).toBe(false);
+  });
+
+  it("rejects an invalid provider kind", () => {
+    expect(() =>
+      ProviderConfigSchema.parse({
+        id: "provider_1",
+        name: "X",
+        kind: "not-a-real-kind",
+        capability: "text",
+        createdAt: "2026-01-01T00:00:00.000Z",
+        modifiedAt: "2026-01-01T00:00:00.000Z",
+      }),
+    ).toThrow();
+  });
+});
+
+describe("BackgroundJobSchema", () => {
+  it("fills in defaults for a minimal job", () => {
+    const job = BackgroundJobSchema.parse({
+      id: "job_1",
+      jobType: "generate-outline",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    });
+    expect(job.status).toBe("queued");
+    expect(job.progress).toBe(0);
+  });
+
+  it("validates a completed job with usage", () => {
+    const job = BackgroundJobSchema.parse({
+      id: "job_1",
+      jobType: "generate-outline",
+      status: "completed",
+      progress: 1,
+      usage: { promptTokens: 42, completionTokens: 128, estimatedCostUsd: 0.002 },
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    });
+    expect(job.usage?.estimatedCostUsd).toBeCloseTo(0.002);
   });
 });
 

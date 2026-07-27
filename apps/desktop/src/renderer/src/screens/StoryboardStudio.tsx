@@ -3,6 +3,7 @@ import { NavSidebar } from "../components/NavSidebar";
 import { NoProjectOpen } from "../components/NoProjectOpen";
 import { useAppStore } from "../state/appStore";
 import { generateId, nowIso } from "../lib/ids";
+import { toFileUrl } from "../lib/fileUrl";
 import type { StoryboardFrame, ShotType } from "@aether/shared-types";
 
 const SHOT_TYPES: ShotType[] = [
@@ -26,11 +27,12 @@ const SHOT_TYPES: ShotType[] = [
 
 export function StoryboardStudio(): JSX.Element {
   const currentManifest = useAppStore((s) => s.currentManifest);
+  const currentProjectDir = useAppStore((s) => s.currentProjectDir);
   const updateAndSave = useAppStore((s) => s.updateAndSave);
   const isSaving = useAppStore((s) => s.isSaving);
   const [view, setView] = useState<"grid" | "list">("grid");
 
-  if (!currentManifest) return <NoProjectOpen what="storyboards" />;
+  if (!currentManifest || !currentProjectDir) return <NoProjectOpen what="storyboards" />;
 
   const frames = [...currentManifest.storyboardFrames].sort(
     (a, b) => a.sceneNumber - b.sceneNumber || a.shotNumber - b.shotNumber,
@@ -116,6 +118,7 @@ export function StoryboardStudio(): JSX.Element {
                 key={frame.id}
                 frame={frame}
                 segments={allSegments}
+                projectDir={currentProjectDir}
                 onChange={(patch) => updateFrame(frame.id, patch)}
                 onRemove={() => removeFrame(frame.id)}
                 onDuplicate={() => duplicateFrame(frame)}
@@ -143,16 +146,59 @@ export function StoryboardStudio(): JSX.Element {
 function FrameCard({
   frame,
   segments,
+  projectDir,
   onChange,
   onRemove,
   onDuplicate,
 }: {
   frame: StoryboardFrame;
   segments: Array<{ id: string; sceneNumber: number; sceneTitle?: string }>;
+  projectDir: string;
   onChange: (patch: Partial<StoryboardFrame>) => void;
   onRemove: () => void;
   onDuplicate: () => void;
 }): JSX.Element {
+  const setCurrentProject = useAppStore((s) => s.setCurrentProject);
+  const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
+
+  async function handleGenerateFrameImage() {
+    const prompt = frame.generationPrompt?.trim() || frame.sceneDescription?.trim();
+    if (!prompt) {
+      setGenError("Add a generation prompt or scene description first.");
+      return;
+    }
+    setGenerating(true);
+    setGenError(null);
+    const providers = await window.aether.providers.list();
+    const candidates = providers.filter((p) => p.capability === "image" && p.enabled);
+    const provider = candidates.find((p) => p.isDefaultForCapability) ?? candidates[0];
+    if (!provider) {
+      setGenerating(false);
+      setGenError("No image provider configured. Add one in the Provider & Plugin Manager (Mock works offline).");
+      return;
+    }
+    const result = await window.aether.providers.runJob({
+      jobType: "storyboard-frame",
+      providerId: provider.id,
+      input: { prompt, negative: frame.negativePrompt },
+      projectDir,
+      imageWidth: 1024,
+      imageHeight: 576,
+    });
+    setGenerating(false);
+    if (!result.ok || !result.asset || !result.manifest) {
+      setGenError(!result.ok ? result.error?.detail ?? "Generation failed." : "Provider returned no image.");
+      return;
+    }
+    // Sync the store with the manifest the main process just saved (which
+    // already includes the new asset) before patching the frame, so the
+    // frame's updateAndSave doesn't overwrite the newly added asset with a
+    // stale in-memory copy of manifest.assets.
+    setCurrentProject(projectDir, result.manifest);
+    onChange({ thumbnailPath: result.asset.filePath });
+  }
+
   return (
     <div className="rounded-lg border border-white/10 bg-charcoal p-4">
       <div className="mb-2 flex items-center justify-between">
@@ -179,8 +225,23 @@ function FrameCard({
         <span className="rounded bg-white/10 px-2 py-0.5 text-xs text-silver">{frame.productionStatus}</span>
       </div>
 
-      <div className="mb-2 flex h-24 items-center justify-center rounded-md border border-dashed border-white/15 text-xs text-silver/50">
-        {frame.thumbnailPath ? "Thumbnail" : "No thumbnail (import via Asset Library, Phase 3)"}
+      <div className="mb-2 flex h-24 items-center justify-center overflow-hidden rounded-md border border-dashed border-white/15 text-xs text-silver/50">
+        {frame.thumbnailPath ? (
+          <img src={toFileUrl(projectDir, frame.thumbnailPath)} alt="" className="h-full w-full object-cover" />
+        ) : (
+          "No thumbnail yet"
+        )}
+      </div>
+      <div className="mb-2 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={handleGenerateFrameImage}
+          disabled={generating}
+          className="rounded border border-electric-blue/50 px-2 py-1 text-xs text-electric-blue hover:bg-electric-blue/10 disabled:opacity-50"
+        >
+          {generating ? "Generating..." : "Generate Frame Image (AI)"}
+        </button>
+        {genError && <span className="text-xs text-red-300">{genError}</span>}
       </div>
 
       <select

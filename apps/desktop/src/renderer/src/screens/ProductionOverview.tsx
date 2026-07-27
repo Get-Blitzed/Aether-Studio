@@ -127,6 +127,7 @@ export function ProductionOverview(): JSX.Element {
             { label: "Screen Capture Studio", path: "/screen-capture" },
             { label: "Timeline Editor", path: "/timeline" },
             { label: "Caption Studio", path: "/captions" },
+            { label: "Provider & Plugin Manager", path: "/providers" },
           ].map((link) => (
             <button
               key={link.path}

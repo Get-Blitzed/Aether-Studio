@@ -10,9 +10,11 @@
     "dist:win": "electron-vite build && electron-builder --win"
   },
   "dependencies": {
+    "@aether/ai-providers": "*",
     "@aether/core": "*",
     "@aether/database": "*",
     "@aether/media-engine": "*",
+    "@aether/plugin-sdk": "*",
     "@aether/project-engine": "*",
     "@aether/shared-types": "*",
     "ffmpeg-static": "^5.2.0",

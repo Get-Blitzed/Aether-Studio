@@ -1,0 +1,20 @@
+{
+  "name": "@aether/ai-providers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aether/core": "*",
+    "@aether/media-engine": "*",
+    "@aether/shared-types": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "@types/node": "^20.14.2"
+  }
+}
