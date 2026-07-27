@@ -4,6 +4,8 @@ import {
   PromptSchema,
   SeriesPlanSchema,
   AssetSchema,
+  VoiceProfileSchema,
+  VoiceTakeSchema,
   ProjectManifestSchema,
 } from "./index.js";
 
@@ -113,8 +115,47 @@ describe("AssetSchema", () => {
   });
 });
 
-describe("ProjectManifestSchema (Phase 2-3 fields)", () => {
-  it("defaults storyboardFrames, prompts, and assets to empty arrays", () => {
+describe("VoiceProfileSchema", () => {
+  it("fills in defaults for a minimal profile", () => {
+    const profile = VoiceProfileSchema.parse({
+      id: "voice_1",
+      name: "Blitz",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      modifiedAt: "2026-01-01T00:00:00.000Z",
+    });
+    expect(profile.name).toBe("Blitz");
+  });
+});
+
+describe("VoiceTakeSchema", () => {
+  it("fills in defaults for a minimal take", () => {
+    const take = VoiceTakeSchema.parse({
+      id: "take_1",
+      filePath: "audio/takes/take-1.wav",
+      originalFileName: "take-1.wav",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      modifiedAt: "2026-01-01T00:00:00.000Z",
+    });
+    expect(take.takeNumber).toBe(1);
+    expect(take.status).toBe("draft");
+  });
+
+  it("rejects an invalid status", () => {
+    expect(() =>
+      VoiceTakeSchema.parse({
+        id: "take_1",
+        filePath: "audio/takes/take-1.wav",
+        originalFileName: "take-1.wav",
+        status: "not-a-real-status",
+        createdAt: "2026-01-01T00:00:00.000Z",
+        modifiedAt: "2026-01-01T00:00:00.000Z",
+      }),
+    ).toThrow();
+  });
+});
+
+describe("ProjectManifestSchema (Phase 2-4 fields)", () => {
+  it("defaults storyboardFrames, prompts, assets, voiceProfiles, and voiceTakes to empty arrays", () => {
     const manifest = ProjectManifestSchema.parse({
       applicationVersion: "0.1.0-test",
       projectId: "proj_1",
@@ -125,6 +166,8 @@ describe("ProjectManifestSchema (Phase 2-3 fields)", () => {
     expect(manifest.storyboardFrames).toEqual([]);
     expect(manifest.prompts).toEqual([]);
     expect(manifest.assets).toEqual([]);
+    expect(manifest.voiceProfiles).toEqual([]);
+    expect(manifest.voiceTakes).toEqual([]);
   });
 
   it("still validates a manifest saved before Phase 2 (no storyboardFrames/prompts/assets keys at all)", () => {

@@ -123,6 +123,8 @@ export function ProductionOverview(): JSX.Element {
             { label: "Prompt Workshop", path: "/prompts" },
             { label: "Series Planner", path: "/series" },
             { label: "Asset Library", path: "/assets" },
+            { label: "Voice Studio", path: "/voice" },
+            { label: "Screen Capture Studio", path: "/screen-capture" },
           ].map((link) => (
             <button
               key={link.path}

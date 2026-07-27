@@ -7,7 +7,16 @@ export class MediaEngineError extends Error {
       | "PROBE_FAILED"
       | "THUMBNAIL_FAILED"
       | "WAVEFORM_FAILED"
-      | "UNSUPPORTED_FILE",
+      | "UNSUPPORTED_FILE"
+      | "TRIM_FAILED"
+      | "NORMALIZE_FAILED"
+      | "DENOISE_FAILED"
+      | "SILENCE_REMOVAL_FAILED"
+      | "MERGE_FAILED"
+      | "CONVERT_FAILED"
+      | "LOUDNESS_ANALYSIS_FAILED"
+      | "VIDEO_TRIM_FAILED"
+      | "VIDEO_SPEED_FAILED",
     public readonly cause?: unknown,
   ) {
     super(message);

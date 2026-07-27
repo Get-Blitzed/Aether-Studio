@@ -7,3 +7,5 @@ export * from "./probeMedia.js";
 export * from "./generateVideoThumbnail.js";
 export * from "./generateWaveformImage.js";
 export * from "./assetKind.js";
+export * from "./audioProcessing.js";
+export * from "./videoProcessing.js";

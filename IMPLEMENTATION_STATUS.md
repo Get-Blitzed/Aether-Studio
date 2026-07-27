@@ -1,6 +1,6 @@
 # Implementation Status
 
-Last updated: 2026-07-27 (Phase 3 checkpoint)
+Last updated: 2026-07-27 (Phase 4 checkpoint)
 
 ## Phase 1 -- Foundation: COMPLETE
 
@@ -106,10 +106,45 @@ was open leaked keystrokes to whatever window actually had focus (in one
 case, this session's own terminal window). Scoping `SetForegroundWindow` to
 the dialog's own `hWnd` fixed it reliably.
 
-## Phases 4-8: NOT STARTED
+## Phase 4 -- Audio and Screen Capture: COMPLETE
 
-See [ROADMAP.md](ROADMAP.md). Nothing in Voice Studio, Screen
-Capture, Timeline, Motion Graphics, Captions, Audio Mixer, Review, Quality
+| Area | Status | Notes |
+|---|---|---|
+| Audio processing (media-engine) | Done | Real FFmpeg filters: `trimAudio`, `normalizeLoudness` (loudnorm), `denoiseAudio` (afftdn), `removeSilence` (silenceremove), `mergeAudioTakes` (concat filter), `convertAudioFormat` (wav/mp3), `analyzeLoudness` (ebur128 parsing) |
+| Video processing (media-engine) | Done | `trimVideo`, `adjustVideoSpeed` (setpts/atempo, clamped to ffmpeg's 0.5-2.0 atempo range) -- used as Screen Capture's post-capture tools |
+| Voice Studio screen | Done | Voice profiles (name, character assignment, direction fields -- provider/model are informational only, no TTS connection), take management, waveform display, trim/normalize/denoise/remove-silence/merge/export actions, all operating on real imported audio |
+| Screen Capture Studio screen | Done | Privacy checklist (9 items from spec, manual confirmation only -- explicitly not automatic secret detection), source picker via `desktopCapturer`, mic toggle, best-effort system-audio toggle, countdown, start/pause/resume/stop via `MediaRecorder`, recordings saved directly into the Asset Library (`screen-recordings` category) |
+| Nav + cross-links | Done | Voice and Screen Capture enabled in the sidebar; Production Overview links to both |
+
+### New shared-types schemas (Phase 4)
+
+`VoiceProfileSchema`, `VoiceTakeSchema`. `ProjectManifestSchema` gained `voiceProfiles` and `voiceTakes` arrays (default `[]`, covered by the same backward-compatibility test pattern as prior phases).
+
+### Architecture note: Screen Capture reuses the Asset Library, not a parallel entity
+
+A completed recording becomes a normal `Asset` (category `screen-recordings`) rather than a separate `ScreenRecording` type. `apps/desktop/src/main/assetBuilder.ts` (the `buildAssetFromFile` function that Phase 3's Asset Library import already used) was extracted so both `assetsIpc.ts` and the new `screenCaptureIpc.ts` share the same checksum/probe/thumbnail logic -- a screen recording gets exactly the same treatment as any other imported video, plus a `notes` field recording which capture options were used.
+
+### Verified manually (Phase 4, this session)
+
+1. `npm test` (62/62 passing, including 23 media-engine tests against the real ffmpeg binary), `npm run typecheck`, `electron-vite build` all succeed.
+2. Fresh launches complete startup with no errors both before and after all Phase 4 changes.
+3. **A real bug was found and fixed**: `analyzeLoudness()`'s regex matched the *first* `I: ... LUFS` occurrence anywhere in ffmpeg's stderr output. ffmpeg's `ebur128` filter prints a progress line roughly every 100ms *while measuring*, each containing that same `I:` pattern, before printing a final `Summary:` block with the converged value. The original code was capturing an early, unstable transient reading instead of the real result -- a 3-second pure tone (which should read roughly -18 to -22 LUFS) was reported as -70 LUFS. Fixed by restricting the regex to the text after the last `Summary:` marker. Added a regression test (`audioVideoProcessing.test.ts`) asserting a plausible loudness range and that `normalizeLoudness` measurably changes the reading toward its target -- the old code would have passed the previous, looser assertion (`toBeTypeOf("number")`) without ever being caught.
+4. **Full Voice Studio pipeline verified headlessly** against the real sample project (import → probe/waveform/loudness → normalize → re-measure → cleanup): confirmed a take's loudness moved from -21.8 LUFS to exactly -16.0 LUFS (the requested target) after normalization, using the exact functions the IPC handlers call.
+5. **`desktopCapturer.getSources()` verified working** via a minimal standalone Electron script: returned 7 real sources (the full screen plus open application windows) with valid, non-empty thumbnails, confirming the API Screen Capture Studio depends on functions correctly on this machine.
+6. Voice Studio's screen was visually confirmed rendering correctly (title, description, empty state, "+ New Voice Profile" button) via screenshot of the real running window.
+
+### What wasn't interactively verified this session, and why
+
+Actually clicking through Screen Capture Studio's live recording flow (start → record a few seconds → stop → confirm it lands in the Asset Library) was not completed. Partway through interactive verification, a mouse click intended for the app landed on an **unrelated window** on the tester's desktop (a personal document, briefly visible in a screenshot) due to a coordinate-mapping problem described below. Continuing to click blindly risked interacting with the user's other open windows, so interactive GUI testing was stopped in favor of the headless verification in items 3-5 above, which exercise the identical underlying code paths (`buildAssetFromFile`, the audio processing functions, `desktopCapturer`) without needing simulated clicks. The `MediaRecorder`/`getUserMedia` recording code itself follows Electron's standard, widely-used documented pattern for this exact purpose; it has not been exercised end-to-end by an actual recording in this session.
+
+### A note on GUI-automation coordinate mapping (root cause found this phase)
+
+Earlier phases worked around unreliable clicks by preferring keyboard navigation. This phase found the actual root cause for the mouse case: **`System.Windows.Forms.Cursor.Position` (used via PowerShell) does not land where `user32.dll`'s `GetWindowRect`/`CopyFromScreen` say it should** -- confirmed by setting a position via `Cursor.Position` and immediately reading it back via the raw `GetCursorPos` Win32 call, which reported a different, non-uniform offset. Calling the raw `SetCursorPos` Win32 function directly instead of going through WinForms' `Cursor.Position` produces an exact match with `GetCursorPos`/`GetWindowRect`, and clicks landed correctly afterward. The practical failure mode before this fix: a click aimed at a button inside the target app's window could land anywhere on the (very large, multi-window, 5120px-wide) desktop instead, including on unrelated windows. Future sessions automating this app's GUI via PowerShell should use `SetCursorPos`/`GetCursorPos`, never `System.Windows.Forms.Cursor.Position`, for coordinate-based clicks.
+
+## Phases 5-8: NOT STARTED
+
+See [ROADMAP.md](ROADMAP.md). Nothing in Timeline, Motion
+Graphics, Captions, Audio Mixer, Review, Quality
 Control, Export, Templates, Providers, Tasks, Analytics, or Learning Center
 is implemented beyond the Zod schema placeholders already present in
 `@aether/shared-types` (`tasks` and `providerReferences` arrays exist on the

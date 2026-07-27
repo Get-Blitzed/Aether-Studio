@@ -6,6 +6,7 @@ import { ScriptSchema } from "./script.js";
 import { StoryboardFrameSchema } from "./storyboard.js";
 import { PromptSchema } from "./prompt.js";
 import { AssetSchema } from "./asset.js";
+import { VoiceProfileSchema, VoiceTakeSchema } from "./voice.js";
 
 export const AETHER_PROJECT_FORMAT_VERSION = 1;
 
@@ -77,6 +78,8 @@ export const ProjectManifestSchema = z.object({
   storyboardFrames: z.array(StoryboardFrameSchema).default([]),
   prompts: z.array(PromptSchema).default([]),
   assets: z.array(AssetSchema).default([]),
+  voiceProfiles: z.array(VoiceProfileSchema).default([]),
+  voiceTakes: z.array(VoiceTakeSchema).default([]),
   tasks: z.array(TaskItemSchema).default([]),
   providerReferences: z.array(z.string()).default([]),
 });

@@ -113,7 +113,9 @@ every save.
 ## Key decision: media processing isolated in packages/media-engine
 
 Every FFmpeg/ffprobe interaction (probing, thumbnail extraction, waveform
-image generation) lives behind `packages/media-engine`'s typed function
+image generation, and as of Phase 4 audio/video editing operations -- trim,
+loudness normalization, denoise, silence removal, merge, format conversion,
+speed adjustment) lives behind `packages/media-engine`'s typed function
 exports -- nothing else in the codebase builds an FFmpeg argument list or
 spawns that process directly. `runProcess()` always uses
 `child_process.execFile` with an argument array, never a shell string, so
@@ -121,6 +123,17 @@ no filename or user input can be reinterpreted as shell syntax regardless
 of its content. See [FFMPEG_INTEGRATION.md](FFMPEG_INTEGRATION.md) for the
 full design, including how the `ffmpeg-static`/`ffprobe-static` binaries are
 located and what happens when FFmpeg genuinely isn't available.
+
+## Key decision: Screen Capture reuses the Asset Library's build pipeline
+
+`apps/desktop/src/main/assetBuilder.ts` (`buildAssetFromFile` and its
+helpers) was extracted out of `assetsIpc.ts` in Phase 4 so
+`screenCaptureIpc.ts` could reuse the identical checksum/probe/thumbnail
+logic for a freshly-recorded clip. A screen recording is a normal `Asset`
+(category `screen-recordings`), not a separate schema -- it gets the same
+duplicate detection, missing-file handling, and preview generation as
+anything imported through the Asset Library, plus a `notes` field recording
+which capture options (mic, system audio, source type) were used.
 
 ## Process boundaries
 
@@ -157,15 +170,19 @@ that shared library is a natural Phase 3+ extension of the same pattern).
 
 ## What's still deliberately not built (see ROADMAP.md / KNOWN_LIMITATIONS.md)
 
-- No FFmpeg integration (nothing to encode yet -- Phase 3).
+- No project-level video encoding/rendering/export (Phase 5/7) -- FFmpeg is
+  used for real editing operations (Phase 3-4) but not yet a full timeline
+  render.
 - No AI provider calls of any kind (Phase 6). There is no network code in
   this codebase at all yet -- Prompt Workshop stores and assembles prompt
-  text for you to paste elsewhere, it doesn't call anything.
-- No timeline, no media import, no voice/animation generation.
+  text for you to paste elsewhere, it doesn't call anything. Voice cloning
+  in particular is not built at all, by design (see KNOWN_LIMITATIONS.md).
+- No timeline, no animation generation, no OS-level input-hook overlays
+  (click indicators, keystroke display) during screen capture.
 - The persistent nav sidebar lists all the modules from the spec. As of
-  Phase 2, Home, Settings, Series, Knowledge, Scripts, Storyboards, Prompts,
-  Characters, and Brands are wired up; the remaining items (Timeline,
-  Assets, Voice, Animation, Screen Capture, Audio, Captions, Review, Export,
+  Phase 4, Home, Settings, Series, Knowledge, Scripts, Storyboards, Prompts,
+  Characters, Brands, Assets, Voice, and Screen Capture are wired up; the
+  remaining items (Timeline, Animation, Audio, Captions, Review, Export,
   Templates, Providers, Learning Center) are disabled buttons with a tooltip
   naming the phase they arrive in. This is intentional -- see spec section 44
   ("prepare clean interfaces for future expansion without filling the

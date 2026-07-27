@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type { AppSettings, Asset, AssetCategory, ProductionSettings, ProjectManifest, SeriesPlan } from "@aether/shared-types";
 
+type AudioExportFormat = "wav" | "mp3";
+
 export interface AppErrorPayload {
   title: string;
   detail: string;
@@ -76,6 +78,56 @@ const api = {
       ipcRenderer.invoke("assets:update-metadata", projectDir, assetId, patch) as Promise<ProjectResult>,
     reveal: (projectDir: string, assetId: string) =>
       ipcRenderer.invoke("assets:reveal", projectDir, assetId) as Promise<{ ok: boolean; error?: AppErrorPayload }>,
+  },
+
+  voice: {
+    chooseAudioFiles: () => ipcRenderer.invoke("voice:choose-audio-files") as Promise<string[] | null>,
+    importTakes: (args: { projectDir: string; filePaths: string[]; voiceProfileId?: string; scriptSegmentId?: string }) =>
+      ipcRenderer.invoke("voice:import-takes", args) as Promise<
+        (ProjectResult & { added?: number })
+      >,
+    processTake: (args: {
+      projectDir: string;
+      takeId: string;
+      action: "trim" | "normalize" | "denoise" | "remove-silence";
+      trimStartSeconds?: number;
+      trimEndSeconds?: number;
+    }) => ipcRenderer.invoke("voice:process-take", args) as Promise<ProjectResult>,
+    mergeTakes: (args: { projectDir: string; takeIds: string[]; voiceProfileId?: string }) =>
+      ipcRenderer.invoke("voice:merge-takes", args) as Promise<ProjectResult>,
+    exportTake: (args: { projectDir: string; takeId: string; format: AudioExportFormat }) =>
+      ipcRenderer.invoke("voice:export-take", args) as Promise<
+        { ok: true; exportedPath: string } | { ok: false; error?: AppErrorPayload; canceled?: boolean }
+      >,
+    removeTake: (projectDir: string, takeId: string) =>
+      ipcRenderer.invoke("voice:remove-take", projectDir, takeId) as Promise<ProjectResult>,
+  },
+
+  screenCapture: {
+    listSources: () =>
+      ipcRenderer.invoke("screencapture:list-sources") as Promise<
+        Array<{ id: string; name: string; thumbnailDataUrl: string; kind: "screen" | "window" }>
+      >,
+    saveRecording: (args: {
+      projectDir: string;
+      data: ArrayBuffer;
+      fileExtension: string;
+      sourceKind: "screen" | "window";
+      micEnabled: boolean;
+      systemAudioEnabled: boolean;
+      privacyChecklistAcknowledged: boolean;
+      scriptSegmentId?: string;
+      notes?: string;
+    }) =>
+      ipcRenderer.invoke("screencapture:save-recording", args) as Promise<
+        | { ok: true; manifest: ProjectManifest; assetId: string }
+        | { ok: false; error?: AppErrorPayload }
+      >,
+    processClip: (
+      args:
+        | { projectDir: string; assetId: string; action: "trim"; trimStartSeconds: number; trimEndSeconds: number }
+        | { projectDir: string; assetId: string; action: "speed"; speedFactor: number },
+    ) => ipcRenderer.invoke("screencapture:process-clip", args) as Promise<ProjectResult>,
   },
 
   ffmpeg: {

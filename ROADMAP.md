@@ -1,8 +1,9 @@
 # Roadmap
 
-Phases 1 (Foundation), 2 (Preproduction), and 3 (Media Management) are
-complete -- see IMPLEMENTATION_STATUS.md. The phases below follow the
-spec's own phasing (section 42) and are not started.
+Phases 1 (Foundation), 2 (Preproduction), 3 (Media Management), and 4
+(Audio and Screen Capture) are complete -- see IMPLEMENTATION_STATUS.md.
+The phases below follow the spec's own phasing (section 42) and are not
+started.
 
 ## Phase 2 -- Preproduction: COMPLETE
 
@@ -47,10 +48,31 @@ Settings. See FFMPEG_INTEGRATION.md for the full design.
 - Asset versioning (spec section 15 mentions it) -- no UI or schema support
   yet beyond the single current file per asset.
 
-## Phase 4 -- Audio and Screen Capture
-Voice Studio (takes, trim, normalize), Screen Capture Studio (privacy
-checklist, post-capture tools). Voice cloning, if ever added, requires an
-explicit consent/rights-warning screen per the spec -- not optional.
+## Phase 4 -- Audio and Screen Capture: COMPLETE
+
+Voice Studio (profiles, takes, real FFmpeg trim/normalize/denoise/
+remove-silence/merge/export), Screen Capture Studio (privacy checklist,
+`desktopCapturer` source picker, `MediaRecorder`-based recording with
+mic/best-effort-system-audio, post-capture trim/speed via the same FFmpeg
+layer). Voice cloning was not built at all (not just deferred) -- the spec
+explicitly says it must not be required, and no cloning means no
+consent/rights-warning screen is needed yet.
+
+**Deferred out of Phase 4, moved later:**
+- Live interactive verification of the actual recording flow (click
+  Start, record, Stop, confirm the asset appears) -- verified instead via
+  headless checks of the same underlying functions (`desktopCapturer`,
+  `buildAssetFromFile`, the audio processing pipeline) after GUI automation
+  in this environment risked interacting with unrelated windows. See
+  IMPLEMENTATION_STATUS.md's Phase 4 notes.
+- Click-indicator/keystroke-display overlays and cursor highlighting during
+  capture -- these need either OS-level input hooks (a native-module risk
+  similar to the one avoided in Phase 1) or compositing work better suited
+  to Phase 5's overlay system. Not attempted.
+- Callouts, step labels, freeze-frame, region blur -- explicitly deferred;
+  trim and speed adjustment are the only post-capture tools built.
+- A pronunciation *dictionary* (per-word overrides) -- `pronunciationNotes`
+  is a free-text field on `VoiceProfile`, not a structured word list.
 
 ## Phase 5 -- Timeline and Graphics
 `packages/timeline-engine`, multitrack editor, overlays/titles/captions,

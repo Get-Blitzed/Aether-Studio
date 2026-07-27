@@ -7,16 +7,17 @@ npm test
 ```
 
 Runs vitest (`vitest.config.ts` at the repo root) over
-`packages/*/src/**/*.test.ts`. Current coverage (46 tests):
+`packages/*/src/**/*.test.ts`. Current coverage (62 tests):
 
 - **`packages/core/src/paths.test.ts`** -- filename sanitization (reserved
   characters, Windows device names, trailing dots/spaces, empty input) and
   `AETHER_APPDATA_OVERRIDE` / `AETHER_DOCUMENTS_OVERRIDE` env-var honoring.
-- **`packages/shared-types/src/schemas.test.ts`** -- Phase 2-3 schema
+- **`packages/shared-types/src/schemas.test.ts`** -- Phase 2-4 schema
   defaults (`StoryboardFrameSchema`, `PromptSchema`, `SeriesPlanSchema`,
-  `AssetSchema`), rejection of invalid enum values, and a dedicated check
-  that a Phase-1-era manifest (no `storyboardFrames`/`prompts`/`assets` keys
-  at all) still validates unchanged.
+  `AssetSchema`, `VoiceProfileSchema`, `VoiceTakeSchema`), rejection of
+  invalid enum values, and a dedicated check that a Phase-1-era manifest
+  (no `storyboardFrames`/`prompts`/`assets`/`voiceProfiles`/`voiceTakes`
+  keys at all) still validates unchanged.
 - **`packages/database/src/db.test.ts`** -- migrations create the expected
   tables, migrations don't re-apply, settings/projects/activity-log
   repositories round-trip correctly, the sql.js-backed database persists
@@ -35,16 +36,30 @@ Runs vitest (`vitest.config.ts` at the repo root) over
   resolution/codec, generates a real JPEG thumbnail and a real waveform
   PNG, and confirms a nonexistent input file produces a structured
   `PROBE_FAILED` error rather than an unhandled rejection.
+- **`packages/media-engine/src/audioVideoProcessing.test.ts`** -- also runs
+  against the real ffmpeg binary: trims audio/video to an exact range,
+  normalizes loudness (and asserts it actually changes and lands closer to
+  the target -- see the loudness-parsing regression note below), denoises,
+  removes silence (shortening a mostly-silent clip), merges takes end to
+  end, converts wav to mp3, adjusts video speed 2x/0.5x, and asserts
+  `mergeAudioTakes` refuses fewer than two inputs. Includes a regression
+  test for a real bug found during Phase 4 manual verification: the
+  original `analyzeLoudness()` regex matched ffmpeg's first `I: ... LUFS`
+  progress line (printed every ~100ms while measuring) instead of the final
+  converged `Summary:` block, so it reported wildly wrong values (e.g. -70
+  LUFS for audible audio). The fix restricts parsing to the text after the
+  last `Summary:` marker; the regression test asserts both a plausible
+  loudness range and that normalization measurably changes the reading.
 
 `apps/desktop` (Electron main/preload/renderer) has no automated tests yet --
 Phase 1 verification for it was manual (see IMPLEMENTATION_STATUS.md).
 Adding renderer component tests and a main-process integration test harness
 is tracked for a later phase.
 
-## Manual acceptance checklist (Phase 1-3 subset)
+## Manual acceptance checklist (Phase 1-4 subset)
 
 The full spec (section 40) lists 20 acceptance tests spanning every phase.
-The ones applicable to Phases 1-3 were run manually:
+The ones applicable to Phases 1-4 were run manually:
 
 1. ✅ Install and launch on Windows (`npm install`, `electron-vite build`, `electron .`)
 2. ✅ Create a new production
@@ -64,9 +79,15 @@ The ones applicable to Phases 1-3 were run manually:
    Asset Library image is a natural Phase 5 (timeline) follow-up
 10. ✅ Import product screen-recording footage -- exercised generically via
     the Asset Library's video import path (checksum, probe, real ffmpeg
-    thumbnail extraction all confirmed); the dedicated Screen *Capture*
-    recording workflow itself is Phase 4
-11-16. Timeline/overlay/caption/QC/export steps are not applicable yet
+    thumbnail extraction all confirmed); Screen Capture Studio's dedicated
+    recording UI exists and its `desktopCapturer` source listing was
+    verified headlessly (see IMPLEMENTATION_STATUS.md), but an actual
+    click-to-record session was not completed this session
+11. ✅ Record or import narration -- Voice Studio's full pipeline (import,
+    probe, waveform, loudness analysis, normalize) verified headlessly
+    end to end against the real sample project, moving a take from
+    -21.8 LUFS to exactly -16.0 LUFS after normalization
+12-16. Timeline/overlay/caption/QC/export steps are not applicable yet
     (Phases 5-7)
 17. ✅ Reopen the production without missing references (confirmed via the
     "Recent Productions" list and re-reading the manifest)

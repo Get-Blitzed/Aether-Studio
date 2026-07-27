@@ -12,6 +12,8 @@ import { ScriptStudio } from "./screens/ScriptStudio";
 import { StoryboardStudio } from "./screens/StoryboardStudio";
 import { PromptWorkshop } from "./screens/PromptWorkshop";
 import { AssetLibrary } from "./screens/AssetLibrary";
+import { VoiceStudio } from "./screens/VoiceStudio";
+import { ScreenCaptureStudio } from "./screens/ScreenCaptureStudio";
 
 export function App(): JSX.Element {
   return (
@@ -29,6 +31,8 @@ export function App(): JSX.Element {
         <Route path="/storyboards" element={<StoryboardStudio />} />
         <Route path="/prompts" element={<PromptWorkshop />} />
         <Route path="/assets" element={<AssetLibrary />} />
+        <Route path="/voice" element={<VoiceStudio />} />
+        <Route path="/screen-capture" element={<ScreenCaptureStudio />} />
         <Route path="/settings" element={<SettingsScreen />} />
       </Routes>
     </HashRouter>
