@@ -31,6 +31,18 @@ jobs:
           node-version: 20
           cache: npm
 
+      # electron-builder bundles a real 7za.exe (via the `7zip-bin`
+      # package) that GitHub's hosted Windows runners' Windows Defender
+      # silently quarantines as a false positive right after npm install,
+      # which then fails the build with an ENOENT trying to chmod/exec it.
+      # This only affects this ephemeral, single-use CI VM -- it doesn't
+      # touch anyone's own machine. See electron-userland/electron-builder
+      # issues for the same root cause reported by many other projects.
+      - name: Disable Windows Defender real-time scanning (CI runner only)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: Set-MpPreference -DisableRealtimeMonitoring $true
+
       - name: Install dependencies
         run: npm install
 
