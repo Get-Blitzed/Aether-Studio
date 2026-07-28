@@ -36,24 +36,27 @@ jobs:
           node-version: 24
           cache: npm
 
-      # Disabling Defender is a harmless, standard CI-only precaution (this
-      # is an ephemeral, single-use VM) against a documented class of issue
-      # where Windows Defender quarantines electron-builder's bundled
-      # 7za.exe -- kept as a defensive measure even though it wasn't, on
-      # its own, sufficient to fix the ENOENT seen in earlier runs.
-      - name: Disable Windows Defender real-time scanning (CI runner only)
+      # A diagnostic step confirmed node_modules/7zip-bin/win/x64/7za.exe
+      # exists (correct size) immediately after npm install, then is GONE
+      # one step later when electron-builder tries to use it -- proof
+      # something actively deletes it mid-job, not that it was never
+      # installed. `Set-MpPreference -DisableRealtimeMonitoring` (tried
+      # first) reported success but had no effect: GitHub-hosted Windows
+      # runners have Defender Tamper Protection enabled, which silently
+      # blocks that specific setting from being changed via script. An
+      # exclusion *path* is a different setting that Tamper Protection does
+      # not block, and is the standard fix for this exact class of issue.
+      - name: Exclude workspace from Windows Defender scanning (CI runner only)
         if: runner.os == 'Windows'
         shell: powershell
-        run: Set-MpPreference -DisableRealtimeMonitoring $true
+        run: Add-MpPreference -ExclusionPath "$env:GITHUB_WORKSPACE"
 
       - name: Install dependencies
         run: npm install
 
-      # Diagnostic: earlier runs failed with "ENOENT ... chmod
-      # node_modules/7zip-bin/<platform>/<arch>/7za[.exe]" immediately after
-      # a clean, warning-free `npm install` reported success -- this proves
-      # or disproves whether the file is actually missing right before
-      # electron-builder needs it, instead of guessing again.
+      # Diagnostic: kept in place to confirm the fix above actually works
+      # (the file should still be here right before "Build installer"
+      # runs) rather than removing it and hoping.
       - name: Check 7zip-bin binary state
         run: node -e "const fs=require('fs');const p=require('path');const dir=path.join('node_modules','7zip-bin');console.log('7zip-bin contents:');for (const plat of fs.readdirSync(dir)) {const platDir=path.join(dir,plat);if(!fs.statSync(platDir).isDirectory())continue;for (const arch of fs.readdirSync(platDir)) {const archDir=path.join(platDir,arch);if(!fs.statSync(archDir).isDirectory())continue;for (const f of fs.readdirSync(archDir)) {const full=path.join(archDir,f);const st=fs.statSync(full);console.log(full, st.size, 'bytes', 'mode='+st.mode.toString(8));}}}"
 
