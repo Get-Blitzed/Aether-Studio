@@ -5,7 +5,9 @@ import { getCacheDir, type Logger } from "@aether/core";
 import { SapiVoiceProvider } from "@aether/ai-providers";
 
 const INTRO_TEXT = "Welcome to Aether Studio Suite. Let's create something fantastic.";
-const INTRO_CACHE_FILENAME = "splash-intro-voice.wav";
+// Bumped to v2 when the pitch was deepened -- a new filename forces
+// re-synthesis instead of serving a stale cached file with the old voice.
+const INTRO_CACHE_FILENAME = "splash-intro-voice-v2.wav";
 
 interface RegisterDeps {
   logger: Logger;
@@ -32,14 +34,14 @@ export function registerIntroIpc({ logger }: RegisterDeps): void {
       const voices = await provider.listVoices();
       const maleVoice = voices.find((v) => v.gender?.toLowerCase() === "male");
 
-      // Medium tone, semi-excited: a touch faster than a natural speaking
-      // pace with a couple of positive semitones, rather than a flat,
-      // robotic default read.
+      // Medium tone, semi-excited, slightly deep: a touch faster than a
+      // natural speaking pace with a negative pitch shift for a deeper
+      // read, rather than a flat, robotic (or higher-pitched) default.
       const result = await provider.synthesizeVoice({
         text: INTRO_TEXT,
         voiceId: maleVoice?.id,
         rate: 2,
-        pitchSemitones: 2,
+        pitchSemitones: -3,
       });
 
       fs.mkdirSync(path.dirname(cachedPath), { recursive: true });

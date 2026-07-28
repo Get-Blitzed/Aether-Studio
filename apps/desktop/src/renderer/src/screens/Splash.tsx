@@ -19,6 +19,10 @@ export function Splash(): JSX.Element {
   const [visibleCount, setVisibleCount] = useState(0);
   const introAudioRef = useRef<HTMLAudioElement | null>(null);
   const [introAudioUrl, setIntroAudioUrl] = useState<string | null>(null);
+  // Gates navigation until the voice intro actually finishes playing (not
+  // just until the status log finishes) -- starts true so we don't
+  // navigate before we even know whether there's audio to wait for.
+  const [waitingForIntroAudio, setWaitingForIntroAudio] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -37,7 +41,13 @@ export function Splash(): JSX.Element {
   useEffect(() => {
     let cancelled = false;
     window.aether.getIntroAudio().then((result) => {
-      if (!cancelled && result.ok) setIntroAudioUrl(toAbsoluteFileUrl(result.filePath));
+      if (cancelled) return;
+      if (result.ok) {
+        setIntroAudioUrl(toAbsoluteFileUrl(result.filePath));
+      } else {
+        // No audio to wait for (synthesis unavailable) -- don't block navigation on it.
+        setWaitingForIntroAudio(false);
+      }
     });
     return () => {
       cancelled = true;
@@ -45,12 +55,18 @@ export function Splash(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (introAudioUrl) void introAudioRef.current?.play().catch(() => undefined);
+    if (!introAudioUrl) return;
+    void introAudioRef.current?.play().catch(() => setWaitingForIntroAudio(false));
+    // Safety net: the intro line is a few seconds long, so if `onEnded`
+    // never fires for some reason (autoplay silently blocked, corrupt
+    // file with no error event), don't strand the user on Splash forever.
+    const failsafe = setTimeout(() => setWaitingForIntroAudio(false), 10_000);
+    return () => clearTimeout(failsafe);
   }, [introAudioUrl]);
 
   useEffect(() => {
     if (!info) return;
-    if (visibleCount >= info.statusLog.length) {
+    if (visibleCount >= info.statusLog.length && !waitingForIntroAudio) {
       const timer = setTimeout(async () => {
         await loadSettings();
         const settings = useAppStore.getState().settings;
@@ -58,9 +74,12 @@ export function Splash(): JSX.Element {
       }, 400);
       return () => clearTimeout(timer);
     }
-    const timer = setTimeout(() => setVisibleCount((c) => c + 1), 220);
-    return () => clearTimeout(timer);
-  }, [info, visibleCount, navigate, loadSettings]);
+    if (visibleCount < info.statusLog.length) {
+      const timer = setTimeout(() => setVisibleCount((c) => c + 1), 220);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [info, visibleCount, waitingForIntroAudio, navigate, loadSettings]);
 
   return (
     <div className="relative flex h-screen flex-col items-center justify-center gap-8 overflow-hidden bg-navy">
@@ -75,7 +94,14 @@ export function Splash(): JSX.Element {
         aria-hidden="true"
       />
 
-      {introAudioUrl && <audio ref={introAudioRef} src={introAudioUrl} />}
+      {introAudioUrl && (
+        <audio
+          ref={introAudioRef}
+          src={introAudioUrl}
+          onEnded={() => setWaitingForIntroAudio(false)}
+          onError={() => setWaitingForIntroAudio(false)}
+        />
+      )}
 
       <Wordmark size="lg" showTagline />
       <p className="text-silver">Plan it. Create it. Animate it. Deliver it.</p>
