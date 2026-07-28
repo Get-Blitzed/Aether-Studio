@@ -88,4 +88,5 @@ See [WINDOWS_BUILD.md](WINDOWS_BUILD.md) for producing an actual
 - [ROADMAP.md](ROADMAP.md) -- phase 9 and beyond
 - [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) -- current gaps and workarounds
 - [WINDOWS_BUILD.md](WINDOWS_BUILD.md) -- producing a Windows installer
+- [MAC_BUILD.md](MAC_BUILD.md) -- producing a macOS installer (requires a Mac or CI)
 - [TESTING.md](TESTING.md) -- how to run and extend the test suite

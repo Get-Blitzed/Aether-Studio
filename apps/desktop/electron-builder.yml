@@ -1,5 +1,10 @@
 appId: com.aetherstudiosuite.desktop
 productName: Aether Studio Suite
+# npm workspaces hoist `electron` to the repo root's node_modules, so
+# electron-builder's own version auto-detection (which only looks in this
+# package's local node_modules) fails to find it -- pinning it explicitly
+# avoids that "Cannot compute electron version" failure.
+electronVersion: 31.7.7
 directories:
   output: ../../release
   buildResources: build
@@ -21,6 +26,21 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: Aether Studio Suite
+mac:
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  category: public.app-category.video
+  artifactName: Aether-Studio-Suite-${arch}.dmg
+  # Unsigned by default -- set CSC_LINK/CSC_KEY_PASSWORD (or use
+  # electron-builder's Apple ID env vars) to sign + notarize for real
+  # distribution. Without those, the dmg still builds but macOS Gatekeeper
+  # will warn on first launch. Must be built ON macOS (or a macOS CI
+  # runner) -- electron-builder cannot produce a working dmg from Windows.
+  hardenedRuntime: true
+  gatekeeperAssess: false
 asar: true
 asarUnpack:
   - "**/node_modules/ffmpeg-static/**"

@@ -254,14 +254,24 @@ to open a manifest from a newer format version, but no actual field-mapping
 migration logic exists yet because there has only ever been one manifest
 version.
 
-## No installer has been produced
+## No app icon has been supplied
 
-`electron-builder.yml` is configured (appId, product name, NSIS target,
-extraResources for `/resources`) but `npm run dist:win` has not been run in
-this session -- Phase 1 verification used `electron-vite build` +
-`electron .` directly, not a packaged installer. No app icon (`.ico`) has
-been supplied yet, either -- electron-builder will fall back to its own
-default icon until one is added under `apps/desktop/build/`.
+`npm run dist:win` has been run and produces a real, working
+`Aether-Studio-Suite-Setup.exe`; no macOS build has been produced from this
+(Windows) environment since that requires actual macOS tooling -- see
+MAC_BUILD.md. Neither installer has a custom app icon yet (no `.ico`/`.icns`
+under `apps/desktop/build/`), so electron-builder falls back to its own
+default icon on both platforms.
+
+## macOS build requires a Mac (or CI) and has no native voice provider
+
+There is no macOS equivalent of `SapiVoiceProvider` yet -- on macOS, the
+native-voice tier of Voice Studio and document-import auto-narration has
+nothing to offer unless an external provider (ElevenLabs) is configured.
+The app itself runs fine on macOS (ffmpeg-static/ffprobe-static publish
+real macOS binaries), this is specifically about the "native/offline voice"
+feature being Windows-only by construction (it shells out to PowerShell's
+`System.Speech`). See MAC_BUILD.md.
 
 ## UI automation of the Electron window required care in this environment
 

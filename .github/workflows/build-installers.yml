@@ -1,0 +1,52 @@
+name: Build installers
+
+# Builds the Windows (NSIS) and macOS (dmg) installers on their native
+# platforms -- electron-builder cannot produce a working macOS dmg from a
+# Windows runner (or vice versa for code signing), so this always needs a
+# real macos-latest runner for the Mac side, not cross-compilation.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            dist-script: dist:win
+            artifact-glob: release/*.exe
+          - os: macos-latest
+            dist-script: dist:mac
+            artifact-glob: release/*.dmg
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build installer
+        run: npm run ${{ matrix.dist-script }} -w apps/desktop
+        env:
+          # Only meaningful on the macOS job; harmless if unset on Windows.
+          # Set these as repo secrets to produce a signed + notarized dmg
+          # instead of an unsigned one (see WINDOWS_BUILD.md / MAC_BUILD.md).
+          CSC_LINK: ${{ secrets.MAC_CERTIFICATE_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aether-studio-suite-${{ matrix.os }}
+          path: ${{ matrix.artifact-glob }}

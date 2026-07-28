@@ -2,12 +2,15 @@
   "name": "@aether/desktop",
   "version": "0.1.0",
   "private": true,
+  "description": "Aether Studio Suite -- a desktop production system for animated product-training videos",
+  "author": "Aether Studio Suite",
   "main": "./out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
-    "dist:win": "electron-vite build && electron-builder --win"
+    "dist:win": "electron-vite build && electron-builder --win",
+    "dist:mac": "electron-vite build && electron-builder --mac"
   },
   "dependencies": {
     "@aether/ai-providers": "*",
