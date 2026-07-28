@@ -50,17 +50,30 @@ jobs:
       - name: Check 7zip-bin binary state
         run: node -e "const fs=require('fs');const p=require('path');const dir=path.join('node_modules','7zip-bin');console.log('7zip-bin contents:');for (const plat of fs.readdirSync(dir)) {const platDir=path.join(dir,plat);if(!fs.statSync(platDir).isDirectory())continue;for (const arch of fs.readdirSync(platDir)) {const archDir=path.join(platDir,arch);if(!fs.statSync(archDir).isDirectory())continue;for (const f of fs.readdirSync(archDir)) {const full=path.join(archDir,f);const st=fs.statSync(full);console.log(full, st.size, 'bytes', 'mode='+st.mode.toString(8));}}}"
 
+      # A GitHub secret that doesn't exist evaluates to an empty string,
+      # not an unset env var -- setting CSC_LINK="" via a static `env:`
+      # block (rather than leaving it truly unset) made electron-builder
+      # try to resolve it as a certificate file path and fail with
+      # "Env WIN_CSC_LINK is not correct... not a file", on *both*
+      # platforms, not just macOS as originally assumed (confirmed locally:
+      # unsetting CSC_LINK entirely fixed it; CSC_IDENTITY_AUTO_DISCOVERY
+      # alone did not). A static `env:` map can't conditionally omit a key,
+      # so this only exports CSC_LINK/etc at all when the secret is
+      # actually configured; otherwise it sets CSC_IDENTITY_AUTO_DISCOVERY
+      # to skip signing entirely, producing an unsigned exe/dmg.
       - name: Build installer
-        run: npm run ${{ matrix.dist-script }} -w apps/desktop
-        env:
-          # Only meaningful on the macOS job; harmless if unset on Windows.
-          # Set these as repo secrets to produce a signed + notarized dmg
-          # instead of an unsigned one (see WINDOWS_BUILD.md / MAC_BUILD.md).
-          CSC_LINK: ${{ secrets.MAC_CERTIFICATE_P12_BASE64 }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        shell: bash
+        run: |
+          if [ -n "${{ secrets.MAC_CERTIFICATE_P12_BASE64 }}" ]; then
+            export CSC_LINK="${{ secrets.MAC_CERTIFICATE_P12_BASE64 }}"
+            export CSC_KEY_PASSWORD="${{ secrets.MAC_CERTIFICATE_PASSWORD }}"
+            export APPLE_ID="${{ secrets.APPLE_ID }}"
+            export APPLE_APP_SPECIFIC_PASSWORD="${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}"
+            export APPLE_TEAM_ID="${{ secrets.APPLE_TEAM_ID }}"
+          else
+            export CSC_IDENTITY_AUTO_DISCOVERY=false
+          fi
+          npm run ${{ matrix.dist-script }} -w apps/desktop
 
       - uses: actions/upload-artifact@v4
         with:
