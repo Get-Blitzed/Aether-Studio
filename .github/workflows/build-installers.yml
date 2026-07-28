@@ -28,16 +28,19 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Matches the Node version this repo is actually developed and
+          # tested against locally (v24) -- CI was previously pinned to
+          # Node 20, below what pdfjs-dist (a document-engine dependency)
+          # requires (>=22.13.0 || >=24), which printed an EBADENGINE
+          # warning on every install.
+          node-version: 24
           cache: npm
 
-      # electron-builder bundles a real 7za.exe (via the `7zip-bin`
-      # package) that GitHub's hosted Windows runners' Windows Defender
-      # silently quarantines as a false positive right after npm install,
-      # which then fails the build with an ENOENT trying to chmod/exec it.
-      # This only affects this ephemeral, single-use CI VM -- it doesn't
-      # touch anyone's own machine. See electron-userland/electron-builder
-      # issues for the same root cause reported by many other projects.
+      # Disabling Defender is a harmless, standard CI-only precaution (this
+      # is an ephemeral, single-use VM) against a documented class of issue
+      # where Windows Defender quarantines electron-builder's bundled
+      # 7za.exe -- kept as a defensive measure even though it wasn't, on
+      # its own, sufficient to fix the ENOENT seen in earlier runs.
       - name: Disable Windows Defender real-time scanning (CI runner only)
         if: runner.os == 'Windows'
         shell: powershell
@@ -45,6 +48,14 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      # Diagnostic: earlier runs failed with "ENOENT ... chmod
+      # node_modules/7zip-bin/<platform>/<arch>/7za[.exe]" immediately after
+      # a clean, warning-free `npm install` reported success -- this proves
+      # or disproves whether the file is actually missing right before
+      # electron-builder needs it, instead of guessing again.
+      - name: Check 7zip-bin binary state
+        run: node -e "const fs=require('fs');const p=require('path');const dir=path.join('node_modules','7zip-bin');console.log('7zip-bin contents:');for (const plat of fs.readdirSync(dir)) {const platDir=path.join(dir,plat);if(!fs.statSync(platDir).isDirectory())continue;for (const arch of fs.readdirSync(platDir)) {const archDir=path.join(platDir,arch);if(!fs.statSync(archDir).isDirectory())continue;for (const f of fs.readdirSync(archDir)) {const full=path.join(archDir,f);const st=fs.statSync(full);console.log(full, st.size, 'bytes', 'mode='+st.mode.toString(8));}}}"
 
       - name: Build installer
         run: npm run ${{ matrix.dist-script }} -w apps/desktop
