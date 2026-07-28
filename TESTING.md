@@ -7,7 +7,13 @@ npm test
 ```
 
 Runs vitest (`vitest.config.ts` at the repo root) over
-`packages/*/src/**/*.test.ts`. Current coverage (62 tests):
+`packages/*/src/**/*.test.ts`. Current coverage (148 tests across 22 test
+files as of the Phase 8 checkpoint; the list below predates Phases 5-8 and
+covers only the original Phase 1-4 suite -- see each package's own
+`*.test.ts` files for the full current set, including `ai-providers`'
+`sapiVoiceProvider.test.ts` against the real Windows System.Speech engine,
+`export-engine`'s blur-compositing test against real ffmpeg, and
+`document-engine`'s real-fixture PDF/DOCX/PPTX extraction tests):
 
 - **`packages/core/src/paths.test.ts`** -- filename sanitization (reserved
   characters, Windows device names, trailing dots/spaces, empty input) and

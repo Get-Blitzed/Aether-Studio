@@ -2,9 +2,11 @@
 
 Phases 1 (Foundation), 2 (Preproduction), 3 (Media Management), 4
 (Audio and Screen Capture), 5 (Timeline and Graphics), 6 (AI Providers),
-and 7 (Review and Export) are complete -- see IMPLEMENTATION_STATUS.md.
-The phase below follows the spec's own phasing (section 42) and is not
-started.
+7 (Review and Export), and 8 (Document-to-Video, Voice, Redaction, and UI
+Redesign) are complete -- see IMPLEMENTATION_STATUS.md. Phase 8's actual
+scope was set by an explicit user request that superseded the original
+spec-section-42 "Polish and Packaging" plan for that slot; that original
+plan now runs as Phase 9 below, still not started.
 
 ## Phase 2 -- Preproduction: COMPLETE
 
@@ -174,10 +176,40 @@ storyboard frame, with the same checklist summary).
   directory, matching the existing `backups/`/`cache/` convention rather
   than adding a save-location dialog.
 
-## Phase 8 -- Polish and Packaging
+## Phase 8 -- Document-to-Video, Voice, Redaction, and UI Redesign: COMPLETE
+
+`packages/document-engine` (PDF/DOCX/PPTX text extraction, slide-card
+rendering, script/storyboard auto-generation), a document-import wizard
+that converts any of those file types (or a plain video/audio file) into a
+full timeline in one step; a native Windows voice (SAPI) provider as the
+default offline TTS tier plus an untested-live ElevenLabs provider as the
+external tier, wired into Voice Studio and the document-import pipeline for
+automatic narration; a "blur" timeline track type with percentage-based
+redaction regions composited into `renderFinalExport()`; an app-wide UI
+redesign (brighter palette, rounder/circular shape language, an original
+circles-and-ellipses logo) and a synthesized voice intro on the Splash
+screen. See IMPLEMENTATION_STATUS.md for full detail.
+
+**Deferred out of Phase 8, moved later:**
+- The Timeline Editor's "Quick Preview Render" (`concatVideoClips()`) still
+  doesn't composite captions or blur regions -- same scope boundary it's
+  had since Phase 5; only `renderFinalExport()` (the real delivery export)
+  composites blur.
+- ElevenLabs support is implemented against the documented API shape but
+  has not been exercised against a live account -- no credentials are
+  available in this environment (same posture Phase 6 shipped with for
+  `OpenAiCompatibleProvider`).
+- The UI redesign re-themes the existing color/shape tokens and hand-picks
+  a few high-visibility screens (Splash, Home, NavSidebar, Voice Studio,
+  Document Import, Timeline Editor's blur controls) rather than
+  individually restyling all ~20 screens -- the retheme cascades
+  everywhere via Tailwind config, but per-screen bespoke layout tweaks
+  were not done everywhere.
+
+## Phase 9 -- Polish and Packaging
 `packages/template-engine`, Learning Center, accessibility pass, performance
 pass, the real Windows installer build (`electron-builder.yml` already
-exists and produces a working NSIS installer shape -- Phase 8 is about
+exists and produces a working NSIS installer shape -- Phase 9 is about
 signing, icons, update architecture, and the release checklist), regression
 tests.
 

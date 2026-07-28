@@ -14,16 +14,21 @@ The included sample production -- **A.I. Blitz, Mission 001: Welcome to A.I.
 Blitz** -- is a template, not a hard-coded special case. The application is
 built to support other characters, brands, clients, and production types.
 
-> **Status: Phases 1 (Foundation), 2 (Preproduction), 3 (Media Management),
-> and 4 (Audio and Screen Capture) complete.** See
+> **Status: Phases 1-8 complete** (Foundation; Preproduction; Media
+> Management; Audio and Screen Capture; Timeline and Graphics; AI Providers;
+> Review and Export; Document-to-Video/Voice/Redaction/UI Redesign). See
 > [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) for exactly what
 > works today versus what's planned. Series planning, brand/character
 > management, knowledge sources, scriptwriting, storyboarding, prompt
-> authoring, the Asset Library, Voice Studio (real FFmpeg trim/normalize/
-> denoise/silence-removal/merge/export), and Screen Capture Studio (privacy
-> checklist, source picker, recording) are all real and working. Phases 5-8
-> (timeline, AI providers, review/export, polish) are not yet built -- this
-> is a real, running application, not a mockup, at every stage.
+> authoring, the Asset Library, Voice Studio (real FFmpeg processing plus
+> AI voice synthesis), Screen Capture Studio, a full multitrack Timeline
+> Editor with blur/redaction, AI provider integration (mock/OpenAI-compatible/
+> generic REST/native Windows voice/ElevenLabs), a real Quality-Control +
+> Export + Archive pipeline, and a one-step Document Import wizard
+> (PDF/DOCX/PPTX/video/audio -> a full narrated video project) are all real
+> and working. Phase 9 (template system, Learning Center, accessibility/
+> performance pass, signed installer) is not yet built -- this is a real,
+> running application, not a mockup, at every stage.
 
 ## Quick start (development)
 
@@ -42,7 +47,7 @@ open the A.I. Blitz sample, or import an existing `.aether` project.
 
 ```bash
 npm run typecheck   # strict TypeScript across every package
-npm test            # vitest unit tests (62 tests across 6 packages)
+npm test            # vitest unit tests (148 tests across 22 test files)
 npm run build        # build all workspace packages
 ```
 
@@ -65,7 +70,11 @@ See [WINDOWS_BUILD.md](WINDOWS_BUILD.md) for producing an actual
 /packages/shared-types  Zod schemas shared by main and renderer
 /packages/database    App-metadata database (SQLite via sql.js) + migrations
 /packages/project-engine  The .aether project file format: create/save/load/backup
-/packages/media-engine  FFmpeg-backed checksum/probe/thumbnail/waveform service
+/packages/media-engine  FFmpeg-backed checksum/probe/thumbnail/waveform/video-processing service
+/packages/ai-providers  Text/image/voice AI provider abstraction (mock, OpenAI-compatible, generic REST, native Windows voice, ElevenLabs)
+/packages/plugin-sdk  Plugin manifest schema + validation (no runtime loader yet)
+/packages/export-engine  Quality-Control checklist, real ffmpeg final export (with blur redaction), production archive zipping
+/packages/document-engine  PDF/DOCX/PPTX text extraction, slide rendering, script/storyboard auto-generation
 /resources            Branding, sample projects (A.I. Blitz), templates
 /docs                 Architecture, format, and process documentation
 ```
@@ -76,7 +85,7 @@ See [WINDOWS_BUILD.md](WINDOWS_BUILD.md) for producing an actual
 - [PROJECT_FORMAT.md](PROJECT_FORMAT.md) -- the `.aether` project file format
 - [FFMPEG_INTEGRATION.md](FFMPEG_INTEGRATION.md) -- the media-engine design and what FFmpeg is (and isn't) used for
 - [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) -- what's built vs. planned
-- [ROADMAP.md](ROADMAP.md) -- phases 5-8
+- [ROADMAP.md](ROADMAP.md) -- phase 9 and beyond
 - [KNOWN_LIMITATIONS.md](KNOWN_LIMITATIONS.md) -- current gaps and workarounds
 - [WINDOWS_BUILD.md](WINDOWS_BUILD.md) -- producing a Windows installer
 - [TESTING.md](TESTING.md) -- how to run and extend the test suite

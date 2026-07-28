@@ -9,7 +9,15 @@ import type {
   ProviderConfig,
   QualityCheck,
   SeriesPlan,
+  VoiceTake,
 } from "@aether/shared-types";
+
+interface VoiceOptionPayload {
+  id: string;
+  name: string;
+  gender?: string;
+  locale?: string;
+}
 
 interface ExportPresetPayload {
   id: string;
@@ -40,6 +48,9 @@ const api = {
       recoveryDetected: boolean;
       logFilePath: string;
     }>,
+
+  getIntroAudio: () =>
+    ipcRenderer.invoke("app:get-intro-audio") as Promise<{ ok: true; filePath: string } | { ok: false }>,
 
   settings: {
     get: () => ipcRenderer.invoke("settings:get") as Promise<AppSettings>,
@@ -178,6 +189,10 @@ const api = {
       ipcRenderer.invoke("providers:test", id) as Promise<
         { ok: true; result: { ok: boolean; message: string } } | { ok: false; error?: AppErrorPayload }
       >,
+    listVoices: (providerId: string) =>
+      ipcRenderer.invoke("providers:list-voices", providerId) as Promise<
+        { ok: true; voices: VoiceOptionPayload[] } | { ok: false; error?: AppErrorPayload }
+      >,
     runJob: (args: {
       jobType: string;
       providerId: string;
@@ -185,9 +200,24 @@ const api = {
       projectDir?: string;
       imageWidth?: number;
       imageHeight?: number;
+      voiceId?: string;
+      voiceRate?: number;
+      voicePitchSemitones?: number;
+      voiceVolume?: number;
+      voiceProfileId?: string;
+      scriptSegmentId?: string;
     }) =>
       ipcRenderer.invoke("providers:run-job", args) as Promise<
-        | { ok: true; job: BackgroundJob; text?: string; asset?: Asset; imagePath?: string; manifest?: ProjectManifest }
+        | {
+            ok: true;
+            job: BackgroundJob;
+            text?: string;
+            asset?: Asset;
+            imagePath?: string;
+            audioPath?: string;
+            voiceTake?: VoiceTake;
+            manifest?: ProjectManifest;
+          }
         | { ok: false; error?: AppErrorPayload; job?: BackgroundJob }
       >,
   },
@@ -205,6 +235,24 @@ const api = {
     createArchive: (projectDir: string) =>
       ipcRenderer.invoke("export:create-archive", projectDir) as Promise<
         { ok: true; archivePath: string } | { ok: false; error?: AppErrorPayload }
+      >,
+  },
+
+  documents: {
+    chooseFile: () => ipcRenderer.invoke("documents:choose-file") as Promise<string | null>,
+    importAndConvert: (args: { projectDir: string; filePath: string; narrate?: boolean }) =>
+      ipcRenderer.invoke("documents:import-and-convert", args) as Promise<
+        | { ok: true; mode: "asset-import"; manifest: ProjectManifest }
+        | {
+            ok: true;
+            mode: "document-conversion";
+            manifest: ProjectManifest;
+            scriptId: string;
+            timelineId: string;
+            pageCount: number;
+            narratedPageCount: number;
+          }
+        | { ok: false; error?: AppErrorPayload }
       >,
   },
 

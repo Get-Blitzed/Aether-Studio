@@ -8,6 +8,16 @@ describe("assertNotBlockedByOfflineMode", () => {
     expect(() => assertNotBlockedByOfflineMode("mock", false)).not.toThrow();
   });
 
+  it("never blocks the native SAPI voice provider (it never touches the network)", () => {
+    expect(() => assertNotBlockedByOfflineMode("sapi-voice", true)).not.toThrow();
+    expect(() => assertNotBlockedByOfflineMode("sapi-voice", false)).not.toThrow();
+  });
+
+  it("blocks the elevenlabs provider when offline mode is on", () => {
+    expect(() => assertNotBlockedByOfflineMode("elevenlabs", true)).toThrow(AiProviderError);
+    expect(() => assertNotBlockedByOfflineMode("elevenlabs", false)).not.toThrow();
+  });
+
   it("blocks networked providers when offline mode is on", () => {
     expect(() => assertNotBlockedByOfflineMode("openai-compatible", true)).toThrow(AiProviderError);
     expect(() => assertNotBlockedByOfflineMode("generic-rest", true)).toThrow(AiProviderError);

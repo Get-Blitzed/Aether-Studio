@@ -16,7 +16,8 @@ export class MediaEngineError extends Error {
       | "CONVERT_FAILED"
       | "LOUDNESS_ANALYSIS_FAILED"
       | "VIDEO_TRIM_FAILED"
-      | "VIDEO_SPEED_FAILED",
+      | "VIDEO_SPEED_FAILED"
+      | "IMAGE_TO_VIDEO_FAILED",
     public readonly cause?: unknown,
   ) {
     super(message);

@@ -1,6 +1,6 @@
 # Implementation Status
 
-Last updated: 2026-07-27 (Phase 7 checkpoint)
+Last updated: 2026-07-28 (Phase 8 checkpoint)
 
 ## Phase 1 -- Foundation: COMPLETE
 
@@ -250,9 +250,52 @@ Partway through manual verification, a mouse click intended for the running app'
 
 The native "Choose Files" import dialog could not be reliably driven by further clicking this phase (see the incident note above) -- Export Center's render and archive features were still verified end-to-end, but via directly-injected `linked` assets rather than by clicking through the Asset Library's own import flow a second time. That flow itself was already verified in Phases 3, 5, and 6.
 
-## Phase 8: NOT STARTED
+## Phase 8 -- Document-to-Video, Voice, Redaction, and UI Redesign: COMPLETE
 
-See [ROADMAP.md](ROADMAP.md). Nothing in Templates, Learning Center, Tasks,
-or Analytics is implemented beyond the Zod schema placeholder already
-present in `@aether/shared-types` (the manifest's `tasks` array exists and
-is currently always empty).
+Phase 8's scope was set directly by the user, not by the original
+spec-section-42 phasing (that plan now runs as Phase 9 -- see
+ROADMAP.md): (1) convert any document (PDF/DOCX/PPTX) or media file into a
+video project in one step, (2) AI voiceover with native Windows voices
+tried before any external source, (3) blur/redact sensitive info in the
+timeline editor, (4) a UI redesign -- bright colors, circles/ellipses
+instead of only squares, an original logo, and a spoken intro on Splash.
+
+| Area | Status | Notes |
+|---|---|---|
+| `packages/document-engine` | Done | `extractDocument()` dispatches by extension to `extractPdfText()` (`pdfjs-dist`, text-only, no canvas/rendering dependency), `extractDocxText()` (`mammoth`), or `extractPptxText()` (hand-rolled `adm-zip` + regex over `<a:t>` runs -- no OOXML library needed); `chunkParagraphsIntoPages()` groups DOCX paragraphs into ~60-word pseudo-pages; `renderTextSlide()` renders a real branded PNG slide card per page via ffmpeg `drawtext` (reading from temp text files, same escaping-avoidance pattern as Phase 7's caption burn-in); `buildScriptFromDocument()` turns extracted pages into a real `Script` + linked `StoryboardFrame[]` |
+| Document Import screen | Done | Choose-file (documents or video/audio) -> either converts (extract -> script/storyboard -> per-page narrated slide video -> assembled `Timeline`) or imports directly as an asset if the file is already a video/audio/image; an optional "Generate native-voice narration automatically" checkbox drives auto-narration |
+| Voice/TTS capability (ai-providers) | Done | `AiProvider` gained optional `listVoices()`/`synthesizeVoice()`; `SapiVoiceProvider` (real, fully offline, Windows System.Speech via a PowerShell child process, all dynamic values -- text, voice name, rate/pitch/volume -- passed through a JSON config file rather than interpolated into the script, the same textfile-based injection-avoidance pattern used elsewhere) is the native/default tier; `ElevenLabsProvider` (real `fetch`-based client against the documented API shape) is the external tier, reached only when a `sapi-voice` provider isn't configured/selected; `assertNotBlockedByOfflineMode()` now exempts `sapi-voice` alongside `mock` since neither touches the network |
+| Voice Studio AI synthesis | Done | A new panel: pick a voice-capability provider, pick a voice (populated from that provider's real `listVoices()`), rate/pitch sliders, free-text input, "Generate Take" -- calls `providers:run-job` with the new `voice` capability branch, which saves the synthesized audio as a real `VoiceTake` (probed duration/loudness/waveform, same metadata pipeline as an imported take) |
+| Auto-narration in the document pipeline | Done | Each page's text is synthesized via `SapiVoiceProvider` before its slide video is rendered; the slide's duration is set from the *actual* synthesized-audio duration (via `probeMedia`, not just a word-count estimate) plus a short tail buffer, and a matching narration clip is added to the timeline's narration track at the same start time. A page that fails to synthesize (no voices installed, non-Windows host) falls back to a silent, word-count-estimated slide rather than failing the whole import |
+| Blur/redaction | Done | A new `"blur"` `TimelineTrackType` and an optional `blurRegion` (percent-of-frame x/y/width/height + strength) on `TimelineClip`; the Timeline Editor has a dedicated "+ Add Blur Region" control, a Clip Inspector section for adjusting the region numerically, and an approximate dashed-rectangle preview overlay on the playback stage; `renderFinalExport()` composites each region via `split` -> `crop` -> `boxblur` -> `overlay`, time-gated per clip via `enable='between(t,start,end)'` |
+| UI redesign | Done | Tailwind `electric-blue`/`bronze` retoned brighter (`#7C5CFC`/`#FFB020`) plus two new gradient accent tokens (`aurora-pink`/`aurora-cyan`); the `borderRadius` scale itself was rounded (e.g. `rounded-md` 6px -> 12px), which reshapes every card/button/input across the entire app without touching each screen file; a hand-authored circles-and-ellipses logo (`Wordmark.tsx`) replaced the earlier angular polygon mark; NavSidebar gained a compact logo header and pill-shaped (rounded-full) nav items with a small circular active-indicator dot; Home and Document Import got circular icon badges and gradient buttons |
+| Splash voice intro | Done | A new `app:get-intro-audio` IPC handler synthesizes "Welcome to Aether Studio Suite. Let's create something fantastic." once via `SapiVoiceProvider` (preferring an installed male voice, `rate: 2`/`pitchSemitones: 2` for a medium-tone, semi-excited read), caches the WAV under `%APPDATA%/Aether Studio Suite/cache/`, and Splash plays it once per launch; if synthesis ever fails, Splash proceeds silently rather than blocking startup |
+
+### New shared-types schema changes (Phase 8)
+
+`ProviderKindSchema` gained `sapi-voice`/`elevenlabs`; `ProviderCapabilitySchema` gained `voice`. `TimelineTrackTypeSchema` gained `blur` (with a new `isBlurTrackType()` helper alongside the existing audio/video/overlay classifiers). `TimelineClipSchema` gained an optional `blurRegion` (new `BlurRegionSchema`: `xPercent`/`yPercent`/`widthPercent`/`heightPercent`/`blurStrength`, all percent-of-frame so it stays correct across export resolutions).
+
+### Architecture note: native-module avoidance continues
+
+Consistent with sql.js (Phase 1), Electron `safeStorage` (Phase 6), and `adm-zip` (Phase 7), this phase chose `pdfjs-dist` over `pdf-parse` for PDF text extraction specifically to avoid a transitive native dependency (`pdf-parse@2.x` pulls in `@napi-rs/canvas`; even `pdf-parse@1.1.1`, which has no native deps, turned out to bundle a 2016-era pdf.js that failed on a real pdf-lib-generated PDF in testing -- see the bug note below) and Windows SAPI over any third-party native TTS binding.
+
+### A real bug found and fixed during Phase 8: SAPI rejects an empty `<prosody>` tag
+
+`SapiVoiceProvider.synthesizeVoice()`'s generated SSML originally always wrapped the spoken text in a `<prosody>` element, adding a `pitch` attribute only when a pitch shift was requested -- so with no pitch shift, the SSML contained a bare `<prosody>` with no attributes at all. Windows' SAPI SSML parser rejects this outright (`'prosody' requires attribute 'pitch, contour, range, rate, duration, volume'`), so every synthesis call with a zero pitch shift threw, which a real headless test (`sapiVoiceProvider.test.ts`, run against the actual Windows System.Speech engine on this machine) caught immediately. Fixed by only emitting the `<prosody>` wrapper at all when `pitchSemitones !== 0`, leaving the text bare inside `<voice>` otherwise.
+
+### A second real bug found and fixed: blur verification test's own flawed metric
+
+The first version of `renderFinalExport()`'s blur test compared PNG file sizes of the same cropped region before/after blurring, expecting the blurred version to compress smaller. It didn't -- re-encoding a blurred region through h264 can introduce its own compression artifacts that sometimes *increase* PNG size despite the frame looking smoother, so the test failed even though the actual blur filter chain was working correctly (confirmed by a separate raw-pixel debug script). This was a bug in the *test's* verification method, not the production code -- fixed by measuring raw grayscale total variation (sum of horizontal pixel-to-pixel differences) instead of file size, which isn't confounded by re-encoding artifacts and correctly shows the blurred region's variation dropping to less than half of the unblurred region's.
+
+### Verified manually (Phase 8, this session)
+
+1. `npm test` (148/148 passing across all 22 test files, including 4 new SAPI voice tests against the real Windows System.Speech engine -- list real installed voices, a successful connection test, synthesizing a playable WAV, and rejecting empty text -- and a new blur-compositing test against the real bundled ffmpeg confirming a region is measurably blurred only within its clip's time window), `npm run typecheck` (every package plus both the desktop app's main and web tsconfigs), and `electron-vite build` all succeed.
+2. This machine has exactly 2 installed native Windows voices (`Microsoft David Desktop`, male; `Microsoft Zira Desktop`, female) -- confirmed by actually calling `SapiVoiceProvider.listVoices()`, not assumed. This is far fewer than the "twenty native voices" language in the original request; per an explicit up-front clarification with the user, the app truthfully reports whatever is actually installed rather than fabricating a count, and correctly selects the real male voice for the Splash intro.
+3. **The full document-to-video-with-narration pipeline was verified end-to-end against real synthesis and real ffmpeg**, outside of any mock: a page of narration text was synthesized via `SapiVoiceProvider` (4.24s of real audio), then a slide video was rendered at a duration derived from that real audio length, and the two were confirmed to match within 0.5s -- proving the auto-narration duration-sync logic (not just that each piece works in isolation).
+4. **The live running Electron app was visually confirmed** via a real window screenshot (captured by rect, not the full virtual desktop, per the established safety protocol below): the redesigned Home screen shows the new gradient logo mark in the sidebar, pill-shaped nav items with a pink active-indicator dot, gradient "Create" and amber "Open Sample" buttons, and circular icon badges on all three home cards -- confirming the retheme renders correctly, not just that it typechecks.
+5. Test artifacts (a debug PowerShell screenshot capture and a scratch verification script) were removed and the Electron dev process was stopped cleanly before finishing.
+
+### What wasn't interactively verified this session, and why
+
+Beyond the Home screen (item 4 above), the Document Import wizard, the Voice Studio synthesis panel, and the Timeline Editor's blur-region controls were not clicked through live -- coordinate-based automation proved unreliable again this phase (a click aimed at a nav item ended up interacting with an unrelated browser tab from this same tool session, not the target app), consistent with every prior phase's experience automating this Electron app's GUI. Given that risk, further verification relied on real, non-mocked pipeline tests that exercise the exact same underlying code the UI calls (SAPI synthesis, ffmpeg blur compositing, the narration-duration-sync logic) rather than continuing to fight coordinate clicks. No further privacy-sensitive incidents occurred this session; the durable safety protocol from the Phase 7 incident (verify `GetForegroundWindow()` before every click, never screenshot the full virtual desktop, prefer `EnumWindows`-by-title over blind clicking) was followed throughout, including for the one live screenshot that was taken.
+ElevenLabs's real `fetch`-based client was not exercised against a live account -- no credentials are available in this environment, the same posture Phase 6 shipped with for `OpenAiCompatibleProvider`.

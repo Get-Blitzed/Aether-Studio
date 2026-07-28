@@ -12,6 +12,7 @@ import { ScriptStudio } from "./screens/ScriptStudio";
 import { StoryboardStudio } from "./screens/StoryboardStudio";
 import { PromptWorkshop } from "./screens/PromptWorkshop";
 import { AssetLibrary } from "./screens/AssetLibrary";
+import { DocumentImport } from "./screens/DocumentImport";
 import { VoiceStudio } from "./screens/VoiceStudio";
 import { ScreenCaptureStudio } from "./screens/ScreenCaptureStudio";
 import { TimelineEditor } from "./screens/TimelineEditor";
@@ -36,6 +37,7 @@ export function App(): JSX.Element {
         <Route path="/storyboards" element={<StoryboardStudio />} />
         <Route path="/prompts" element={<PromptWorkshop />} />
         <Route path="/assets" element={<AssetLibrary />} />
+        <Route path="/documents" element={<DocumentImport />} />
         <Route path="/voice" element={<VoiceStudio />} />
         <Route path="/screen-capture" element={<ScreenCaptureStudio />} />
         <Route path="/timeline" element={<TimelineEditor />} />

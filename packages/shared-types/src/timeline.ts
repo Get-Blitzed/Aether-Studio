@@ -10,6 +10,7 @@ export const TimelineTrackTypeSchema = z.enum([
   "titles",
   "overlays",
   "captions",
+  "blur",
   "narration",
   "music",
   "sound-effects",
@@ -34,6 +35,9 @@ export function isVideoTrackType(type: TimelineTrackType): boolean {
 export function isOverlayTrackType(type: TimelineTrackType): boolean {
   return OVERLAY_TRACK_TYPES.has(type);
 }
+export function isBlurTrackType(type: TimelineTrackType): boolean {
+  return type === "blur";
+}
 
 export const TimelineTrackSchema = z.object({
   id: z.string(),
@@ -46,10 +50,24 @@ export const TimelineTrackSchema = z.object({
 });
 export type TimelineTrack = z.infer<typeof TimelineTrackSchema>;
 
+/**
+ * A rectangular redaction region, expressed as percentages (0-100) of the
+ * export frame rather than pixels -- stays correct regardless of which
+ * export preset/resolution the timeline is ultimately rendered at.
+ */
+export const BlurRegionSchema = z.object({
+  xPercent: z.number().min(0).max(100),
+  yPercent: z.number().min(0).max(100),
+  widthPercent: z.number().min(0).max(100),
+  heightPercent: z.number().min(0).max(100),
+  blurStrength: z.number().min(1).max(50).default(20),
+});
+export type BlurRegion = z.infer<typeof BlurRegionSchema>;
+
 export const TimelineClipSchema = z.object({
   id: z.string(),
   trackId: z.string(),
-  /** Either assetId (media clip) or overlayTemplateId (graphic/title clip) is set, not both. */
+  /** Either assetId (media clip) or overlayTemplateId (graphic/title clip) is set, not both. Blur-track clips set neither. */
   assetId: z.string().optional(),
   overlayTemplateId: z.string().optional(),
   sourceInSeconds: z.number().default(0),
@@ -63,6 +81,8 @@ export const TimelineClipSchema = z.object({
   muted: z.boolean().default(false),
   locked: z.boolean().default(false),
   overlayText: z.string().optional(),
+  /** Only set for clips on a "blur" track -- the region to redact for this clip's time range. */
+  blurRegion: BlurRegionSchema.optional(),
   notes: z.string().optional(),
   createdAt: z.string(),
   modifiedAt: z.string(),

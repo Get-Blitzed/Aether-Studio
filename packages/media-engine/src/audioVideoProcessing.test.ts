@@ -14,7 +14,7 @@ import {
   convertAudioFormat,
   analyzeLoudness,
 } from "./audioProcessing.js";
-import { trimVideo, adjustVideoSpeed } from "./videoProcessing.js";
+import { trimVideo, adjustVideoSpeed, imageToVideo } from "./videoProcessing.js";
 import { MediaEngineError } from "./errors.js";
 
 describe("audio/video processing (against the real bundled ffmpeg)", () => {
@@ -23,6 +23,7 @@ describe("audio/video processing (against the real bundled ffmpeg)", () => {
   let toneWav: string;
   let combinedWav: string; // 1s silence + 1s tone + 1s silence
   let testVideo: string;
+  let testImage: string;
 
   beforeAll(async () => {
     workDir = fs.mkdtempSync(path.join(os.tmpdir(), "audio-video-proc-test-"));
@@ -49,6 +50,9 @@ describe("audio/video processing (against the real bundled ffmpeg)", () => {
       "-f", "lavfi", "-i", "sine=frequency=440:duration=3",
       "-shortest", testVideo,
     ]);
+
+    testImage = path.join(workDir, "still.png");
+    await runProcess(ffmpegPath, ["-y", "-f", "lavfi", "-i", "color=c=blue:size=320x240", "-frames:v", "1", testImage]);
   }, 30_000);
 
   afterAll(() => {
@@ -153,6 +157,16 @@ describe("audio/video processing (against the real bundled ffmpeg)", () => {
     const probe = await probeMedia(output);
     expect(probe.durationSeconds).toBeGreaterThan(4);
   });
+
+  it("turns a still image into a silent video of the requested duration", async () => {
+    const output = path.join(workDir, "slide-video.mp4");
+    await imageToVideo(testImage, output, 2.5);
+    const probe = await probeMedia(output);
+    expect(probe.durationSeconds).toBeCloseTo(2.5, 0);
+    expect(probe.width).toBe(320);
+    expect(probe.height).toBe(240);
+    expect(probe.videoCodec).toBeTruthy();
+  }, 20_000);
 
   it("throws a MediaEngineError instance with the right code shape", () => {
     const error = new MediaEngineError("simulated", "FFMPEG_NOT_FOUND");

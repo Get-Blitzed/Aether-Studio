@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavSidebar } from "../components/NavSidebar";
 import { NoProjectOpen } from "../components/NoProjectOpen";
 import { ErrorBanner } from "../components/ErrorBanner";
 import { useAppStore } from "../state/appStore";
 import { generateId, nowIso } from "../lib/ids";
 import { toFileUrl } from "../lib/fileUrl";
-import type { VoiceProfile, VoiceTake } from "@aether/shared-types";
+import type { ProviderConfig, VoiceProfile, VoiceTake } from "@aether/shared-types";
+
+interface VoiceOptionUi {
+  id: string;
+  name: string;
+  gender?: string;
+  locale?: string;
+}
 
 export function VoiceStudio(): JSX.Element {
   const currentManifest = useAppStore((s) => s.currentManifest);
@@ -18,6 +25,39 @@ export function VoiceStudio(): JSX.Element {
   const [selectedTakeIds, setSelectedTakeIds] = useState<Set<string>>(new Set());
   const [error, setError] = useState<{ title: string; detail: string } | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const [voiceProviders, setVoiceProviders] = useState<ProviderConfig[]>([]);
+  const [synthProviderId, setSynthProviderId] = useState<string>("");
+  const [availableVoices, setAvailableVoices] = useState<VoiceOptionUi[]>([]);
+  const [synthVoiceId, setSynthVoiceId] = useState<string>("");
+  const [synthText, setSynthText] = useState("");
+  const [synthRate, setSynthRate] = useState(0);
+  const [synthPitch, setSynthPitch] = useState(0);
+  const [synthesizing, setSynthesizing] = useState(false);
+
+  useEffect(() => {
+    window.aether.providers.list().then((all) => {
+      const voiceCapable = all.filter((p) => p.capability === "voice" && p.enabled);
+      setVoiceProviders(voiceCapable);
+      const preferred = voiceCapable.find((p) => p.isDefaultForCapability) ?? voiceCapable[0];
+      if (preferred) setSynthProviderId(preferred.id);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!synthProviderId) {
+      setAvailableVoices([]);
+      return;
+    }
+    window.aether.providers.listVoices(synthProviderId).then((result) => {
+      if (result.ok) {
+        setAvailableVoices(result.voices);
+        setSynthVoiceId((current) => (result.voices.some((v) => v.id === current) ? current : result.voices[0]?.id ?? ""));
+      } else {
+        setAvailableVoices([]);
+      }
+    });
+  }, [synthProviderId]);
 
   if (!currentManifest || !currentProjectDir) return <NoProjectOpen what="voice takes" />;
 
@@ -123,6 +163,28 @@ export function VoiceStudio(): JSX.Element {
     }
   }
 
+  async function handleSynthesize() {
+    if (!currentProjectDir || !synthProviderId || !synthText.trim()) return;
+    setSynthesizing(true);
+    const result = await window.aether.providers.runJob({
+      jobType: "voice-synthesis",
+      providerId: synthProviderId,
+      input: { text: synthText },
+      projectDir: currentProjectDir,
+      voiceId: synthVoiceId || undefined,
+      voiceRate: synthRate,
+      voicePitchSemitones: synthPitch,
+      voiceProfileId: selectedProfileId ?? undefined,
+    });
+    setSynthesizing(false);
+    if (result.ok && result.manifest) {
+      setCurrentProject(currentProjectDir, result.manifest);
+      setSynthText("");
+    } else {
+      setError(result.ok ? { title: "Synthesis error", detail: "No project was updated." } : result.error ?? { title: "Synthesis failed", detail: "Unknown error" });
+    }
+  }
+
   function toggleTakeSelection(takeId: string) {
     setSelectedTakeIds((prev) => {
       const next = new Set(prev);
@@ -140,8 +202,8 @@ export function VoiceStudio(): JSX.Element {
           <div>
             <h1 className="text-2xl font-semibold text-cream">Voice Studio</h1>
             <p className="text-sm text-silver">
-              Manage narration takes for {currentManifest.title}. No connected voice-generation provider is
-              required -- import recordings and process them locally.
+              Manage narration takes for {currentManifest.title}. Import your own recordings, or generate a take
+              automatically with a configured voice provider (native Windows voices work offline).
             </p>
           </div>
           <button
@@ -243,6 +305,90 @@ export function VoiceStudio(): JSX.Element {
                     />
                   </div>
                 </div>
+              </div>
+
+              <div className="rounded-lg border border-white/10 bg-charcoal p-4">
+                <h2 className="mb-3 font-medium text-cream">AI Voice Synthesis</h2>
+                {voiceProviders.length === 0 ? (
+                  <p className="text-sm text-silver">
+                    No voice provider configured yet. Add a native Windows voice (SAPI) or ElevenLabs provider in{" "}
+                    <span className="text-cream">Providers</span> to generate narration automatically.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                      <label className="text-xs text-silver">
+                        Provider
+                        <select
+                          value={synthProviderId}
+                          onChange={(e) => setSynthProviderId(e.target.value)}
+                          className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                        >
+                          {voiceProviders.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="text-xs text-silver">
+                        Voice
+                        <select
+                          value={synthVoiceId}
+                          onChange={(e) => setSynthVoiceId(e.target.value)}
+                          className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                        >
+                          {availableVoices.length === 0 && <option value="">No voices available</option>}
+                          {availableVoices.map((v) => (
+                            <option key={v.id} value={v.id}>
+                              {v.name}
+                              {v.gender ? ` (${v.gender})` : ""}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <label className="text-xs text-silver">
+                          Rate ({synthRate})
+                          <input
+                            type="range"
+                            min={-10}
+                            max={10}
+                            value={synthRate}
+                            onChange={(e) => setSynthRate(Number(e.target.value))}
+                            className="mt-1 block w-full"
+                          />
+                        </label>
+                        <label className="text-xs text-silver">
+                          Pitch ({synthPitch}st)
+                          <input
+                            type="range"
+                            min={-12}
+                            max={12}
+                            value={synthPitch}
+                            onChange={(e) => setSynthPitch(Number(e.target.value))}
+                            className="mt-1 block w-full"
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    <textarea
+                      value={synthText}
+                      onChange={(e) => setSynthText(e.target.value)}
+                      placeholder="Text to speak..."
+                      rows={3}
+                      className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSynthesize}
+                      disabled={synthesizing || !synthText.trim() || !availableVoices.length}
+                      className="rounded-md bg-electric-blue px-4 py-2 text-sm font-medium text-navy disabled:opacity-50"
+                    >
+                      {synthesizing ? "Generating..." : "Generate Take"}
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center justify-between">

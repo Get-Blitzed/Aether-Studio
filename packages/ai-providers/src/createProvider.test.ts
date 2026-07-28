@@ -3,6 +3,8 @@ import { createProvider } from "./createProvider.js";
 import { MockProvider } from "./mockProvider.js";
 import { OpenAiCompatibleProvider } from "./openAiCompatibleProvider.js";
 import { GenericRestProvider } from "./genericRestProvider.js";
+import { SapiVoiceProvider } from "./sapiVoiceProvider.js";
+import { ElevenLabsProvider } from "./elevenLabsProvider.js";
 import { AiProviderError } from "./errors.js";
 import type { ProviderConfig } from "@aether/shared-types";
 
@@ -57,6 +59,26 @@ describe("createProvider", () => {
     } catch (error) {
       expect(error).toBeInstanceOf(AiProviderError);
       expect((error as AiProviderError).code).toBe("INVALID_CONFIG");
+    }
+  });
+
+  it("builds a SapiVoiceProvider for kind 'sapi-voice' with no secret required", () => {
+    const provider = createProvider(baseConfig({ kind: "sapi-voice", capability: "voice" }), undefined);
+    expect(provider).toBeInstanceOf(SapiVoiceProvider);
+  });
+
+  it("builds an ElevenLabsProvider given a secret", () => {
+    const provider = createProvider(baseConfig({ kind: "elevenlabs", capability: "voice" }), "xi-test-key");
+    expect(provider).toBeInstanceOf(ElevenLabsProvider);
+  });
+
+  it("throws MISSING_SECRET for an elevenlabs provider with no secret", () => {
+    try {
+      createProvider(baseConfig({ kind: "elevenlabs", capability: "voice" }), undefined);
+      expect.unreachable();
+    } catch (error) {
+      expect(error).toBeInstanceOf(AiProviderError);
+      expect((error as AiProviderError).code).toBe("MISSING_SECRET");
     }
   });
 });

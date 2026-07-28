@@ -24,6 +24,7 @@ const EXTENSION_GROUPS: Record<string, "image" | "video" | "audio" | "font" | "d
   ".woff2": "font",
   ".pdf": "document",
   ".docx": "document",
+  ".pptx": "document",
   ".md": "document",
   ".txt": "document",
 };

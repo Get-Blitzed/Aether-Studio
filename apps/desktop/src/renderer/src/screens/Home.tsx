@@ -80,7 +80,12 @@ export function Home(): JSX.Element {
 
         <section className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="rounded-lg border border-white/10 bg-charcoal p-5">
-            <h2 className="mb-3 font-medium text-cream">New Production</h2>
+            <div className="mb-3 flex items-center gap-3">
+              <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-electric-blue to-aurora-pink text-lg">
+                ✦
+              </span>
+              <h2 className="font-medium text-cream">New Production</h2>
+            </div>
             <input
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
@@ -91,31 +96,41 @@ export function Home(): JSX.Element {
               type="button"
               disabled={creating || !newTitle.trim()}
               onClick={handleCreate}
-              className="w-full rounded-md bg-electric-blue px-3 py-2 text-sm font-medium text-navy disabled:opacity-50"
+              className="w-full rounded-full bg-gradient-to-r from-electric-blue to-aurora-pink px-3 py-2 text-sm font-medium text-navy disabled:opacity-50"
             >
               {creating ? "Creating..." : "Create"}
             </button>
           </div>
 
           <div className="rounded-lg border border-white/10 bg-charcoal p-5">
-            <h2 className="mb-3 font-medium text-cream">Open Production</h2>
+            <div className="mb-3 flex items-center gap-3">
+              <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-aurora-cyan to-electric-blue text-lg">
+                ⌾
+              </span>
+              <h2 className="font-medium text-cream">Open Production</h2>
+            </div>
             <p className="mb-3 text-sm text-silver">Select an existing project folder containing project.aether.</p>
             <button
               type="button"
               onClick={handleOpen}
-              className="w-full rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
+              className="w-full rounded-full border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
             >
               Choose Folder...
             </button>
           </div>
 
           <div className="rounded-lg border border-bronze/40 bg-bronze/10 p-5">
-            <h2 className="mb-3 font-medium text-cream">A.I. Blitz Sample Template</h2>
+            <div className="mb-3 flex items-center gap-3">
+              <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-bronze text-lg text-navy">
+                ★
+              </span>
+              <h2 className="font-medium text-cream">A.I. Blitz Sample Template</h2>
+            </div>
             <p className="mb-3 text-sm text-silver">Mission 001, with Blitz's character profile pre-filled.</p>
             <button
               type="button"
               onClick={handleSample}
-              className="w-full rounded-md bg-bronze px-3 py-2 text-sm font-medium text-navy"
+              className="w-full rounded-full bg-bronze px-3 py-2 text-sm font-medium text-navy"
             >
               Open Sample
             </button>

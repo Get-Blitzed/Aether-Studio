@@ -26,10 +26,22 @@ export interface ExportCaption {
   text: string;
 }
 
+export interface ExportBlurRegion {
+  startSeconds: number;
+  endSeconds: number;
+  /** All in 0-100, percentage of the export frame -- resolution-independent. */
+  xPercent: number;
+  yPercent: number;
+  widthPercent: number;
+  heightPercent: number;
+  blurStrength: number;
+}
+
 export interface RenderFinalExportOptions {
   videoSegments: ExportVideoSegment[];
   audioClips: ExportAudioClip[];
   captions?: ExportCaption[];
+  blurRegions?: ExportBlurRegion[];
   preset: ExportPreset;
   ffmpegOverridePath?: string;
 }
@@ -58,7 +70,7 @@ function totalVideoDuration(segments: ExportVideoSegment[]): number {
  * tracks).
  */
 export async function renderFinalExport(options: RenderFinalExportOptions, outputPath: string): Promise<void> {
-  const { videoSegments, audioClips, captions = [], preset } = options;
+  const { videoSegments, audioClips, captions = [], blurRegions = [], preset } = options;
   if (videoSegments.length === 0) {
     throw new ExportEngineError("At least one primary-video clip is required to export.", "NO_VIDEO_SEGMENTS");
   }
@@ -97,6 +109,28 @@ export async function renderFinalExport(options: RenderFinalExportOptions, outpu
       `[${videoOutLabel}]drawtext=text='${text}':fontcolor=white:fontsize=${Math.max(18, Math.round(height / 20))}:` +
         `box=1:boxcolor=black@0.6:boxborderw=10:x=(w-text_w)/2:y=h-text_h-${Math.round(height * 0.06)}:` +
         `enable='between(t\\,${caption.startSeconds}\\,${caption.endSeconds})'[${nextLabel}]`,
+    );
+    videoOutLabel = nextLabel;
+  });
+
+  // Redaction: each blur region is composited as split -> crop the region
+  // -> boxblur it -> overlay it back over the original frame at the same
+  // position, gated to its own time window via `enable`. Chaining regions
+  // this way (rather than one combined filter) keeps each region
+  // independent and lets them overlap in time without interfering.
+  blurRegions.forEach((region, i) => {
+    const x = Math.max(0, Math.min(width - 2, Math.round((region.xPercent / 100) * width)));
+    const y = Math.max(0, Math.min(height - 2, Math.round((region.yPercent / 100) * height)));
+    const w = Math.max(2, Math.min(width - x, Math.round((region.widthPercent / 100) * width)));
+    const h = Math.max(2, Math.min(height - y, Math.round((region.heightPercent / 100) * height)));
+    const baseLabel = `vblurbase${i}`;
+    const cropSrcLabel = `vblursrc${i}`;
+    const blurredLabel = `vblurred${i}`;
+    const nextLabel = `vblur${i}`;
+    filters.push(`[${videoOutLabel}]split=2[${baseLabel}][${cropSrcLabel}]`);
+    filters.push(`[${cropSrcLabel}]crop=${w}:${h}:${x}:${y},boxblur=${Math.round(region.blurStrength)}:1[${blurredLabel}]`);
+    filters.push(
+      `[${baseLabel}][${blurredLabel}]overlay=${x}:${y}:enable='between(t\\,${region.startSeconds}\\,${region.endSeconds})'[${nextLabel}]`,
     );
     videoOutLabel = nextLabel;
   });

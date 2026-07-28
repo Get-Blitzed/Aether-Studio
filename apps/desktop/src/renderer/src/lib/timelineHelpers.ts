@@ -10,6 +10,7 @@ export const TRACK_TYPES: TimelineTrackType[] = [
   "titles",
   "overlays",
   "captions",
+  "blur",
   "narration",
   "music",
   "sound-effects",
@@ -46,6 +47,10 @@ export function isOverlayTrack(type: TimelineTrackType): boolean {
 
 export function isCaptionsTrack(type: TimelineTrackType): boolean {
   return type === "captions";
+}
+
+export function isBlurTrack(type: TimelineTrackType): boolean {
+  return type === "blur";
 }
 
 export function formatTimecode(totalSeconds: number): string {

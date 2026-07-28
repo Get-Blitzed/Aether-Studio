@@ -64,3 +64,41 @@ export async function adjustVideoSpeed(
     throw new MediaEngineError(`Failed to adjust playback speed for ${sourcePath}`, "VIDEO_SPEED_FAILED", cause);
   }
 }
+
+/**
+ * Turns a single still image into a silent video of the given duration --
+ * used for document-to-video conversion, where each page/slide becomes a
+ * fixed-length clip on the primary video track (a narration audio track
+ * is added and timed separately once TTS generates it).
+ */
+export async function imageToVideo(
+  imagePath: string,
+  outputPath: string,
+  durationSeconds: number,
+  ffmpegOverridePath?: string,
+): Promise<void> {
+  const ffmpegPath = requireFfmpeg(ffmpegOverridePath);
+  ensureOutputDir(outputPath);
+  try {
+    await runProcess(
+      ffmpegPath,
+      [
+        "-y",
+        "-loop",
+        "1",
+        "-i",
+        imagePath,
+        "-t",
+        String(durationSeconds),
+        "-vf",
+        "fps=30,format=yuv420p",
+        "-c:v",
+        "libx264",
+        outputPath,
+      ],
+      60_000,
+    );
+  } catch (cause) {
+    throw new MediaEngineError(`Failed to convert image to video: ${imagePath}`, "IMAGE_TO_VIDEO_FAILED", cause);
+  }
+}

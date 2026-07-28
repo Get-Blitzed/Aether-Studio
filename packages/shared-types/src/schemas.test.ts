@@ -9,6 +9,8 @@ import {
   TimelineSchema,
   TimelineTrackSchema,
   TimelineClipSchema,
+  BlurRegionSchema,
+  isBlurTrackType,
   OverlayTemplateSchema,
   CaptionSchema,
   ProviderConfigSchema,
@@ -189,6 +191,29 @@ describe("TimelineTrackSchema and TimelineClipSchema", () => {
     expect(clip.volume).toBe(1);
     expect(clip.opacity).toBe(1);
     expect(clip.fadeInSeconds).toBe(0);
+  });
+
+  it("accepts a 'blur' track type and identifies it via isBlurTrackType", () => {
+    const track = TimelineTrackSchema.parse({ id: "track_blur", type: "blur", name: "Redactions", order: 2 });
+    expect(isBlurTrackType(track.type)).toBe(true);
+    expect(isBlurTrackType("primary-video")).toBe(false);
+  });
+
+  it("fills in a default blurStrength when a clip carries a blurRegion", () => {
+    const clip = TimelineClipSchema.parse({
+      id: "clip_blur",
+      trackId: "track_blur",
+      timelineStartSeconds: 0,
+      timelineDurationSeconds: 5,
+      blurRegion: { xPercent: 10, yPercent: 10, widthPercent: 30, heightPercent: 20 },
+      createdAt: "2026-01-01T00:00:00.000Z",
+      modifiedAt: "2026-01-01T00:00:00.000Z",
+    });
+    expect(clip.blurRegion?.blurStrength).toBe(20);
+  });
+
+  it("rejects a blur region with an out-of-range percentage", () => {
+    expect(() => BlurRegionSchema.parse({ xPercent: 10, yPercent: 10, widthPercent: 150, heightPercent: 20 })).toThrow();
   });
 });
 

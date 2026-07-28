@@ -4,3 +4,9 @@ export function toFileUrl(baseDir: string, relativePath: string): string {
   const normalized = combined.replace(/^\/?/, "/");
   return `file://${encodeURI(normalized)}`;
 }
+
+/** Builds a file:// URL from a single already-absolute path (no project directory involved). */
+export function toAbsoluteFileUrl(absolutePath: string): string {
+  const normalized = absolutePath.replace(/\\/g, "/").replace(/^\/?/, "/");
+  return `file://${encodeURI(normalized)}`;
+}

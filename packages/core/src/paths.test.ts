@@ -1,5 +1,5 @@
 import { describe, expect, it, afterEach } from "vitest";
-import { sanitizeFileName, getAppDataDir, getDefaultProjectsDir } from "./paths.js";
+import { sanitizeFileName, getAppDataDir, getDefaultProjectsDir, getCacheDir } from "./paths.js";
 
 describe("sanitizeFileName", () => {
   it("replaces filesystem-reserved characters", () => {
@@ -44,5 +44,10 @@ describe("appdata paths", () => {
   it("honors AETHER_DOCUMENTS_OVERRIDE for the default projects dir", () => {
     process.env.AETHER_DOCUMENTS_OVERRIDE = "D:\\Fake\\Documents";
     expect(getDefaultProjectsDir()).toBe("D:\\Fake\\Documents\\Aether Studio Suite");
+  });
+
+  it("nests the cache dir under the app data dir", () => {
+    process.env.AETHER_APPDATA_OVERRIDE = "D:\\Fake\\AppData";
+    expect(getCacheDir()).toBe("D:\\Fake\\AppData\\Aether Studio Suite\\cache");
   });
 });

@@ -8,7 +8,9 @@ export class AiProviderError extends Error {
       | "MISSING_SECRET"
       | "NETWORK_ERROR"
       | "REQUEST_FAILED"
-      | "IMAGE_GENERATION_FAILED",
+      | "IMAGE_GENERATION_FAILED"
+      | "VOICE_SYNTHESIS_FAILED"
+      | "VOICE_LIST_FAILED",
     public readonly cause?: unknown,
   ) {
     super(message);

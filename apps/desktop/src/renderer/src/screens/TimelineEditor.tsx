@@ -5,7 +5,7 @@ import { ErrorBanner } from "../components/ErrorBanner";
 import { useAppStore } from "../state/appStore";
 import { generateId, nowIso } from "../lib/ids";
 import { toFileUrl } from "../lib/fileUrl";
-import { TRACK_TYPES, trackAssetKind, assetMatchesTrack, isOverlayTrack, isCaptionsTrack, formatTimecode } from "../lib/timelineHelpers";
+import { TRACK_TYPES, trackAssetKind, assetMatchesTrack, isOverlayTrack, isCaptionsTrack, isBlurTrack, formatTimecode } from "../lib/timelineHelpers";
 import { buildStandardOverlayTemplates } from "../lib/overlayTemplateSeed";
 import type { Timeline, TimelineTrack, TimelineClip, TimelineTrackType, ProjectManifest } from "@aether/shared-types";
 
@@ -240,6 +240,32 @@ export function TimelineEditor(): JSX.Element {
     setSelectedClipId(clip.id);
   }
 
+  function addBlurClipToTrack(track: TimelineTrack) {
+    if (!timeline) return;
+    pushUndo();
+    const trackClips = timeline.clips.filter((c) => c.trackId === track.id);
+    const start = trackClips.reduce((max, c) => Math.max(max, c.timelineStartSeconds + c.timelineDurationSeconds), 0);
+    const timestamp = nowIso();
+    const clip: TimelineClip = {
+      id: generateId("clip"),
+      trackId: track.id,
+      sourceInSeconds: 0,
+      timelineStartSeconds: start,
+      timelineDurationSeconds: 3,
+      volume: 1,
+      opacity: 1,
+      fadeInSeconds: 0,
+      fadeOutSeconds: 0,
+      muted: false,
+      locked: false,
+      blurRegion: { xPercent: 35, yPercent: 35, widthPercent: 30, heightPercent: 30, blurStrength: 20 },
+      createdAt: timestamp,
+      modifiedAt: timestamp,
+    };
+    void mutateTimeline((t) => ({ ...t, clips: [...t.clips, clip] }));
+    setSelectedClipId(clip.id);
+  }
+
   function updateClip(clipId: string, patch: Partial<TimelineClip>) {
     if (!timeline) return;
     void mutateTimeline((t) => ({ ...t, clips: t.clips.map((c) => (c.id === clipId ? { ...c, ...patch, modifiedAt: nowIso() } : c)) }));
@@ -342,6 +368,14 @@ export function TimelineEditor(): JSX.Element {
     return captionsTrack ? findActiveClip(timeline.clips, captionsTrack.id, playheadSeconds) : undefined;
   }, [timeline, sortedTracks, playheadSeconds]);
 
+  const activeBlurClips = useMemo(() => {
+    if (!timeline) return [];
+    return sortedTracks
+      .filter((t) => isBlurTrack(t.type))
+      .map((t) => findActiveClip(timeline.clips, t.id, playheadSeconds))
+      .filter((c): c is TimelineClip => Boolean(c && c.blurRegion));
+  }, [timeline, sortedTracks, playheadSeconds]);
+
   return (
     <div className="flex h-screen bg-navy">
       <NavSidebar />
@@ -415,6 +449,19 @@ export function TimelineEditor(): JSX.Element {
                     {activeCaptionClip.overlayText}
                   </div>
                 )}
+                {activeBlurClips.map((clip) => (
+                  <div
+                    key={clip.id}
+                    className="pointer-events-none absolute border-2 border-dashed border-red-400 bg-black/40 backdrop-blur-[2px]"
+                    style={{
+                      left: `${clip.blurRegion!.xPercent}%`,
+                      top: `${clip.blurRegion!.yPercent}%`,
+                      width: `${clip.blurRegion!.widthPercent}%`,
+                      height: `${clip.blurRegion!.heightPercent}%`,
+                    }}
+                    title="Blur region (approximate preview)"
+                  />
+                ))}
                 {audioTracks.map((track) => {
                   const activeClip = findActiveClip(timeline.clips, track.id, playheadSeconds);
                   const asset = activeClip ? currentManifest.assets.find((a) => a.id === activeClip.assetId) : undefined;
@@ -509,6 +556,7 @@ export function TimelineEditor(): JSX.Element {
                     onUpdateTrack={(patch) => updateTrack(track.id, patch)}
                     onRemoveTrack={() => removeTrack(track.id)}
                     onAddClip={(refId, kind, duration) => addClipToTrack(track, refId, kind, duration)}
+                    onAddBlurClip={() => addBlurClipToTrack(track)}
                   />
                 ))}
                 {sortedTracks.length === 0 && <p className="text-sm text-silver">No tracks yet. Add one above.</p>}
@@ -560,6 +608,7 @@ function TrackRow({
   onUpdateTrack,
   onRemoveTrack,
   onAddClip,
+  onAddBlurClip,
 }: {
   track: TimelineTrack;
   clips: TimelineClip[];
@@ -571,8 +620,10 @@ function TrackRow({
   onUpdateTrack: (patch: Partial<TimelineTrack>) => void;
   onRemoveTrack: () => void;
   onAddClip: (refId: string, kind: "asset" | "overlay", durationSeconds: number) => void;
+  onAddBlurClip: () => void;
 }): JSX.Element {
   const kind = trackAssetKind(track.type);
+  const isBlur = isBlurTrack(track.type);
   const compatibleAssets = assets.filter((a) => assetMatchesTrack(a.originalFileName, track.type));
 
   return (
@@ -600,7 +651,11 @@ function TrackRow({
             Lock
           </button>
         </div>
-        {kind === "overlay" ? (
+        {isBlur ? (
+          <button type="button" onClick={onAddBlurClip} className="w-full rounded border border-white/20 px-1.5 py-1 text-[10px] text-cream hover:bg-white/5">
+            + Add Blur Region
+          </button>
+        ) : kind === "overlay" ? (
           <OverlayAddControl templates={overlayTemplates} onAdd={onAddClip} />
         ) : (
           <AssetAddControl assets={compatibleAssets} onAdd={onAddClip} />
@@ -608,8 +663,9 @@ function TrackRow({
       </div>
       <div className="relative h-16 flex-1 bg-charcoal/40" style={{ minWidth: 400 }}>
         {clips.map((clip) => {
-          const label =
-            kind === "overlay"
+          const label = isBlur
+            ? "Blur Region"
+            : kind === "overlay"
               ? overlayTemplates.find((o) => o.id === clip.overlayTemplateId)?.name ?? "Overlay"
               : assets.find((a) => a.id === clip.assetId)?.originalFileName ?? "Clip";
           return (
@@ -764,6 +820,70 @@ function ClipInspector({
             placeholder="(uses template default text)"
             className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-sm text-cream"
           />
+        </div>
+      )}
+      {clip.blurRegion && (
+        <div className="mt-3">
+          <p className="mb-1 text-xs text-silver">
+            Blur Region (percent of frame) -- sensitive content in this rectangle is redacted for this clip's time range.
+          </p>
+          <div className="grid grid-cols-2 gap-3 text-xs text-silver md:grid-cols-5">
+            <label>
+              X %
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={clip.blurRegion.xPercent}
+                onChange={(e) => onChange({ blurRegion: { ...clip.blurRegion!, xPercent: Number(e.target.value) } })}
+                className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+              />
+            </label>
+            <label>
+              Y %
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={clip.blurRegion.yPercent}
+                onChange={(e) => onChange({ blurRegion: { ...clip.blurRegion!, yPercent: Number(e.target.value) } })}
+                className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+              />
+            </label>
+            <label>
+              Width %
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={clip.blurRegion.widthPercent}
+                onChange={(e) => onChange({ blurRegion: { ...clip.blurRegion!, widthPercent: Number(e.target.value) } })}
+                className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+              />
+            </label>
+            <label>
+              Height %
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={clip.blurRegion.heightPercent}
+                onChange={(e) => onChange({ blurRegion: { ...clip.blurRegion!, heightPercent: Number(e.target.value) } })}
+                className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+              />
+            </label>
+            <label>
+              Strength
+              <input
+                type="number"
+                min={1}
+                max={50}
+                value={clip.blurRegion.blurStrength}
+                onChange={(e) => onChange({ blurRegion: { ...clip.blurRegion!, blurStrength: Number(e.target.value) } })}
+                className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+              />
+            </label>
+          </div>
         </div>
       )}
     </div>

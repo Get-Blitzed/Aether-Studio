@@ -5,7 +5,7 @@ import { readManifest, saveProject } from "@aether/project-engine";
 import type { Logger } from "@aether/core";
 import { nowIso } from "@aether/core";
 import { EXPORT_PRESETS, getExportPreset, runQualityChecklist, renderFinalExport, archiveProduction, ExportEngineError } from "@aether/export-engine";
-import { isAudioTrackType } from "@aether/shared-types";
+import { isAudioTrackType, isBlurTrackType } from "@aether/shared-types";
 import type { SettingsRepository } from "@aether/database";
 import type { AppError } from "./projectsIpc.js";
 import { buildAssetFromFile, resolveAssetPath } from "../assetBuilder.js";
@@ -85,12 +85,25 @@ export function registerExportIpc({ logger, settingsRepo }: RegisterDeps): void 
 
         const captions = manifest.captions.map((c) => ({ startSeconds: c.startSeconds, endSeconds: c.endSeconds, text: c.text }));
 
+        const blurTrackIds = new Set(timeline.tracks.filter((t) => isBlurTrackType(t.type)).map((t) => t.id));
+        const blurRegions = timeline.clips
+          .filter((c) => blurTrackIds.has(c.trackId) && c.blurRegion)
+          .map((c) => ({
+            startSeconds: c.timelineStartSeconds,
+            endSeconds: c.timelineStartSeconds + c.timelineDurationSeconds,
+            xPercent: c.blurRegion!.xPercent,
+            yPercent: c.blurRegion!.yPercent,
+            widthPercent: c.blurRegion!.widthPercent,
+            heightPercent: c.blurRegion!.heightPercent,
+            blurStrength: c.blurRegion!.blurStrength,
+          }));
+
         const ffmpegOverridePath = settingsRepo.get().ffmpegPath;
         const rendersDir = path.join(args.projectDir, "renders");
         fs.mkdirSync(rendersDir, { recursive: true });
         const tempOutput = path.join(rendersDir, `export-${preset.id}-${Date.now()}.mp4`);
 
-        await renderFinalExport({ videoSegments, audioClips, captions, preset }, tempOutput);
+        await renderFinalExport({ videoSegments, audioClips, captions, blurRegions, preset }, tempOutput);
 
         const asset = await buildAssetFromFile(args.projectDir, tempOutput, "exports", "managed", ffmpegOverridePath, logger);
         fs.unlinkSync(tempOutput);

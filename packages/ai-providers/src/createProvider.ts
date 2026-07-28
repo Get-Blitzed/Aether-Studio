@@ -2,6 +2,8 @@ import type { ProviderConfig } from "@aether/shared-types";
 import { MockProvider } from "./mockProvider.js";
 import { OpenAiCompatibleProvider } from "./openAiCompatibleProvider.js";
 import { GenericRestProvider } from "./genericRestProvider.js";
+import { SapiVoiceProvider } from "./sapiVoiceProvider.js";
+import { ElevenLabsProvider } from "./elevenLabsProvider.js";
 import { AiProviderError } from "./errors.js";
 import type { AiProvider } from "./types.js";
 
@@ -21,6 +23,13 @@ export function createProvider(config: ProviderConfig, secret: string | undefine
         baseUrl: config.baseUrl ?? "",
         apiKey: secret,
         requestTemplate: config.requestTemplate,
+      });
+    case "sapi-voice":
+      return new SapiVoiceProvider();
+    case "elevenlabs":
+      return new ElevenLabsProvider({
+        baseUrl: config.baseUrl ?? "https://api.elevenlabs.io/v1",
+        apiKey: secret ?? "",
       });
     default: {
       const exhaustiveCheck: never = config.kind;

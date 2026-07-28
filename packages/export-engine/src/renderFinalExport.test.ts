@@ -74,6 +74,82 @@ describe("renderFinalExport (against the real bundled ffmpeg)", () => {
     expect(probe.height).toBe(1080);
   }, 30_000);
 
+  it("blurs the requested region only, only within its time window", async () => {
+    const preset = getExportPreset("youtube-720p")!;
+
+    // testsrc has real high-frequency detail (gradient bars, moving box).
+    // A boxblur measurably reduces horizontal pixel-to-pixel variation
+    // (total variation) within the blurred region -- PNG file size turned
+    // out to be an unreliable proxy here, since re-encoding a blurred
+    // region through h264 can introduce its own compression artifacts that
+    // sometimes *increase* PNG size despite the image looking smoother.
+    // Measuring raw grayscale pixel differences avoids that confound.
+    const detailedClip = path.join(workDir, "detailed.mp4");
+    await runProcess(ffmpegPath, ["-y", "-f", "lavfi", "-i", "testsrc=size=640x360:duration=3:rate=15", detailedClip]);
+
+    const unblurred = path.join(workDir, "unblurred.mp4");
+    await renderFinalExport(
+      { videoSegments: [{ filePath: detailedClip, startSeconds: 0, endSeconds: 3 }], audioClips: [], preset },
+      unblurred,
+    );
+
+    const blurred = path.join(workDir, "blurred.mp4");
+    await renderFinalExport(
+      {
+        videoSegments: [{ filePath: detailedClip, startSeconds: 0, endSeconds: 3 }],
+        audioClips: [],
+        blurRegions: [{ startSeconds: 0, endSeconds: 1.5, xPercent: 20, yPercent: 20, widthPercent: 30, heightPercent: 30, blurStrength: 25 }],
+        preset,
+      },
+      blurred,
+    );
+
+    const regionWidth = Math.round(preset.width * 0.3);
+    const regionHeight = Math.round(preset.height * 0.3);
+    const regionX = Math.round(preset.width * 0.2);
+    const regionY = Math.round(preset.height * 0.2);
+    const cropFilter = `crop=${regionWidth}:${regionHeight}:${regionX}:${regionY},format=gray`;
+
+    function totalVariation(pgmPath: string): number {
+      const buf = fs.readFileSync(pgmPath);
+      let idx = 0;
+      const readToken = (): string => {
+        while (buf[idx] === 0x20 || buf[idx] === 0x0a || buf[idx] === 0x09) idx++;
+        const start = idx;
+        while (buf[idx] !== 0x20 && buf[idx] !== 0x0a && buf[idx] !== 0x09) idx++;
+        return buf.toString("ascii", start, idx);
+      };
+      readToken(); // magic ("P5")
+      const w = Number.parseInt(readToken(), 10);
+      const h = Number.parseInt(readToken(), 10);
+      readToken(); // maxval
+      idx += 1; // single whitespace separator before pixel data
+      const pixels = buf.subarray(idx, idx + w * h);
+      let tv = 0;
+      for (let y = 0; y < h; y += 1) {
+        for (let x = 0; x < w - 1; x += 1) {
+          tv += Math.abs(pixels[y * w + x]! - pixels[y * w + x + 1]!);
+        }
+      }
+      return tv;
+    }
+
+    async function extractRegionVariation(source: string, atSeconds: number, outPgm: string): Promise<number> {
+      await runProcess(ffmpegPath, ["-y", "-ss", String(atSeconds), "-i", source, "-vf", cropFilter, "-frames:v", "1", "-pix_fmt", "gray", outPgm]);
+      return totalVariation(outPgm);
+    }
+
+    const unblurredVariation = await extractRegionVariation(unblurred, 0.5, path.join(workDir, "unblurred-region.pgm"));
+    const blurredVariation = await extractRegionVariation(blurred, 0.5, path.join(workDir, "blurred-region.pgm"));
+    expect(blurredVariation).toBeLessThan(unblurredVariation * 0.75);
+
+    // Outside the blur's time window (region only runs 0-1.5s), the same
+    // crop should look like the unblurred source again.
+    const laterUnblurredVariation = await extractRegionVariation(unblurred, 2.5, path.join(workDir, "later-unblurred.pgm"));
+    const laterBlurredVariation = await extractRegionVariation(blurred, 2.5, path.join(workDir, "later-blurred.pgm"));
+    expect(laterBlurredVariation).toBeGreaterThan(laterUnblurredVariation * 0.9);
+  }, 60_000);
+
   it("throws a structured error for an empty video segment list", async () => {
     const preset = getExportPreset("youtube-1080p")!;
     await expect(renderFinalExport({ videoSegments: [], audioClips: [], preset }, path.join(workDir, "shouldfail.mp4"))).rejects.toBeInstanceOf(

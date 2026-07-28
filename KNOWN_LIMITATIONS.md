@@ -1,4 +1,4 @@
-# Known Limitations (Phase 1-7)
+# Known Limitations (Phase 1-8)
 
 ## Database engine: sql.js, not better-sqlite3
 
@@ -198,6 +198,55 @@ presentation views. Prompt Workshop stores and assembles prompts as text but
 has no connection to an actual image/video generation provider (there are
 none yet -- see Phase 6).
 
+## Only two native Windows voices are actually installed on this machine
+
+The original request asked for "twenty native voices before searching
+outside sources." Windows SAPI voice availability depends entirely on
+what's installed on the host OS -- this machine has exactly two
+(`Microsoft David Desktop`, male, and `Microsoft Zira Desktop`, female),
+confirmed by actually calling `SapiVoiceProvider.listVoices()` rather than
+assumed. The app reports whatever is genuinely installed instead of
+fabricating a count; a machine with more language packs/voices installed
+would see more options automatically, with no code change needed.
+
+## ElevenLabs has not been exercised against a live account
+
+`ElevenLabsProvider` is a real `fetch`-based HTTP client written against
+ElevenLabs' documented request/response shapes, not a stub -- but no API
+credentials are available in this environment, so it has never made a
+real network call. Same posture Phase 6 shipped with for
+`OpenAiCompatibleProvider`.
+
+## Document-to-video only understands PDF, DOCX, and PPTX
+
+`extractDocument()` dispatches on file extension to exactly three
+extractors. Other document-ish types (`.txt`, `.md`, older `.doc`/`.ppt`
+binary formats, etc.) are not handled by the document-import pipeline;
+a `.txt`/`.md` file is still classified as `"document"` for Asset Library
+icon purposes (from Phase 3), but won't be offered the document-to-video
+conversion flow.
+
+## Blur regions only composite into the final export, not the quick preview
+
+The Timeline Editor's "Quick Preview Render" (`concatVideoClips()`) still
+only handles the primary-video track, same scope boundary it's had since
+Phase 5 -- it doesn't composite captions (already true before Phase 8) or
+blur regions (new in Phase 8). Only `renderFinalExport()`, used by the
+Export Center's real delivery export, composites blur.
+
+## The UI redesign re-themes globally but doesn't bespoke-restyle every screen
+
+Phase 8's redesign changed the underlying Tailwind color tokens
+(`electric-blue`/`bronze` retoned brighter, two new gradient accents added)
+and rounded the `borderRadius` scale itself, so every screen's existing
+`rounded-md`/`rounded-lg`/`bg-electric-blue`/etc. classes automatically
+picked up the brighter, rounder look -- but only a handful of
+high-visibility screens (Splash, Home, NavSidebar, Voice Studio, Document
+Import, Timeline Editor's blur controls) got hands-on layout changes
+(circular icon badges, gradient buttons, pill-shaped nav items). The
+other ~15 screens look brighter/rounder via the shared tokens but weren't
+individually redesigned.
+
 ## No migration exercised beyond format version 1
 
 `ProjectManifestSchema`'s version-mismatch guard is in place and will refuse
@@ -294,3 +343,14 @@ automation here, to avoid repeating the same failure mode.
      (an export render and an archive) was done by writing test data
      directly into the project file as `linked`-storage assets instead of
      continuing to attempt the import dialog.
+- **A click landed on an unrelated tool tab instead of the target app**
+  (Phase 8) -- a click aimed at a NavSidebar item instead brought this same
+  session's own browser-preview tab (showing a benign local scratchpad file
+  path, no personal or sensitive content) to the foreground, and a
+  follow-up focus check correctly reported the mismatch rather than
+  proceeding blind. Consistent with every prior phase, the response was to
+  stop clicking and rely on real, non-mocked pipeline tests (SAPI
+  synthesis, ffmpeg blur compositing, narration-duration sync) that
+  exercise the same underlying code the UI calls, plus one verified
+  screenshot of the Home screen taken by rect (not full-desktop) with focus
+  confirmed beforehand.

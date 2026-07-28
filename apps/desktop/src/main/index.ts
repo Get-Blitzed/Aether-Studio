@@ -13,6 +13,8 @@ import { registerTimelineIpc } from "./ipc/timelineIpc.js";
 import { registerCaptionsIpc } from "./ipc/captionsIpc.js";
 import { registerProvidersIpc } from "./ipc/providersIpc.js";
 import { registerExportIpc } from "./ipc/exportIpc.js";
+import { registerDocumentsIpc } from "./ipc/documentsIpc.js";
+import { registerIntroIpc } from "./ipc/introIpc.js";
 import { createSecretsStore } from "./secretsStore.js";
 
 const isDev = !app.isPackaged;
@@ -76,6 +78,8 @@ app.whenReady().then(async () => {
     logFilePath: logger.getLogFilePath(),
   }));
 
+  registerIntroIpc({ logger });
+
   if (database) {
     registerSettingsIpc(database);
     registerProjectsIpc({
@@ -116,6 +120,11 @@ app.whenReady().then(async () => {
     registerExportIpc({
       logger,
       settingsRepo: new SettingsRepository(database),
+    });
+    registerDocumentsIpc({
+      logger,
+      settingsRepo: new SettingsRepository(database),
+      getWindow: () => mainWindow,
     });
   }
 

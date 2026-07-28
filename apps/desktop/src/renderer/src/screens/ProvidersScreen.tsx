@@ -4,8 +4,9 @@ import { ErrorBanner } from "../components/ErrorBanner";
 import { generateId, nowIso } from "../lib/ids";
 import type { ProviderConfig, ProviderKind, ProviderCapability, BackgroundJob } from "@aether/shared-types";
 
-const PROVIDER_KINDS: ProviderKind[] = ["mock", "openai-compatible", "generic-rest"];
-const CAPABILITIES: ProviderCapability[] = ["text", "image"];
+const PROVIDER_KINDS: ProviderKind[] = ["mock", "openai-compatible", "generic-rest", "sapi-voice", "elevenlabs"];
+const CAPABILITIES: ProviderCapability[] = ["text", "image", "voice"];
+const KINDS_NEEDING_CREDENTIALS = new Set<ProviderKind>(["openai-compatible", "generic-rest", "elevenlabs"]);
 
 interface NewProviderForm {
   name: string;
@@ -119,8 +120,9 @@ export function ProvidersScreen(): JSX.Element {
         <header className="mb-6">
           <h1 className="text-2xl font-semibold text-cream">Provider &amp; Plugin Manager</h1>
           <p className="text-sm text-silver">
-            Configure AI providers for text and image generation. The Mock provider works offline with no credentials; real
-            providers require an API key and are blocked while Settings &gt; Offline Mode is on.
+            Configure AI providers for text, image, and voice generation. The Mock and native Windows voice (SAPI)
+            providers work offline with no credentials; other providers require an API key and are blocked while
+            Settings &gt; Offline Mode is on.
           </p>
         </header>
 
@@ -237,14 +239,20 @@ export function ProvidersScreen(): JSX.Element {
               </select>
             </label>
 
-            {form.kind !== "mock" && (
+            {form.kind === "sapi-voice" && (
+              <p className="col-span-2 text-xs text-silver md:col-span-3">
+                Native Windows text-to-speech (System.Speech). Fully offline, no API key or base URL needed -- whatever
+                voices are installed on this machine will be available.
+              </p>
+            )}
+            {KINDS_NEEDING_CREDENTIALS.has(form.kind) && (
               <>
                 <label className="text-xs text-silver">
                   Base URL
                   <input
                     value={form.baseUrl}
                     onChange={(e) => setForm((f) => ({ ...f, baseUrl: e.target.value }))}
-                    placeholder="https://api.openai.com/v1"
+                    placeholder={form.kind === "elevenlabs" ? "https://api.elevenlabs.io/v1" : "https://api.openai.com/v1"}
                     className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
                   />
                 </label>

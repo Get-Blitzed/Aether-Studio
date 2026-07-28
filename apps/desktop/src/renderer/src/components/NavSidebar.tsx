@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { Wordmark } from "./Wordmark";
 
 interface NavItemDef {
   label: string;
@@ -11,6 +12,7 @@ const NAV_ITEMS: NavItemDef[] = [
   { label: "Productions", path: "/home" },
   { label: "Series", path: "/series" },
   { label: "Knowledge", path: "/knowledge" },
+  { label: "Import Document", path: "/documents" },
   { label: "Scripts", path: "/scripts" },
   { label: "Storyboards", path: "/storyboards" },
   { label: "Prompts", path: "/prompts" },
@@ -37,6 +39,14 @@ export function NavSidebar(): JSX.Element {
 
   return (
     <nav className="flex w-56 flex-shrink-0 flex-col gap-1 border-r border-white/10 bg-charcoal p-3" aria-label="Primary">
+      <button
+        type="button"
+        onClick={() => navigate("/home")}
+        className="mb-3 flex items-center gap-2 rounded-full px-2 py-1.5 hover:bg-white/5"
+        aria-label="Aether Studio Suite home"
+      >
+        <Wordmark size="sm" compact />
+      </button>
       {NAV_ITEMS.map((item) => {
         const isActive = item.path && location.pathname === item.path;
         if (!item.path) {
@@ -47,7 +57,7 @@ export function NavSidebar(): JSX.Element {
                 disabled
                 title={item.disabledReason}
                 aria-disabled="true"
-                className="w-full cursor-not-allowed rounded-md px-3 py-2 text-left text-sm text-silver/40"
+                className="w-full cursor-not-allowed rounded-full px-3 py-2 text-left text-sm text-silver/40"
               >
                 {item.label}
               </button>
@@ -59,10 +69,16 @@ export function NavSidebar(): JSX.Element {
             key={item.label}
             type="button"
             onClick={() => navigate(item.path!)}
-            className={`w-full rounded-md px-3 py-2 text-left text-sm transition-colors ${
-              isActive ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-white/5 hover:text-cream"
+            className={`flex w-full items-center gap-2 rounded-full px-3 py-2 text-left text-sm transition-colors ${
+              isActive
+                ? "bg-gradient-to-r from-electric-blue/25 to-aurora-pink/15 text-cream"
+                : "text-silver hover:bg-white/5 hover:text-cream"
             }`}
           >
+            <span
+              className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${isActive ? "bg-aurora-pink" : "bg-transparent"}`}
+              aria-hidden="true"
+            />
             {item.label}
           </button>
         );
