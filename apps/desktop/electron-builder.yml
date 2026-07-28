@@ -5,6 +5,18 @@ productName: Aether Studio Suite
 # package's local node_modules) fails to find it -- pinning it explicitly
 # avoids that "Cannot compute electron version" failure.
 electronVersion: 31.7.7
+# In an npm workspace, node_modules is one shared, hoisted tree across the
+# whole monorepo -- not a private one per package. electron-builder's
+# default "install/rebuild production dependencies before packaging" step
+# was reinstalling apps/desktop's dependencies as production-only against
+# that SAME shared tree, pruning devDependencies (which includes
+# electron-builder's own transitive 7zip-bin dependency) out from under
+# itself mid-build -- the actual cause of a repeated "ENOENT chmod
+# .../7zip-bin/.../7za[.exe]" CI failure that looked like antivirus
+# quarantine but wasn't. Disabling it is safe here: this project has zero
+# native modules to rebuild (see ARCHITECTURE.md's sql.js/safeStorage/
+# adm-zip decisions), so there was never anything for this step to do.
+npmRebuild: false
 directories:
   output: ../../release
   buildResources: build
