@@ -66,7 +66,7 @@ const api = {
     chooseAndOpen: () => ipcRenderer.invoke("projects:choose-and-open") as Promise<ProjectResult & { canceled?: boolean }>,
     save: (projectDir: string, manifest: ProjectManifest) =>
       ipcRenderer.invoke("projects:save", projectDir, manifest) as Promise<ProjectResult>,
-    openSample: () => ipcRenderer.invoke("projects:open-sample-ai-blitz") as Promise<
+    openSample: () => ipcRenderer.invoke("projects:open-sample") as Promise<
       ProjectResult & { characterSheetImported?: boolean }
     >,
     listBackups: (projectDir: string) => ipcRenderer.invoke("projects:list-backups", projectDir),

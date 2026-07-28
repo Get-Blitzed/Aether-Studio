@@ -38,7 +38,7 @@ describe("project-engine", () => {
   it("sanitizes the title into a safe folder name", () => {
     const result = createProject({
       parentDir,
-      title: 'A.I. Blitz: Mission "001"?',
+      title: 'Orbit: Mission "001"?',
       applicationVersion: "0.1.0-test",
     });
     expect(fs.existsSync(result.projectDir)).toBe(true);

@@ -24,9 +24,9 @@ describe("SeriesRepository", () => {
     const timestamp = new Date().toISOString();
     return SeriesPlanSchema.parse({
       id: "series_1",
-      title: "A.I. Blitz Missions",
+      title: "Orbit Missions",
       episodes: [
-        { id: "ep_1", order: 1, title: "Mission 001 - Welcome to A.I. Blitz" },
+        { id: "ep_1", order: 1, title: "Mission 001 - Welcome to Orbit" },
         { id: "ep_2", order: 2, title: "Mission 002 - Creating Your First Workspace" },
       ],
       createdAt: timestamp,
@@ -55,7 +55,7 @@ describe("SeriesRepository", () => {
   it("gets a single plan by id", () => {
     const repo = new SeriesRepository(database);
     repo.save(samplePlan());
-    expect(repo.get("series_1")?.title).toBe("A.I. Blitz Missions");
+    expect(repo.get("series_1")?.title).toBe("Orbit Missions");
     expect(repo.get("missing")).toBeUndefined();
   });
 

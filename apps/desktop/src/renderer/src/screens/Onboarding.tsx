@@ -67,8 +67,8 @@ export function Onboarding(): JSX.Element {
           onClick={() => setChoice("blank")}
         />
         <OnboardingCard
-          title="Use the A.I. Blitz Sample Project"
-          description="Explore a fully editable sample: Blitz character profile, brand, and the Mission 001 script."
+          title="Use the Orbit Sample Project"
+          description="Explore a fully editable sample: Nova's character profile, the Orbit brand, and the Mission 001 script."
           selected={choice === "sample"}
           onClick={() => setChoice("sample")}
         />
@@ -109,7 +109,7 @@ export function Onboarding(): JSX.Element {
           onClick={handleSample}
           className="rounded-md bg-electric-blue px-4 py-2 font-medium text-navy disabled:opacity-50"
         >
-          {busy ? "Loading sample..." : "Open A.I. Blitz Sample"}
+          {busy ? "Loading sample..." : "Open Orbit Sample"}
         </button>
       )}
 

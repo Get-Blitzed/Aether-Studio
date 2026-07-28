@@ -14,7 +14,7 @@ const STANDARD_TEMPLATES: SeedSpec[] = [
   { kind: "episode-title", name: "Episode Title", defaultText: "Episode Title", position: "center", backgroundColor: "#131A2BE6" },
   { kind: "scene-title", name: "Scene Title", defaultText: "Scene Title", position: "top-left", backgroundColor: "#131A2BCC" },
   { kind: "lower-third", name: "Lower Third", defaultText: "Name / Role", position: "bottom-left", backgroundColor: "#131A2BCC" },
-  { kind: "blitz-tip", name: "BLITZ TIP", defaultText: "Start with one problem you understand well.", position: "bottom-center", backgroundColor: "#B08D57CC" },
+  { kind: "host-tip", name: "HOST TIP", defaultText: "Start with one problem you understand well.", position: "bottom-center", backgroundColor: "#FFB020CC" },
   { kind: "important", name: "IMPORTANT", defaultText: "Important information", position: "bottom-center", backgroundColor: "#7A2E2ECC" },
   { kind: "warning", name: "WARNING", defaultText: "Warning", position: "bottom-center", backgroundColor: "#7A2E2ECC" },
   { kind: "step-number", name: "Step Number", defaultText: "Step 1", position: "top-right", backgroundColor: "#131A2BCC" },

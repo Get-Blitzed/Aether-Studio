@@ -11,7 +11,7 @@ plan now runs as Phase 9 below, still not started.
 ## Phase 2 -- Preproduction: COMPLETE
 
 Series & Curriculum Planner (global, DB-backed, with the editable sample
-A.I. Blitz Mission 001-010 curriculum), Brand Studio, Character Studio
+Orbit Mission 001-010 curriculum), Brand Studio, Character Studio
 (reference gallery + consistency locks), Knowledge Library, Script Studio
 (scene/segment editor with real duration math), Storyboard Studio, Prompt
 Workshop -- all built and manually verified against the running app.

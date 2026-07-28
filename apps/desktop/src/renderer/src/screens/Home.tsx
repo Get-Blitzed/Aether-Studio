@@ -124,9 +124,9 @@ export function Home(): JSX.Element {
               <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-bronze text-lg text-navy">
                 ★
               </span>
-              <h2 className="font-medium text-cream">A.I. Blitz Sample Template</h2>
+              <h2 className="font-medium text-cream">Orbit Sample Template</h2>
             </div>
-            <p className="mb-3 text-sm text-silver">Mission 001, with Blitz's character profile pre-filled.</p>
+            <p className="mb-3 text-sm text-silver">Mission 001, with Nova's character profile pre-filled.</p>
             <button
               type="button"
               onClick={handleSample}

@@ -40,9 +40,9 @@ describe("MockProvider.generateText -- outline", () => {
 describe("MockProvider.generateText -- improve-hook", () => {
   it("rewrites the current line into something different", async () => {
     const provider = new MockProvider();
-    const prompt = buildStructuredPrompt("improve-hook", { current: "Welcome to A.I. Blitz." });
+    const prompt = buildStructuredPrompt("improve-hook", { current: "Welcome to Orbit." });
     const result = await provider.generateText!({ prompt });
-    expect(result.text).not.toBe("Welcome to A.I. Blitz.");
+    expect(result.text).not.toBe("Welcome to Orbit.");
     expect(result.text.length).toBeGreaterThan(0);
   });
 

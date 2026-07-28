@@ -3,7 +3,7 @@ import { sanitizeFileName, getAppDataDir, getDefaultProjectsDir, getCacheDir } f
 
 describe("sanitizeFileName", () => {
   it("replaces filesystem-reserved characters", () => {
-    expect(sanitizeFileName('A.I. Blitz: Mission "001"?')).not.toMatch(/[<>:"/\\|?*]/);
+    expect(sanitizeFileName('Orbit: Mission "001"?')).not.toMatch(/[<>:"/\\|?*]/);
   });
 
   it("guards against Windows reserved device names", () => {

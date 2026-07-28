@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { NavSidebar } from "../components/NavSidebar";
 import { ErrorBanner } from "../components/ErrorBanner";
 import { generateId, nowIso } from "../lib/ids";
-import { buildAiBlitzSampleCurriculum } from "../lib/aiBlitzCurriculum";
+import { buildOrbitSampleCurriculum } from "../lib/orbitCurriculum";
 import type { SeriesPlan, EpisodePlan } from "@aether/shared-types";
 
 export function SeriesPlanner(): JSX.Element {
@@ -50,7 +50,7 @@ export function SeriesPlanner(): JSX.Element {
   }
 
   async function handleLoadSample() {
-    await persist(buildAiBlitzSampleCurriculum());
+    await persist(buildOrbitSampleCurriculum());
   }
 
   async function handleDelete(id: string) {
@@ -126,7 +126,7 @@ export function SeriesPlanner(): JSX.Element {
               onClick={handleLoadSample}
               className="rounded-md bg-bronze px-3 py-2 text-sm font-medium text-navy"
             >
-              Load A.I. Blitz Sample Curriculum
+              Load Orbit Sample Curriculum
             </button>
           </div>
         </header>

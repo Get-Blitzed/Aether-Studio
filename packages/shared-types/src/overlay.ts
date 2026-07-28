@@ -5,7 +5,7 @@ export const OverlayTemplateKindSchema = z.enum([
   "episode-title",
   "scene-title",
   "lower-third",
-  "blitz-tip",
+  "host-tip",
   "important",
   "warning",
   "step-number",

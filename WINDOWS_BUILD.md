@@ -33,7 +33,7 @@ This runs `electron-vite build` followed by `electron-builder --win`, using
 - Product name: `Aether Studio Suite`
 - Output: `Aether-Studio-Setup.exe`-style NSIS installer in `/release`
 - `/resources` (branding, sample projects, templates) is copied in as
-  `extraResources`, so the packaged app resolves the A.I. Blitz sample data
+  `extraResources`, so the packaged app resolves the Orbit sample data
   the same way dev mode does (`getBundledResourcesDir()` in
   `apps/desktop/src/main/resourcePaths.ts` branches on `app.isPackaged`)
 

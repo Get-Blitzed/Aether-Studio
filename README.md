@@ -10,9 +10,10 @@ scriptwriting environment, storyboard planning, a character-consistency
 manager, brand management, a prompt workshop, media asset management, and a
 lightweight nonlinear timeline editor into one local-first application.
 
-The included sample production -- **A.I. Blitz, Mission 001: Welcome to A.I.
-Blitz** -- is a template, not a hard-coded special case. The application is
-built to support other characters, brands, clients, and production types.
+The included sample production -- **Orbit, Mission 001: Welcome to Orbit**,
+narrated by the onboarding guide Nova -- is a template, not a hard-coded
+special case. The application is built to support other characters,
+brands, clients, and production types.
 
 > **Status: Phases 1-8 complete** (Foundation; Preproduction; Media
 > Management; Audio and Screen Capture; Timeline and Graphics; AI Providers;
@@ -41,7 +42,7 @@ npm run dev
 
 `npm run dev` launches the Electron app with the renderer running under Vite
 HMR. On first run you'll see the onboarding wizard: start a blank production,
-open the A.I. Blitz sample, or import an existing `.aether` project.
+open the Orbit sample, or import an existing `.aether` project.
 
 ## Other useful commands
 
@@ -75,7 +76,7 @@ See [WINDOWS_BUILD.md](WINDOWS_BUILD.md) for producing an actual
 /packages/plugin-sdk  Plugin manifest schema + validation (no runtime loader yet)
 /packages/export-engine  Quality-Control checklist, real ffmpeg final export (with blur redaction), production archive zipping
 /packages/document-engine  PDF/DOCX/PPTX text extraction, slide rendering, script/storyboard auto-generation
-/resources            Branding, sample projects (A.I. Blitz), templates
+/resources            Branding, sample projects (Orbit), templates
 /docs                 Architecture, format, and process documentation
 ```
 

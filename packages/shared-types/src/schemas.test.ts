@@ -52,7 +52,7 @@ describe("PromptSchema", () => {
   it("fills in defaults for a minimal prompt", () => {
     const prompt = PromptSchema.parse({
       id: "prompt_1",
-      label: "Blitz idle presenter",
+      label: "Nova idle drift",
       category: "character-animation",
       createdAt: "2026-01-01T00:00:00.000Z",
       modifiedAt: "2026-01-01T00:00:00.000Z",
@@ -66,7 +66,7 @@ describe("SeriesPlanSchema", () => {
   it("validates a curriculum with ordered episodes", () => {
     const plan = SeriesPlanSchema.parse({
       id: "series_1",
-      title: "A.I. Blitz Missions",
+      title: "Orbit Missions",
       episodes: [
         { id: "ep_1", order: 1, title: "Mission 001" },
         { id: "ep_2", order: 2, title: "Mission 002", difficulty: "intermediate" },
@@ -86,8 +86,8 @@ describe("AssetSchema", () => {
       id: "asset_1",
       category: "images",
       storageMode: "managed",
-      filePath: "assets/images/blitz.jpg",
-      originalFileName: "blitz.jpg",
+      filePath: "assets/images/nova.jpg",
+      originalFileName: "nova.jpg",
       importedAt: "2026-01-01T00:00:00.000Z",
       modifiedAt: "2026-01-01T00:00:00.000Z",
     });
@@ -130,11 +130,11 @@ describe("VoiceProfileSchema", () => {
   it("fills in defaults for a minimal profile", () => {
     const profile = VoiceProfileSchema.parse({
       id: "voice_1",
-      name: "Blitz",
+      name: "Nova",
       createdAt: "2026-01-01T00:00:00.000Z",
       modifiedAt: "2026-01-01T00:00:00.000Z",
     });
-    expect(profile.name).toBe("Blitz");
+    expect(profile.name).toBe("Nova");
   });
 });
 
@@ -250,8 +250,8 @@ describe("OverlayTemplateSchema", () => {
   it("fills in defaults for a minimal template", () => {
     const template = OverlayTemplateSchema.parse({
       id: "overlay_1",
-      kind: "blitz-tip",
-      name: "BLITZ TIP",
+      kind: "host-tip",
+      name: "HOST TIP",
       createdAt: "2026-01-01T00:00:00.000Z",
       modifiedAt: "2026-01-01T00:00:00.000Z",
     });

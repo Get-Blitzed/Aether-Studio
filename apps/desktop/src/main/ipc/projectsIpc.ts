@@ -12,7 +12,7 @@ import {
 } from "@aether/project-engine";
 import { getDefaultProjectsDir, nowIso, type Logger } from "@aether/core";
 import type { ProjectManifest, ProductionSettings } from "@aether/shared-types";
-import { ensureAiBlitzSampleProject } from "../sampleAiBlitzProject.js";
+import { ensureOrbitSampleProject } from "../sampleOrbitProject.js";
 
 export interface AppError {
   title: string;
@@ -159,21 +159,21 @@ export function registerProjectsIpc({ db, logger, applicationVersion, getWindow 
     }
   });
 
-  ipcMain.handle("projects:open-sample-ai-blitz", () => {
+  ipcMain.handle("projects:open-sample", () => {
     try {
       const parentDir = getDefaultProjectsDir();
       fs.mkdirSync(parentDir, { recursive: true });
-      const result = ensureAiBlitzSampleProject(parentDir, applicationVersion, logger);
+      const result = ensureOrbitSampleProject(parentDir, applicationVersion, logger);
       registerInDb(result.projectDir, result.manifest);
       projects.markOpened(result.projectId, nowIso());
       activity.record({
         projectId: result.projectId,
         eventType: "sample-project-opened",
-        message: "Opened the A.I. Blitz sample project",
+        message: "Opened the Orbit sample project",
       });
       return { ok: true as const, ...result };
     } catch (error) {
-      logger.error("projects:open-sample-ai-blitz failed", error);
+      logger.error("projects:open-sample failed", error);
       return { ok: false as const, error: toAppError(error) };
     }
   });

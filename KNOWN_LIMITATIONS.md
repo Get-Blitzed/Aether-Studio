@@ -247,6 +247,21 @@ Import, Timeline Editor's blur controls) got hands-on layout changes
 other ~15 screens look brighter/rounder via the shared tokens but weren't
 individually redesigned.
 
+## Reference images don't render in `npm run dev`, only in a real build
+
+Character Studio's reference-image thumbnails (and any other `<img
+src="file://...">` usage) show a broken-image icon when running via `npm
+run dev` -- Vite's dev server serves the renderer over
+`http://localhost:5173`, and Chromium blocks a page loaded over http from
+loading local `file://` subresources. This is not specific to the sample
+project's character-sheet art (discovered while verifying it, but it would
+affect any imported reference image) and does not occur in a real build
+(`electron-vite build && electron .`, or the packaged installer) where the
+renderer itself loads over `file://` and origins match -- confirmed by
+comparing the two side by side. No code fix has been applied since dev
+mode still works for everything else; worth knowing before assuming a
+missing thumbnail in dev mode is a real bug.
+
 ## No migration exercised beyond format version 1
 
 `ProjectManifestSchema`'s version-mismatch guard is in place and will refuse

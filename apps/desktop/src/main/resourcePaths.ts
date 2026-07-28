@@ -10,13 +10,13 @@ export function getBundledResourcesDir(): string {
   return path.resolve(app.getAppPath(), "..", "..", "resources");
 }
 
-export function getBlitzCharacterSheetSourcePath(): string {
+export function getNovaCharacterSheetSourcePath(): string {
   return path.join(
     getBundledResourcesDir(),
     "sample-projects",
-    "ai-blitz",
+    "orbit",
     "characters",
-    "blitz",
-    "blitz-character-sheet.jpeg",
+    "nova",
+    "nova-character-sheet.svg",
   );
 }

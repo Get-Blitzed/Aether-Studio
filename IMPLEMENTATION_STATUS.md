@@ -18,17 +18,17 @@ Last updated: 2026-07-28 (Phase 8 checkpoint)
 | Project save/load | Done | Atomic write, Zod validation on read, structured errors |
 | Backup + recovery | Done | Rotating snapshots on every save; restore-from-backup IPC + function; crash-recovery marker file drives a "safe mode" splash notice |
 | Splash screen | Done | Logo, tagline, animated indicator, staggered real startup-status messages, version, recovery notice |
-| Home screen | Done | New/Open/Recent Productions, A.I. Blitz sample card, full nav list (Phase 2 items now enabled; remaining ones phase-labeled and disabled) |
-| First-run onboarding | Done | Blank / A.I. Blitz Sample / Import Existing, exactly as specified |
-| A.I. Blitz sample project | Done | Blitz character profile (personality, wardrobe, locks, animation restrictions), A.I. Blitz brand profile, full 9-scene Mission 001 script with the specified narration, unverified-claim flags, and the "CONFIRM FINAL PRODUCT WORDING BEFORE PUBLICATION" warning |
-| Blitz character sheet import | Done | Auto-copies from `/resources/sample-projects/ai-blitz/characters/blitz/` into the project if present; degrades gracefully (shows a "Locate character sheet" button) if absent -- never fails |
+| Home screen | Done | New/Open/Recent Productions, Orbit sample card, full nav list (Phase 2 items now enabled; remaining ones phase-labeled and disabled) |
+| First-run onboarding | Done | Blank / Orbit Sample / Import Existing, exactly as specified |
+| Orbit sample project | Done | Nova character profile (personality, visual description, locks), Orbit brand profile, full 9-scene Mission 001 script with narration, unverified-claim flags, and the "CONFIRM FINAL PRODUCT WORDING BEFORE PUBLICATION" warning. Originally seeded as "A.I. Blitz" (a real character/live application) -- replaced with the original Nova/Orbit sample after the fact; see the rebrand note below |
+| Nova character sheet import | Done | Auto-copies from `/resources/sample-projects/orbit/characters/nova/` into the project if present; degrades gracefully (shows a "Locate character sheet" button) if absent -- never fails |
 | Windows path handling | Done | `sanitizeFileName()` strips reserved chars, trailing dots/spaces, and guards reserved device names (CON, NUL, COM1, ...) |
 
 ## Phase 2 -- Preproduction: COMPLETE
 
 | Area | Status | Notes |
 |---|---|---|
-| Series & Curriculum Planner | Done | Global (DB-backed via `series_plans`), CRUD for series and episodes, up/down reordering, editable A.I. Blitz Missions 001-010 sample curriculum loader |
+| Series & Curriculum Planner | Done | Global (DB-backed via `series_plans`), CRUD for series and episodes, up/down reordering, editable Orbit Missions 001-010 sample curriculum loader |
 | Brand Studio | Done | Full CRUD on a project's `brands[]`: color palette editor, approved/prohibited terminology, disclaimers, accessibility requirements, client-side validation warnings (missing logo, empty palette, no disclaimer, no accessibility requirements) |
 | Character Studio | Done | Full CRUD on `characters[]`: bio fields, lip-sync toggle, all 7 consistency locks as toggleable chips, reference gallery with per-image category + approval, reuses Phase 1's reference-image import flow |
 | Knowledge Library | Done | CRUD on `knowledgeSources[]`, search/filter, status badges, stale/conflicting-source warning banner |
@@ -299,3 +299,41 @@ The first version of `renderFinalExport()`'s blur test compared PNG file sizes o
 
 Beyond the Home screen (item 4 above), the Document Import wizard, the Voice Studio synthesis panel, and the Timeline Editor's blur-region controls were not clicked through live -- coordinate-based automation proved unreliable again this phase (a click aimed at a nav item ended up interacting with an unrelated browser tab from this same tool session, not the target app), consistent with every prior phase's experience automating this Electron app's GUI. Given that risk, further verification relied on real, non-mocked pipeline tests that exercise the exact same underlying code the UI calls (SAPI synthesis, ffmpeg blur compositing, the narration-duration-sync logic) rather than continuing to fight coordinate clicks. No further privacy-sensitive incidents occurred this session; the durable safety protocol from the Phase 7 incident (verify `GetForegroundWindow()` before every click, never screenshot the full virtual desktop, prefer `EnumWindows`-by-title over blind clicking) was followed throughout, including for the one live screenshot that was taken.
 ElevenLabs's real `fetch`-based client was not exercised against a live account -- no credentials are available in this environment, the same posture Phase 6 shipped with for `OpenAiCompatibleProvider`.
+
+## Sample project rebrand: A.I. Blitz -> Orbit / Nova
+
+The built-in sample production seeded since Phase 1 was originally named
+"A.I. Blitz" with a character called "Blitz" -- both turned out to be a
+real character and live application, not appropriate to ship as this
+app's own bundled sample. Replaced entirely with an original creation:
+
+- **Nova** -- a small, non-humanoid comet-being of aurora-gradient light,
+  the onboarding guide. Hand-authored as original circles-and-ellipses SVG
+  art (`resources/sample-projects/orbit/characters/nova/nova-character-sheet.svg`),
+  consistent with the Phase 8 UI redesign's visual language rather than a
+  photo-real character sheet.
+- **Orbit** -- a fictional team-collaboration product, the brand/subject
+  of the sample Mission 001 script. Its color palette reuses the app's own
+  redesigned aurora-pink/electric-violet/aurora-cyan/bronze tokens, so the
+  in-sample "product" visually matches the studio producing it.
+- The sample project's directory, IPC channel (`projects:open-sample`,
+  simplified from `projects:open-sample-ai-blitz`), and the Series
+  Planner's sample curriculum (`Orbit Missions`, 10 mission titles) were
+  all renamed to match. The generic `"blitz-tip"` overlay-template kind
+  (an app-wide feature, not sample-specific) was renamed to `"host-tip"`
+  since it shouldn't stay tied to a retired sample character's name.
+- **A real bug was found and fixed while verifying this**: the new
+  character-sheet art is SVG rather than JPEG, and its reference-gallery
+  thumbnail rendered as a broken-image icon under `npm run dev` but
+  rendered correctly in a real build (`electron-vite build && electron .`).
+  Root cause: Vite's dev server serves the renderer over
+  `http://localhost:5173`, and Chromium blocks an http-origin page from
+  loading local `file://` subresources -- a pre-existing dev-mode-only
+  limitation that would affect any reference image (not something the SVG
+  format introduced), now documented in KNOWN_LIMITATIONS.md.
+- Verified end-to-end against the real running app (both `npm run dev` for
+  the initial creation and a full `electron-vite build && electron .` for
+  the image-rendering check): the sample project opens as "Orbit - Mission
+  001 - Welcome to Orbit," Character Studio shows Nova with the imported
+  SVG reference correctly rendered, and the script shows "Orbit -- Mission
+  001: Welcome to Orbit -- 9 scenes."

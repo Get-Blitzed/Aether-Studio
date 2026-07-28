@@ -34,7 +34,7 @@ that's still worth flagging.
 
 - [ ] Create a new blank production with a completely empty title (just spaces) — does it reject cleanly or crash?
 - [ ] Create a production titled with reserved Windows characters: `CON`, `A/B:C*D?.txt`, trailing dots/spaces (`My Project...   `). Confirm the folder name comes out sanitized, not rejected outright.
-- [ ] Open the A.I. Blitz sample, confirm Mission 001's script/character data loads correctly.
+- [ ] Open the Orbit sample, confirm Mission 001's script/character data loads correctly.
 - [ ] Mid-edit (e.g. typing in Script Studio), **force-quit** the app (Task Manager / `kill -9`). Relaunch — does recovery/safe-mode detection kick in? Is data loss limited to the last few keystrokes, not the whole project?
 - [ ] Manually edit `project.aether` in a text editor while the app is closed: delete a required field, or corrupt the JSON syntax entirely (stray `}`). Reopen the project — does it fail with a clear error, or silently produce a broken UI?
 - [ ] Open the same project in two separate app instances at once, edit conflicting fields in each, save both. What wins? Is there any warning?
@@ -100,7 +100,7 @@ that's still worth flagging.
 
 ## 9. Installers
 
-- [ ] Windows: run `Aether-Studio-Suite-Setup.exe` on a machine that's never had the app installed. Confirm SmartScreen's "unknown publisher" warning is expected (unsigned build) and the install completes, creates Desktop/Start Menu shortcuts, and the app launches and finds the bundled A.I. Blitz sample.
+- [ ] Windows: run `Aether-Studio-Suite-Setup.exe` on a machine that's never had the app installed. Confirm SmartScreen's "unknown publisher" warning is expected (unsigned build) and the install completes, creates Desktop/Start Menu shortcuts, and the app launches and finds the bundled Orbit sample.
 - [ ] Uninstall, confirm it cleans up program files but (per typical NSIS behavior) leaves user data in `%APPDATA%` — check whether that's the intended behavior or should be called out to the user.
 - [ ] macOS: mount the `.dmg`, drag to Applications, first launch — confirm Gatekeeper's "unidentified developer" warning is expected (unsigned) and right-click → Open bypasses it. Confirm ffmpeg-backed features (export, blur) work identically to Windows. Confirm Voice Studio's native tier correctly reports "unavailable" (no SAPI on Mac) rather than crashing.
 
