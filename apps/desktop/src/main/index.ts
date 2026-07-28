@@ -15,6 +15,7 @@ import { registerProvidersIpc } from "./ipc/providersIpc.js";
 import { registerExportIpc } from "./ipc/exportIpc.js";
 import { registerDocumentsIpc } from "./ipc/documentsIpc.js";
 import { registerIntroIpc } from "./ipc/introIpc.js";
+import { registerSoundLibraryIpc } from "./ipc/soundLibraryIpc.js";
 import { createSecretsStore } from "./secretsStore.js";
 
 const isDev = !app.isPackaged;
@@ -125,6 +126,10 @@ app.whenReady().then(async () => {
       logger,
       settingsRepo: new SettingsRepository(database),
       getWindow: () => mainWindow,
+    });
+    registerSoundLibraryIpc({
+      logger,
+      settingsRepo: new SettingsRepository(database),
     });
   }
 

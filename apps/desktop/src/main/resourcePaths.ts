@@ -20,3 +20,7 @@ export function getNovaCharacterSheetSourcePath(): string {
     "nova-character-sheet.svg",
   );
 }
+
+export function getSoundLibraryDir(): string {
+  return path.join(getBundledResourcesDir(), "sound-library");
+}

@@ -19,6 +19,16 @@ interface VoiceOptionPayload {
   locale?: string;
 }
 
+interface SoundLibraryEntryPayload {
+  id: string;
+  filePath: string;
+  title: string;
+  category: string;
+  categoryLabel: string;
+  durationSeconds: number | null;
+  originalFileName: string;
+}
+
 interface ExportPresetPayload {
   id: string;
   name: string;
@@ -253,6 +263,17 @@ const api = {
             narratedPageCount: number;
           }
         | { ok: false; error?: AppErrorPayload }
+      >,
+  },
+
+  soundLibrary: {
+    list: () =>
+      ipcRenderer.invoke("sound-library:list") as Promise<
+        { ok: true; entries: (SoundLibraryEntryPayload & { absolutePath: string })[] } | { ok: false; error?: AppErrorPayload }
+      >,
+    import: (args: { projectDir: string; entryIds: string[] }) =>
+      ipcRenderer.invoke("sound-library:import", args) as Promise<
+        { ok: true; manifest: ProjectManifest; added: number; duplicates: string[] } | { ok: false; error?: AppErrorPayload }
       >,
   },
 

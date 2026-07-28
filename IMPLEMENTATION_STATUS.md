@@ -337,3 +337,51 @@ app's own bundled sample. Replaced entirely with an original creation:
   001 - Welcome to Orbit," Character Studio shows Nova with the imported
   SVG reference correctly rendered, and the script shows "Orbit -- Mission
   001: Welcome to Orbit -- 9 scenes."
+
+## Sound Library: bundled royalty-free sound effects
+
+A global, read-only library of curated sound effects, browsable from any
+project and imported into its Asset Library on demand -- distinct from
+the Orbit sample's auto-copy-on-create pattern, since bundling all source
+files directly into every new project would multiply disk usage per
+project and bloat the installer for content most users won't touch.
+
+- **Source**: the user supplied a personal folder of 684 royalty-free
+  `.mp3` sound effects (confirmed to permit redistribution as bundled
+  application assets) and asked for a subset to be added to the packaged
+  app.
+- **Curation**: keyword-classified by filename into 10 categories (UI,
+  Notification & Alert, Whoosh & Transition, Impact & Hit, Success, Error,
+  Applause & Crowd, Cinematic & Logo, Office & Tech, Fun & Cartoon),
+  excluding long-form music loops, nature/ambience beds, and
+  horror/weapon/game-specific effects as out of scope for product-training
+  videos. **115 files, 30MB total** were selected and renamed to clean
+  `category-NN.mp3` filenames (the originals were Pixabay-style
+  slug-plus-numeric-ID names) with a generated `manifest.json` (title,
+  category, real ffprobe-measured duration) -- bundled at
+  `resources/sound-library/`, picked up automatically by the existing
+  `extraResources` config in `electron-builder.yml` (no packaging changes
+  needed).
+- **New IPC** (`soundLibraryIpc.ts`): `sound-library:list` resolves the
+  bundled manifest to absolute file paths (only the main process can
+  resolve `getBundledResourcesDir()`); `sound-library:import` copies
+  selected entries into the current project via the same
+  `buildAssetFromFile` + checksum-dedup pipeline every other asset-import
+  flow in this codebase uses (`assets:import`, document-to-video,
+  AI-generated images), registering them as real `sound-effects` Assets.
+- **New Sound Library screen**: search + category filter, a real HTML5
+  `<audio controls>` preview per effect (not a custom player), multi-select
+  checkboxes, "Add N to Project."
+- **Verified**: real audio elements confirmed playing with correct
+  titles/categories/durations in a packaged build (`electron-vite build &&
+  electron .`) -- the same dev-mode file:// restriction noted in the
+  rebrand section above also applies here, so previews only render in a
+  real build, not `npm run dev`. The import path's file resolution and
+  checksum computation were verified directly against the real bundled
+  files and an existing project manifest; the underlying
+  `buildAssetFromFile`/dedup logic itself is the same code already proven
+  by `assets:import` and other asset-creating flows, not re-verified here.
+- **Not done**: no UI to browse or add from the full 684-file source pack
+  (would need re-running the curation script with different limits); no
+  per-effect waveform preview (relies on the browser's native audio
+  player).

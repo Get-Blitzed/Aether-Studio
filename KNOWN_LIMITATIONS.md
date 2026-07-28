@@ -379,3 +379,14 @@ automation here, to avoid repeating the same failure mode.
   exercise the same underlying code the UI calls, plus one verified
   screenshot of the Home screen taken by rect (not full-desktop) with focus
   confirmed beforehand.
+
+## Sound Library is a curated subset, not the full source pack
+
+The bundled Sound Library ships 115 of the 684 royalty-free sound effects
+in the original source folder, chosen by filename-keyword curation across
+10 categories, to keep the installer size reasonable. There's no in-app
+way to browse or add the remaining ~569 files; doing so would mean
+re-running the curation script with different limits/categories and
+re-bundling. Redistribution of the raw audio files as bundled application
+assets was explicitly confirmed with the source's rights holder (the user)
+before any were added.

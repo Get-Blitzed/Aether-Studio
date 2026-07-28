@@ -21,7 +21,8 @@ brands, clients, and production types.
 > [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) for exactly what
 > works today versus what's planned. Series planning, brand/character
 > management, knowledge sources, scriptwriting, storyboarding, prompt
-> authoring, the Asset Library, Voice Studio (real FFmpeg processing plus
+> authoring, the Asset Library, a bundled Sound Library of 115 curated
+> royalty-free sound effects, Voice Studio (real FFmpeg processing plus
 > AI voice synthesis), Screen Capture Studio, a full multitrack Timeline
 > Editor with blur/redaction, AI provider integration (mock/OpenAI-compatible/
 > generic REST/native Windows voice/ElevenLabs), a real Quality-Control +
@@ -76,7 +77,7 @@ See [WINDOWS_BUILD.md](WINDOWS_BUILD.md) for producing an actual
 /packages/plugin-sdk  Plugin manifest schema + validation (no runtime loader yet)
 /packages/export-engine  Quality-Control checklist, real ffmpeg final export (with blur redaction), production archive zipping
 /packages/document-engine  PDF/DOCX/PPTX text extraction, slide rendering, script/storyboard auto-generation
-/resources            Branding, sample projects (Orbit), templates
+/resources            Branding, sample projects (Orbit), sound-library (curated royalty-free SFX), templates
 /docs                 Architecture, format, and process documentation
 ```
 
