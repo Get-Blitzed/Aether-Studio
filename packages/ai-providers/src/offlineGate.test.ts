@@ -13,6 +13,11 @@ describe("assertNotBlockedByOfflineMode", () => {
     expect(() => assertNotBlockedByOfflineMode("sapi-voice", false)).not.toThrow();
   });
 
+  it("never blocks the bundled Piper voice provider (it never touches the network)", () => {
+    expect(() => assertNotBlockedByOfflineMode("piper-voice", true)).not.toThrow();
+    expect(() => assertNotBlockedByOfflineMode("piper-voice", false)).not.toThrow();
+  });
+
   it("blocks the elevenlabs provider when offline mode is on", () => {
     expect(() => assertNotBlockedByOfflineMode("elevenlabs", true)).toThrow(AiProviderError);
     expect(() => assertNotBlockedByOfflineMode("elevenlabs", false)).not.toThrow();

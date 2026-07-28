@@ -4,7 +4,7 @@ import { ErrorBanner } from "../components/ErrorBanner";
 import { generateId, nowIso } from "../lib/ids";
 import type { ProviderConfig, ProviderKind, ProviderCapability, BackgroundJob } from "@aether/shared-types";
 
-const PROVIDER_KINDS: ProviderKind[] = ["mock", "openai-compatible", "generic-rest", "sapi-voice", "elevenlabs"];
+const PROVIDER_KINDS: ProviderKind[] = ["mock", "openai-compatible", "generic-rest", "sapi-voice", "piper-voice", "elevenlabs"];
 const CAPABILITIES: ProviderCapability[] = ["text", "image", "voice"];
 const KINDS_NEEDING_CREDENTIALS = new Set<ProviderKind>(["openai-compatible", "generic-rest", "elevenlabs"]);
 
@@ -243,6 +243,13 @@ export function ProvidersScreen(): JSX.Element {
               <p className="col-span-2 text-xs text-silver md:col-span-3">
                 Native Windows text-to-speech (System.Speech). Fully offline, no API key or base URL needed -- whatever
                 voices are installed on this machine will be available.
+              </p>
+            )}
+            {form.kind === "piper-voice" && (
+              <p className="col-span-2 text-xs text-silver md:col-span-3">
+                Bundled offline neural voices (Piper). Fully offline, no API key or base URL needed -- four curated
+                voices ship with the app, the same on every machine, and generally sound more natural than SAPI while
+                staying free.
               </p>
             )}
             {KINDS_NEEDING_CREDENTIALS.has(form.kind) && (

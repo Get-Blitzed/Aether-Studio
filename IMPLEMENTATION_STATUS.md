@@ -385,3 +385,59 @@ project and bloat the installer for content most users won't touch.
   (would need re-running the curation script with different limits); no
   per-effect waveform preview (relies on the browser's native audio
   player).
+
+## Bundled offline Piper voice provider
+
+A second offline TTS tier alongside Windows SAPI, added as a follow-up to
+the Sound Library work when the user asked whether a voice platform like
+ElevenLabs could be bundled the same way sound effects were. ElevenLabs
+itself can't -- it's a cloud-inference-only API with no distributable
+model files -- but Piper (https://github.com/rhasspy/piper) is a real,
+offline, MIT-licensed neural TTS engine that ships as a self-contained
+native binary, making it a genuine bundle candidate.
+
+- **Engine**: the frozen, archived, MIT-licensed `rhasspy/piper` release
+  (`2023.11.14-2`), not the actively maintained `OHF-Voice/piper1-gpl`
+  fork -- that fork is GPL-3.0 and a `pip install`-only Python package with
+  no prebuilt native binary, a worse fit on both licensing and packaging.
+  The frozen release's `piper_windows_amd64.zip` is exactly the same shape
+  as the already-bundled `ffmpeg-static`/`ffprobe-static` binaries: a
+  standalone `.exe` invoked via subprocess, no Python or install step.
+- **Voices**: four curated voice models, each individually license-checked
+  before inclusion (several popular Piper voices trace back to
+  CC-BY-NC-SA or ambiguously-licensed datasets and were deliberately
+  excluded): `en_US-lessac-medium` (male, MIT), `en_US-ljspeech-medium`
+  (female, public domain), `en_US-joe-medium` (male, CC0), and
+  `en_US-kathleen-low` (female, CC0, the lightweight low-quality option).
+  Bundled at `resources/piper/` (`bin/` for the engine + espeak-ng data,
+  `voices/<id>/model.onnx` + `.onnx.json` per voice, plus a
+  `voices/manifest.json` the provider reads for metadata) -- picked up
+  automatically by the existing `extraResources` config, no packaging
+  changes needed. ~270MB total (~38MB engine, ~232MB for the four voices),
+  a real installer-size cost noted in KNOWN_LIMITATIONS.md.
+- **New provider kind** `"piper-voice"` (`packages/shared-types`'s
+  `ProviderKindSchema`), a `PiperVoiceProvider`
+  (`packages/ai-providers/src/piperVoiceProvider.ts`) structured like
+  `SapiVoiceProvider` but shelling out to the bundled `piper.exe` instead
+  of PowerShell/SAPI, and wired into `createProvider()` via a new optional
+  `CreateProviderContext` parameter (`{ piperDir }`) since -- unlike every
+  other provider kind -- it needs a bundled-resource path resolved by the
+  main process (`getPiperDir()` in `resourcePaths.ts`) rather than
+  user-supplied config. Marked offline-safe in `offlineGate.ts` alongside
+  `mock` and `sapi-voice`. No API key field in the Providers screen, same
+  UX as the SAPI entry.
+- **Quality**: sits between SAPI (more robotic) and ElevenLabs (noticeably
+  better prosody, but paid/cloud) -- a genuine offline middle tier, not a
+  replacement for ElevenLabs when quality matters most. A sample WAV
+  (the `lessac` voice) was generated and sent to the user for a listen
+  before building the rest of the feature.
+- **Verified**: `PiperVoiceProvider` has a dedicated test suite
+  (`piperVoiceProvider.test.ts`) that runs real synthesis against the
+  actual bundled binary and models (mirroring `sapiVoiceProvider.test.ts`'s
+  "against the real engine" pattern) -- lists voices, synthesizes both the
+  default and an explicitly-requested voice, confirms a real playable WAV
+  via `probeMedia`, and confirms empty-text rejection. `createProvider()`
+  and `offlineGate()` each got new test cases for the `piper-voice` kind.
+  All 156 tests pass; `npx tsc --noEmit` clean; `npm run build -w
+  apps/desktop` succeeds; the packaged app launches cleanly with the new
+  provider kind present in the Providers screen's dropdown.

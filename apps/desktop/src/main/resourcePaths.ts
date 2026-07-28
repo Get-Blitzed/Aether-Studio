@@ -24,3 +24,7 @@ export function getNovaCharacterSheetSourcePath(): string {
 export function getSoundLibraryDir(): string {
   return path.join(getBundledResourcesDir(), "sound-library");
 }
+
+export function getPiperDir(): string {
+  return path.join(getBundledResourcesDir(), "piper");
+}

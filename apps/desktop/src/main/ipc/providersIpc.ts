@@ -15,6 +15,7 @@ import type { ProviderConfig, BackgroundJob, VoiceTake } from "@aether/shared-ty
 import type { AppError } from "./projectsIpc.js";
 import type { SecretsStore } from "../secretsStore.js";
 import { buildAssetFromFile } from "../assetBuilder.js";
+import { getPiperDir } from "../resourcePaths.js";
 
 function toAppError(error: unknown): AppError {
   if (error instanceof AiProviderError) return { title: "Provider error", detail: error.message, code: error.code };
@@ -90,7 +91,7 @@ export function registerProvidersIpc({ db, settingsRepo, secretsStore, logger }:
       assertNotBlockedByOfflineMode(config.kind, settingsRepo.get().offlineMode);
       const encrypted = providerRepo.getEncryptedSecret(id);
       const secret = encrypted && secretsStore.isAvailable() ? secretsStore.decrypt(encrypted) : undefined;
-      const provider = createProvider(config, secret);
+      const provider = createProvider(config, secret, { piperDir: getPiperDir() });
       const result = await provider.testConnection();
       return { ok: true as const, result };
     } catch (error) {
@@ -106,7 +107,7 @@ export function registerProvidersIpc({ db, settingsRepo, secretsStore, logger }:
       assertNotBlockedByOfflineMode(config.kind, settingsRepo.get().offlineMode);
       const encrypted = providerRepo.getEncryptedSecret(providerId);
       const secret = encrypted && secretsStore.isAvailable() ? secretsStore.decrypt(encrypted) : undefined;
-      const provider = createProvider(config, secret);
+      const provider = createProvider(config, secret, { piperDir: getPiperDir() });
       if (!provider.listVoices) return { ok: false as const, error: { title: "Not supported", detail: "This provider does not support listing voices." } };
       const voices = await provider.listVoices();
       return { ok: true as const, voices };
@@ -139,7 +140,7 @@ export function registerProvidersIpc({ db, settingsRepo, secretsStore, logger }:
 
       const encrypted = providerRepo.getEncryptedSecret(args.providerId);
       const secret = encrypted && secretsStore.isAvailable() ? secretsStore.decrypt(encrypted) : undefined;
-      const provider = createProvider(config, secret);
+      const provider = createProvider(config, secret, { piperDir: getPiperDir() });
       const prompt = buildStructuredPrompt(args.jobType, args.input);
 
       if (config.capability === "text") {

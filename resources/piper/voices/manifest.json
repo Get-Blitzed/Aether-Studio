@@ -1,0 +1,42 @@
+[
+  {
+    "id": "en_US-lessac-medium",
+    "name": "Lessac",
+    "gender": "male",
+    "locale": "en_US",
+    "quality": "medium",
+    "sampleRate": 22050,
+    "license": "MIT",
+    "source": "https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/lessac/medium"
+  },
+  {
+    "id": "en_US-ljspeech-medium",
+    "name": "LJSpeech",
+    "gender": "female",
+    "locale": "en_US",
+    "quality": "medium",
+    "sampleRate": 22050,
+    "license": "Public domain",
+    "source": "https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/ljspeech/medium"
+  },
+  {
+    "id": "en_US-joe-medium",
+    "name": "Joe",
+    "gender": "male",
+    "locale": "en_US",
+    "quality": "medium",
+    "sampleRate": 22050,
+    "license": "CC0",
+    "source": "https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/joe/medium"
+  },
+  {
+    "id": "en_US-kathleen-low",
+    "name": "Kathleen",
+    "gender": "female",
+    "locale": "en_US",
+    "quality": "low",
+    "sampleRate": 16000,
+    "license": "CC0",
+    "source": "https://huggingface.co/rhasspy/piper-voices/tree/main/en/en_US/kathleen/low"
+  }
+]

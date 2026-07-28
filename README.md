@@ -25,7 +25,7 @@ brands, clients, and production types.
 > royalty-free sound effects, Voice Studio (real FFmpeg processing plus
 > AI voice synthesis), Screen Capture Studio, a full multitrack Timeline
 > Editor with blur/redaction, AI provider integration (mock/OpenAI-compatible/
-> generic REST/native Windows voice/ElevenLabs), a real Quality-Control +
+> generic REST/native Windows voice/bundled offline Piper voice/ElevenLabs), a real Quality-Control +
 > Export + Archive pipeline, and a one-step Document Import wizard
 > (PDF/DOCX/PPTX/video/audio -> a full narrated video project) are all real
 > and working. Phase 9 (template system, Learning Center, accessibility/
@@ -77,7 +77,7 @@ See [WINDOWS_BUILD.md](WINDOWS_BUILD.md) for producing an actual
 /packages/plugin-sdk  Plugin manifest schema + validation (no runtime loader yet)
 /packages/export-engine  Quality-Control checklist, real ffmpeg final export (with blur redaction), production archive zipping
 /packages/document-engine  PDF/DOCX/PPTX text extraction, slide rendering, script/storyboard auto-generation
-/resources            Branding, sample projects (Orbit), sound-library (curated royalty-free SFX), templates
+/resources            Branding, sample projects (Orbit), sound-library (curated royalty-free SFX), piper (bundled offline voice engine + models), templates
 /docs                 Architecture, format, and process documentation
 ```
 

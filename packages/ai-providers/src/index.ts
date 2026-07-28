@@ -7,5 +7,6 @@ export * from "./mockProvider.js";
 export * from "./openAiCompatibleProvider.js";
 export * from "./genericRestProvider.js";
 export * from "./sapiVoiceProvider.js";
+export * from "./piperVoiceProvider.js";
 export * from "./elevenLabsProvider.js";
 export * from "./createProvider.js";

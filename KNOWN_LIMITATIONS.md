@@ -390,3 +390,16 @@ re-running the curation script with different limits/categories and
 re-bundling. Redistribution of the raw audio files as bundled application
 assets was explicitly confirmed with the source's rights holder (the user)
 before any were added.
+
+## Piper voice bundle adds ~270MB to the installer
+
+The four bundled offline voices (see IMPLEMENTATION_STATUS.md) are the
+single largest bundled-resource addition to the app so far -- each
+medium-quality `.onnx` model is ~60MB, versus a few KB per sound effect.
+This is a real, deliberate size/quality/cost tradeoff (free, offline,
+no API key vs. a much larger installer) rather than an oversight. Only
+English (`en_US`) voices are bundled even though Piper supports 30+
+languages, and only the Windows binary is bundled even though Piper also
+ships Linux/macOS binaries -- extending either would mean re-running the
+same license-vetting-and-download process done here for the initial four
+voices, not a config change.

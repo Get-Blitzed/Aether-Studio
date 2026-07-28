@@ -4,6 +4,7 @@ import { MockProvider } from "./mockProvider.js";
 import { OpenAiCompatibleProvider } from "./openAiCompatibleProvider.js";
 import { GenericRestProvider } from "./genericRestProvider.js";
 import { SapiVoiceProvider } from "./sapiVoiceProvider.js";
+import { PiperVoiceProvider } from "./piperVoiceProvider.js";
 import { ElevenLabsProvider } from "./elevenLabsProvider.js";
 import { AiProviderError } from "./errors.js";
 import type { ProviderConfig } from "@aether/shared-types";
@@ -65,6 +66,21 @@ describe("createProvider", () => {
   it("builds a SapiVoiceProvider for kind 'sapi-voice' with no secret required", () => {
     const provider = createProvider(baseConfig({ kind: "sapi-voice", capability: "voice" }), undefined);
     expect(provider).toBeInstanceOf(SapiVoiceProvider);
+  });
+
+  it("builds a PiperVoiceProvider for kind 'piper-voice' given a piperDir", () => {
+    const provider = createProvider(baseConfig({ kind: "piper-voice", capability: "voice" }), undefined, { piperDir: "/fake/piper" });
+    expect(provider).toBeInstanceOf(PiperVoiceProvider);
+  });
+
+  it("throws INVALID_CONFIG for a piper-voice provider with no piperDir provided", () => {
+    try {
+      createProvider(baseConfig({ kind: "piper-voice", capability: "voice" }), undefined);
+      expect.unreachable();
+    } catch (error) {
+      expect(error).toBeInstanceOf(AiProviderError);
+      expect((error as AiProviderError).code).toBe("INVALID_CONFIG");
+    }
   });
 
   it("builds an ElevenLabsProvider given a secret", () => {
