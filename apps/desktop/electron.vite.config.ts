@@ -11,6 +11,7 @@ const workspacePackages = [
   "@aether/ai-providers",
   "@aether/core",
   "@aether/database",
+  "@aether/export-engine",
   "@aether/media-engine",
   "@aether/plugin-sdk",
   "@aether/project-engine",

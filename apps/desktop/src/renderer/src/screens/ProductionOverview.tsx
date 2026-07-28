@@ -128,6 +128,8 @@ export function ProductionOverview(): JSX.Element {
             { label: "Timeline Editor", path: "/timeline" },
             { label: "Caption Studio", path: "/captions" },
             { label: "Provider & Plugin Manager", path: "/providers" },
+            { label: "Review & Approval", path: "/review" },
+            { label: "Export Center", path: "/export" },
           ].map((link) => (
             <button
               key={link.path}

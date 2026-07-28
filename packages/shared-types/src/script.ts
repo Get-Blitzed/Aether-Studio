@@ -20,6 +20,7 @@ export const ScriptSegmentSchema = z.object({
   unverifiedClaim: z.boolean().default(false),
   notes: z.string().optional(),
   approvalStatus: z.enum(["draft", "in-review", "approved"]).default("draft"),
+  reviewNotes: z.string().optional(),
 });
 export type ScriptSegment = z.infer<typeof ScriptSegmentSchema>;
 

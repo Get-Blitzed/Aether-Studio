@@ -13,4 +13,5 @@ export * from "./caption.js";
 export * from "./appSettings.js";
 export * from "./providerConfig.js";
 export * from "./backgroundJob.js";
+export * from "./qualityCheck.js";
 export * from "./projectManifest.js";

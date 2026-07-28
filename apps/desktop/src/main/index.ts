@@ -12,6 +12,7 @@ import { registerScreenCaptureIpc } from "./ipc/screenCaptureIpc.js";
 import { registerTimelineIpc } from "./ipc/timelineIpc.js";
 import { registerCaptionsIpc } from "./ipc/captionsIpc.js";
 import { registerProvidersIpc } from "./ipc/providersIpc.js";
+import { registerExportIpc } from "./ipc/exportIpc.js";
 import { createSecretsStore } from "./secretsStore.js";
 
 const isDev = !app.isPackaged;
@@ -111,6 +112,10 @@ app.whenReady().then(async () => {
       settingsRepo: new SettingsRepository(database),
       secretsStore: createSecretsStore(logger),
       logger,
+    });
+    registerExportIpc({
+      logger,
+      settingsRepo: new SettingsRepository(database),
     });
   }
 

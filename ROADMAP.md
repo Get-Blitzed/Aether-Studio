@@ -1,9 +1,10 @@
 # Roadmap
 
 Phases 1 (Foundation), 2 (Preproduction), 3 (Media Management), 4
-(Audio and Screen Capture), 5 (Timeline and Graphics), and 6 (AI Providers)
-are complete -- see IMPLEMENTATION_STATUS.md. The phases below follow the
-spec's own phasing (section 42) and are not started.
+(Audio and Screen Capture), 5 (Timeline and Graphics), 6 (AI Providers),
+and 7 (Review and Export) are complete -- see IMPLEMENTATION_STATUS.md.
+The phase below follows the spec's own phasing (section 42) and is not
+started.
 
 ## Phase 2 -- Preproduction: COMPLETE
 
@@ -145,10 +146,33 @@ gates every provider call that isn't the mock kind.
   well under a second; a real network call could take much longer) and are
   only recorded, not streamed, to the Recent Jobs list.
 
-## Phase 7 -- Review and Export
-`packages/export-engine`, review/approval workflow, the full Quality-Control
-Engine checklist, export presets, production archive ZIP, social-media
-version generator.
+## Phase 7 -- Review and Export: COMPLETE
+
+`packages/export-engine` (pure `runQualityChecklist()`, real ffmpeg
+`renderFinalExport()` with audio mixing and caption burn-in, real
+`archiveProduction()` zip via `adm-zip`), four built-in export presets
+(the social-media version generator, in effect -- a vertical and a square
+preset alongside the two 16:9 ones), the Export Center screen (checklist +
+render + archive + past-exports list), and the Review & Approval screen
+(inline approval-status editing and reviewer notes across every scene and
+storyboard frame, with the same checklist summary).
+
+**Deferred out of Phase 7, moved later:**
+- Export presets are a fixed built-in list, not a user-editable/CRUD
+  screen -- matches the Phase 6 precedent for AI provider presets not
+  needing their own management UI to be useful.
+- Overlay/graphics/title track compositing is not part of the final
+  export -- `renderFinalExport()` composites the primary video track,
+  audio tracks, and captions, same scope boundary Phase 5's preview
+  render already had; secondary-video, character-animation, and
+  screen-capture tracks are likewise not composited.
+- No per-job export progress bar -- a render blocks the Export Center's
+  "Export Now" button until ffmpeg finishes, the same synchronous-from-the-
+  renderer's-perspective model Phase 6's AI jobs use.
+- No choice of *where* an archive or export is saved -- both always land
+  in a fixed subfolder (`renders/`, `archives/`) inside the project
+  directory, matching the existing `backups/`/`cache/` convention rather
+  than adding a save-location dialog.
 
 ## Phase 8 -- Polish and Packaging
 `packages/template-engine`, Learning Center, accessibility pass, performance

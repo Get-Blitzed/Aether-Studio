@@ -1,4 +1,4 @@
-# Known Limitations (Phase 1-6)
+# Known Limitations (Phase 1-7)
 
 ## Database engine: sql.js, not better-sqlite3
 
@@ -22,16 +22,19 @@ need revisiting if the app ever tracked, say, millions of activity-log rows
 without pruning. `ARCHITECTURE.md` documents the swap-back path if a build
 toolchain becomes available and native performance matters.
 
-## FFmpeg is integrated for metadata/preview and now real editing, but not full encoding/export
+## FFmpeg does real delivery export now, but only primary-video + audio + captions
 
-As of Phase 4, FFmpeg does real work beyond metadata: audio trim/normalize/
-denoise/silence-removal/merge/format-conversion, and video trim/speed
-adjustment, in addition to Phase 3's probing and thumbnail/waveform
-generation (see FFMPEG_INTEGRATION.md). What's still missing: full
-project-level video **encoding**/rendering or transcoding for delivery. The
-"output format," "aspect ratio," and "frame rate" fields on a production's
-settings are stored but not yet acted on by anything -- that's Phase 5
-(timeline render) and Phase 7 (export).
+As of Phase 7, `renderFinalExport()` produces a genuine delivery video: the
+primary video track concatenated and scaled to a chosen preset resolution,
+every narration/music/sound-effect clip positioned and mixed into one audio
+stream, and captions burned in. What's still missing: compositing the
+graphics/titles/overlays tracks (positioned image/text overlays) into the
+final export, and any use of the secondary-video, character-animation, or
+screen-capture tracks -- only the primary video track is composited, the
+same scope boundary Phase 5's quick preview already had. The production's
+`outputFormat`/`aspectRatio`/`frameRate` settings fields still aren't
+consulted by the export pipeline -- preset selection in the Export Center
+is independent of those fields today.
 
 ## Voice cloning is not built, by design
 
@@ -118,12 +121,30 @@ would eventually plug into.
 
 ## Nav sidebar still lists some modules that don't work yet
 
-As of Phase 6, Series, Knowledge, Scripts, Storyboards, Prompts, Characters,
-Brands, Assets, Voice, Screen Capture, Timeline, Audio, Captions, and
-Providers are real, working screens. Animation, Review, Export, Templates,
-and Learning Center remain disabled buttons with a tooltip naming the phase
+As of Phase 7, Series, Knowledge, Scripts, Storyboards, Prompts, Characters,
+Brands, Assets, Voice, Screen Capture, Timeline, Audio, Captions, Providers,
+Review, and Export are real, working screens. Animation, Templates, and
+Learning Center remain disabled buttons with a tooltip naming the phase
 they arrive in (or, for Animation, no scheduled phase yet). This is
 deliberate (see ARCHITECTURE.md), not an oversight.
+
+## Export presets are fixed, not user-editable
+
+The Export Center offers four built-in presets (YouTube 1080p/720p,
+Vertical 1080x1920, Square 1080x1080). There is no screen to add, edit, or
+remove presets -- the spec's "social-media version generator" requirement
+is satisfied by the vertical/square presets existing at all, not by a
+configurable preset system.
+
+## Final export doesn't composite overlays, and has no progress bar
+
+`renderFinalExport()` composites the primary video track, all audio
+tracks, and captions -- graphics/titles/overlays tracks (positioned
+image/text overlays) are not burned into the final export, matching the
+scope Phase 5's quick preview already had. There's also no per-render
+progress indicator; "Export Now" simply stays disabled and shows
+"Rendering..." until ffmpeg finishes, the same synchronous-from-the-UI's-
+perspective model Phase 6's AI provider jobs use.
 
 ## Asset Library has no video playback or proxy generation
 
@@ -247,3 +268,29 @@ automation here, to avoid repeating the same failure mode.
   when a specific coordinate keeps failing after several refocus retries, it
   is often faster to rely on the equivalent unit test than to keep fighting
   the click.
+- **A stray click brought an unrelated window containing real personal
+  credentials into view** (Phase 7) -- the most serious incident of this
+  kind across all phases so far. Earlier phases' mistargeted clicks landed
+  on generically "unrelated" windows; this one happened to be a document
+  with a visible API token, a site login, and a password. The response:
+  work paused immediately, the exposure was disclosed to the user in plain
+  terms without repeating the content, and nothing from it was used or
+  stored. Three concrete changes followed, and should be standard practice
+  in any future session automating this app's GUI:
+  1. **Verify focus, don't assume it.** Every click is now preceded by
+     confirming `GetForegroundWindow()` actually equals the target
+     window's handle, aborting rather than proceeding if it doesn't --
+     a `SetForegroundWindow` call can silently fail (see the Alt-key note
+     above) and previously nothing caught that before the next click fired
+     blind.
+  2. **Never screenshot the full virtual desktop to "find" a window.**
+     When a dialog's existence needed confirming, `EnumWindows` was used
+     to list window *titles* only (no pixel data) rather than capturing
+     the whole 5120px-wide desktop -- title enumeration can't leak
+     document contents the way a screenshot can.
+  3. **When a native OS dialog won't reliably respond to clicks, stop
+     clicking it and route around it.** After the file-picker dialog
+     proved unreliable a second time this phase, remaining verification
+     (an export render and an archive) was done by writing test data
+     directly into the project file as `linked`-storage assets instead of
+     continuing to attempt the import dialog.

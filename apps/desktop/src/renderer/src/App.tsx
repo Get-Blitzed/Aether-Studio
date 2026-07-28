@@ -17,6 +17,8 @@ import { ScreenCaptureStudio } from "./screens/ScreenCaptureStudio";
 import { TimelineEditor } from "./screens/TimelineEditor";
 import { CaptionStudio } from "./screens/CaptionStudio";
 import { ProvidersScreen } from "./screens/ProvidersScreen";
+import { ReviewCenter } from "./screens/ReviewCenter";
+import { ExportCenter } from "./screens/ExportCenter";
 
 export function App(): JSX.Element {
   return (
@@ -39,6 +41,8 @@ export function App(): JSX.Element {
         <Route path="/timeline" element={<TimelineEditor />} />
         <Route path="/captions" element={<CaptionStudio />} />
         <Route path="/providers" element={<ProvidersScreen />} />
+        <Route path="/review" element={<ReviewCenter />} />
+        <Route path="/export" element={<ExportCenter />} />
         <Route path="/settings" element={<SettingsScreen />} />
       </Routes>
     </HashRouter>

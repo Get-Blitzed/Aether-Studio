@@ -7,8 +7,17 @@ import type {
   ProductionSettings,
   ProjectManifest,
   ProviderConfig,
+  QualityCheck,
   SeriesPlan,
 } from "@aether/shared-types";
+
+interface ExportPresetPayload {
+  id: string;
+  name: string;
+  width: number;
+  height: number;
+  frameRate: number;
+}
 
 type AudioExportFormat = "wav" | "mp3";
 
@@ -180,6 +189,22 @@ const api = {
       ipcRenderer.invoke("providers:run-job", args) as Promise<
         | { ok: true; job: BackgroundJob; text?: string; asset?: Asset; imagePath?: string; manifest?: ProjectManifest }
         | { ok: false; error?: AppErrorPayload; job?: BackgroundJob }
+      >,
+  },
+
+  export: {
+    listPresets: () => ipcRenderer.invoke("export:list-presets") as Promise<ExportPresetPayload[]>,
+    runQualityChecklist: (projectDir: string) =>
+      ipcRenderer.invoke("export:run-quality-checklist", projectDir) as Promise<
+        { ok: true; checks: QualityCheck[] } | { ok: false; error?: AppErrorPayload }
+      >,
+    render: (args: { projectDir: string; timelineId: string; presetId: string }) =>
+      ipcRenderer.invoke("export:render", args) as Promise<
+        { ok: true; manifest: ProjectManifest; assetId: string } | { ok: false; error?: AppErrorPayload }
+      >,
+    createArchive: (projectDir: string) =>
+      ipcRenderer.invoke("export:create-archive", projectDir) as Promise<
+        { ok: true; archivePath: string } | { ok: false; error?: AppErrorPayload }
       >,
   },
 

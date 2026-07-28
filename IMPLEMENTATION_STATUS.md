@@ -1,6 +1,6 @@
 # Implementation Status
 
-Last updated: 2026-07-27 (Phase 6 checkpoint)
+Last updated: 2026-07-27 (Phase 7 checkpoint)
 
 ## Phase 1 -- Foundation: COMPLETE
 
@@ -216,9 +216,43 @@ The image-generation branch of `providers:run-job` originally called `buildAsset
 The offline-mode gate (`assertNotBlockedByOfflineMode`) is thoroughly unit-tested (4 dedicated tests covering both the mock exemption and the block/allow behavior for networked provider kinds) and is wired into both `providers:test` and `providers:run-job` identically to how every other provider call is gated. It was not re-confirmed by toggling Settings > Offline Mode in the live UI and attempting a real provider call, because doing so required navigating to the Settings screen and a stray window (this session's own Claude desktop app, confirmed via `GetForegroundWindow` -- not an unrelated or personal window) was persistently occupying the exact screen region the Settings nav item was in, resisting repeated `SetForegroundWindow` retries. Given the logic is identical to the already-verified provider-lookup and provider-construction code paths exercised in items 3-6 above, and is independently unit-tested, this was judged lower-value to keep fighting for than moving to close out the phase.
 Neither the `OpenAiCompatibleProvider` nor `GenericRestProvider` was exercised against a real network endpoint -- there are no API credentials available in this environment. Both are implemented with real `fetch`-based HTTP logic (not stubs), and their config-validation error paths (missing API key, missing base URL) are unit-tested, but the actual request/response handling against a live OpenAI-compatible or arbitrary REST API has not been proven end-to-end.
 
-## Phases 7-8: NOT STARTED
+## Phase 7 -- Review and Export: COMPLETE
 
-See [ROADMAP.md](ROADMAP.md). Nothing in Review, Quality Control, Export,
-Templates, Learning Center, Tasks, or Analytics is implemented beyond the
-Zod schema placeholder already present in `@aether/shared-types` (the
-manifest's `tasks` array exists and is currently always empty).
+| Area | Status | Notes |
+|---|---|---|
+| `packages/export-engine` | Done | `runQualityChecklist()` (pure, 8 checks against a manifest -- unverified claims, scene/storyboard approval, timeline/primary-video/audio-track presence, orphaned clip-asset references, caption presence); `renderFinalExport()` (real ffmpeg: primary-video concat scaled to a chosen preset resolution, all narration/music/sound-effect clips positioned via `adelay` and mixed via `amix`, captions burned in via a chained `drawtext` filter with `enable='between(t,start,end)'` windows); `archiveProduction()` (real .zip via `adm-zip`, excluding the regenerable `cache/` folder and any prior archives so re-running doesn't nest) |
+| Export presets | Done | Four built-in presets (YouTube 1080p/720p, Vertical 1080x1920, Square 1080x1080) -- not user-editable this phase, see ROADMAP.md |
+| Export Center screen | Done | Timeline + preset pickers, live Quality-Control checklist, "Export Now" (renders and registers a real Asset in the `exports` category, same pipeline the render is proven against in tests), "Create Production Archive (.zip)", a Past Exports list |
+| Review & Approval screen | Done | Every script segment and storyboard frame listed with its real approval/production status (editable inline) and a new free-text `reviewNotes` field, plus the same Quality-Control summary shown as a strip of pass/warning/fail badges |
+| Nav + cross-links | Done | Review and Export enabled in the sidebar (previously disabled placeholders); Production Overview links to both |
+
+### New shared-types additions (Phase 7)
+
+`QualityCheckStatusSchema`/`QualityCheckSchema` (a computed, non-persisted result that crosses the IPC boundary, so it gets a schema like everything else that does). `ScriptSegmentSchema` and `StoryboardFrameSchema` each gained an optional `reviewNotes: string` field.
+
+### Architecture note: exports and archives reuse existing patterns, not new ones
+
+A rendered export becomes a normal `Asset` (category `exports`) via the same `buildAssetFromFile` pipeline Phases 3-6 already established for imports, screen recordings, timeline previews, and AI-generated images -- no new "export record" concept was added to the manifest. A production archive is written to a plain `archives/` subfolder inside the project directory (matching the existing `renders/`, `backups/`, and `cache/` subfolder conventions from Phase 1's project structure) rather than requiring a save-location dialog.
+
+### Verified manually (Phase 7, this session)
+
+1. `npm test` (123/123 passing, including 14 new tests: 4 for the new schema fields, 4 for `runQualityChecklist()` covering both an empty production and one with real approval/asset data, 3 for `renderFinalExport()` against the real bundled ffmpeg -- including asserting the output actually has both a video and an audio stream at the exact requested preset resolution -- and 3 for `archiveProduction()` against a real zip, including that a prior archive and the cache folder are correctly excluded), `npm run typecheck`, `electron-vite build` all succeed.
+2. Fresh launches complete startup with no errors both before and after all Phase 7 changes.
+3. **Review & Approval verified against the real Mission 001 script**: the live Quality-Control summary correctly showed real red/amber/green states (e.g. "fail" for 2 segments still flagged `unverifiedClaim`, "warning" for scenes not yet approved), and setting Scene 1's status to Approved and typing a reviewer note ("Great hook, ready to go.") persisted correctly through `updateAndSave`.
+4. **A full Export Center render was verified end-to-end against the real running app**: rather than fight the native "Choose Files" dialog a second time this session (see the note below), two real ffmpeg-generated test files were wired directly into `project.aether` as `linked`-storage assets and a timeline referencing them, then the running app was restarted to pick up the change from disk. With that in place, "Export Now" (preset: YouTube 1080p) produced `export-youtube-1080p-*.mp4`, confirmed via `ffprobe` to be exactly what was requested: 1920x1080 h264 video, AAC audio, both streams exactly 4.0s -- not just "a file was created," but the actual muxed, scaled, correctly-durationed result. "Create Production Archive (.zip)" was verified the same way: the resulting zip (34 real entries) was opened with Python's `zipfile` and confirmed to contain `project.aether` and the rendered export, while correctly excluding `cache/` and any prior `archives/` entries.
+5. All injected test assets/timeline, the rendered export (including its now-orphaned `cache/previews` thumbnail), the archive .zip, and the Review Center's test edits to Scene 1 (status and reviewer note) were removed/reverted from the real sample project before finishing, consistent with every prior phase's practice -- confirmed by relaunching and seeing "0 Assets," no timeline, and Scene 1 back to "Draft" with no reviewer note.
+
+### An incident this session, and how it was handled
+
+Partway through manual verification, a mouse click intended for the running app's Asset Library instead brought an entirely unrelated window into focus -- one that turned out to contain visible personal credentials (an API token, a site login, a password) belonging to the person operating this session. This was caught immediately from the resulting screenshot; work was paused, the exposure was disclosed to the user in plain terms without repeating the sensitive content, and no part of it was used, stored, or acted on. Verification then resumed with three concrete changes: (1) every focus-changing action now verifies `GetForegroundWindow()` actually matches the target window's handle and aborts rather than proceeding if it doesn't, instead of assuming a `SetForegroundWindow` call succeeded; (2) when a dialog's presence needed confirming, window titles were enumerated via `EnumWindows` rather than taking a full-virtual-desktop screenshot, so nothing outside the app's own window is ever captured; (3) after the native file-picker dialog proved unreliable to drive via further clicking, the remaining verification (the actual export render and archive creation) was restructured to avoid it entirely -- test assets were wired into the project file directly as `linked`-storage entries instead. See KNOWN_LIMITATIONS.md for the durable version of this guidance.
+
+### What wasn't interactively verified this session, and why
+
+The native "Choose Files" import dialog could not be reliably driven by further clicking this phase (see the incident note above) -- Export Center's render and archive features were still verified end-to-end, but via directly-injected `linked` assets rather than by clicking through the Asset Library's own import flow a second time. That flow itself was already verified in Phases 3, 5, and 6.
+
+## Phase 8: NOT STARTED
+
+See [ROADMAP.md](ROADMAP.md). Nothing in Templates, Learning Center, Tasks,
+or Analytics is implemented beyond the Zod schema placeholder already
+present in `@aether/shared-types` (the manifest's `tasks` array exists and
+is currently always empty).

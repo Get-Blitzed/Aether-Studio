@@ -13,6 +13,8 @@ import {
   CaptionSchema,
   ProviderConfigSchema,
   BackgroundJobSchema,
+  QualityCheckSchema,
+  ScriptSegmentSchema,
   ProjectManifestSchema,
 } from "./index.js";
 
@@ -311,6 +313,29 @@ describe("BackgroundJobSchema", () => {
       updatedAt: "2026-01-01T00:00:00.000Z",
     });
     expect(job.usage?.estimatedCostUsd).toBeCloseTo(0.002);
+  });
+});
+
+describe("QualityCheckSchema", () => {
+  it("validates a minimal check result", () => {
+    const check = QualityCheckSchema.parse({ id: "unverified-claims", label: "Unverified claims", status: "pass" });
+    expect(check.status).toBe("pass");
+  });
+
+  it("rejects an invalid status", () => {
+    expect(() => QualityCheckSchema.parse({ id: "x", label: "X", status: "not-a-real-status" })).toThrow();
+  });
+});
+
+describe("ScriptSegmentSchema reviewNotes (Phase 7)", () => {
+  it("leaves reviewNotes undefined by default", () => {
+    const segment = ScriptSegmentSchema.parse({ id: "seg_1", sceneNumber: 1 });
+    expect(segment.reviewNotes).toBeUndefined();
+  });
+
+  it("accepts reviewNotes when provided", () => {
+    const segment = ScriptSegmentSchema.parse({ id: "seg_1", sceneNumber: 1, reviewNotes: "Tighten the hook." });
+    expect(segment.reviewNotes).toBe("Tighten the hook.");
   });
 });
 

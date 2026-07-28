@@ -6,7 +6,7 @@
 flowchart TB
     subgraph Renderer["Renderer (React, sandboxed)"]
         UI[Screens: Splash, Onboarding, Home, ProductionOverview, Settings, ...,
-TimelineEditor, CaptionStudio, ProvidersScreen]
+TimelineEditor, CaptionStudio, ProvidersScreen, ReviewCenter, ExportCenter]
         Store[Zustand app store]
     end
 
@@ -28,6 +28,7 @@ TimelineEditor, CaptionStudio, ProvidersScreen]
         Media["@aether/media-engine: FFmpeg ops + concatVideoClips"]
         AI["@aether/ai-providers: provider interface + Mock/OpenAI/REST adapters"]
         Plugin["@aether/plugin-sdk: plugin manifest schema"]
+        Export["@aether/export-engine: quality checklist + renderFinalExport + archiveProduction"]
     end
 
     UI --> Store --> Bridge --> IPC
@@ -51,8 +52,8 @@ stack minus FFmpeg (deferred to Phase 3, where it's actually exercised).
   plain `electron` + hand-rolled Vite config does not.
 - **npm workspaces monorepo**: `apps/desktop` + `packages/*`, matching the
   spec's package boundaries (core, database, project-engine, shared-types,
-  media-engine, ai-providers, and plugin-sdk today; export-engine, security,
-  testing arrive with the phases that need them -- see
+  media-engine, ai-providers, plugin-sdk, and export-engine today; security
+  and testing arrive with the phases that need them -- see
   [ROADMAP.md](ROADMAP.md). A dedicated `timeline-engine` package named in
   the original roadmap turned out not to be needed -- Phase 5's timeline
   logic split cleanly across the existing `shared-types` (data model),
@@ -212,6 +213,29 @@ media elements (one video, several audio tracks) in acceptable sync for a
 preview editor with a simple mental model, at the cost of not being
 frame-accurate. See KNOWN_LIMITATIONS.md.
 
+## Key decision: the Quality-Control checklist is a pure function, not a service
+
+`runQualityChecklist()` (`packages/export-engine`) takes a `ProjectManifest`
+and returns `QualityCheck[]` -- no ffmpeg, no filesystem access, no network,
+nothing async. This is deliberate: both the Export Center and the Review &
+Approval screen need the same checklist, and a pure function is trivially
+shareable and re-runnable (on every visit to either screen) without needing
+a caching layer or a "is this stale" question. It's also why the checklist
+is fully covered by fast unit tests rather than needing ffmpeg fixtures the
+way `renderFinalExport()` does.
+
+## Key decision: exports and archives reuse existing patterns, not new ones
+
+A rendered export becomes a normal `Asset` (category `exports`) through the
+same `buildAssetFromFile` pipeline established in Phase 3 and reused by
+Phase 4's screen recordings, Phase 5's timeline preview, and Phase 6's
+AI-generated images -- Phase 7 did not introduce a separate "export record"
+concept. Likewise, a production archive is written to a plain `archives/`
+subfolder inside the project directory, following the same convention as
+the existing `renders/`, `backups/`, and `cache/` subfolders from Phase 1's
+project structure, rather than adding a save-location dialog or a new
+top-level concept.
+
 ## What's still deliberately not built (see ROADMAP.md / KNOWN_LIMITATIONS.md)
 
 - No delivery-quality project export encoding (Phase 7) -- Phase 5's
@@ -235,11 +259,15 @@ frame-accurate. See KNOWN_LIMITATIONS.md.
   Mixer screen (audio tracks live inside the Timeline Editor instead), no
   drag-and-drop clip editing (numeric controls only, see
   KNOWN_LIMITATIONS.md).
+- Final export composites the primary video track, audio tracks, and
+  captions only -- graphics/titles/overlays tracks are not burned into the
+  delivered video, and export presets are a fixed built-in list rather
+  than a user-editable/CRUD screen.
 - The persistent nav sidebar lists all the modules from the spec. As of
-  Phase 6, Home, Settings, Series, Knowledge, Scripts, Storyboards, Prompts,
+  Phase 7, Home, Settings, Series, Knowledge, Scripts, Storyboards, Prompts,
   Characters, Brands, Assets, Voice, Screen Capture, Timeline, Audio,
-  Captions, and Providers are wired up; the remaining items (Animation,
-  Review, Export, Templates, Learning Center) are disabled buttons with a
+  Captions, Providers, Review, and Export are wired up; the remaining items
+  (Animation, Templates, Learning Center) are disabled buttons with a
   tooltip naming the phase they arrive in. This is intentional -- see spec
   section 44 ("prepare clean interfaces for future expansion without
   filling the interface with nonfunctional placeholders"); a full

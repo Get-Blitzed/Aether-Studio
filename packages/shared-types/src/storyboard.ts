@@ -44,6 +44,7 @@ export const StoryboardFrameSchema = z.object({
   negativePrompt: z.string().optional(),
   continuityNotes: z.string().optional(),
   productionStatus: z.enum(["draft", "in-progress", "approved"]).default("draft"),
+  reviewNotes: z.string().optional(),
   createdAt: z.string(),
   modifiedAt: z.string(),
 });

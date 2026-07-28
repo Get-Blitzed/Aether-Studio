@@ -46,11 +46,14 @@ without the derived metadata/preview rather than failing the whole import.
 | `trimVideo()` | `ffmpeg -i <in> -ss <start> -to <end> -c:v libx264 -c:a aac <out>` | Throws `VIDEO_TRIM_FAILED` |
 | `adjustVideoSpeed()` | `ffmpeg -i <in> -filter_complex "[0:v]setpts=(1/f)*PTS[v];[0:a]atempo=f[a]" -map [v] -map [a] <out>` (f clamped to 0.5-2.0, `atempo`'s single-stage range) | Throws `VIDEO_SPEED_FAILED` |
 | `concatVideoClips()` | Single invocation, all segments as inputs: one `filter_complex` chain per segment (`trim=start=..:end=..,setpts=PTS-STARTPTS,scale=<w>:<h>:force_original_aspect_ratio=decrease,pad=<w>:<h>:(ow-iw)/2:(oh-ih)/2,setsar=1`, default 1280x720) so mismatched source resolutions don't break the join, then `concat=n=N:v=1:a=0` -- video-only, no audio track | Throws `VIDEO_TRIM_FAILED` (including a pre-check: empty segment list) |
+| `renderFinalExport()` (`@aether/export-engine`) | Single invocation: the same per-segment trim/scale/pad/concat as `concatVideoClips()` but parameterized by an export preset's resolution/frame rate, chained through a `drawtext` filter per caption (`enable='between(t\,start\,end)'` time-windows, commas escaped since the filtergraph itself is comma-delimited) for burn-in, plus every narration/music/sound-effect clip trimmed (`atrim`), volume/faded (`afade`), delayed to its timeline position (`adelay=<ms>:all=1`), and mixed (`amix=inputs=N:duration=first`) into one audio stream muxed with the video (`-c:v libx264 -c:a aac`) | Throws `RENDER_FAILED` (including a pre-check: empty video segment list -> `NO_VIDEO_SEGMENTS`) |
+| `archiveProduction()` (`@aether/export-engine`) | Not ffmpeg -- zips a project folder via `adm-zip`, excluding the regenerable `cache/` folder and any prior `archives/` entries | Throws `ARCHIVE_FAILED` |
 
-All of these were exercised in `packages/media-engine/src/mediaEngine.test.ts`
-and `audioVideoProcessing.test.ts` against **real** ffmpeg-generated test
-video/audio (via `-f lavfi` `testsrc`/`sine`/`anullsrc` sources, so the
-tests need no checked-in binary media fixtures) -- not mocked.
+All of these were exercised in `packages/media-engine/src/mediaEngine.test.ts`,
+`audioVideoProcessing.test.ts`, and `packages/export-engine/src/renderFinalExport.test.ts`/
+`archiveProduction.test.ts` against **real** ffmpeg-generated test video/audio
+(via `-f lavfi` `testsrc`/`sine`/`anullsrc` sources, so the tests need no
+checked-in binary media fixtures) and a real zip archive -- not mocked.
 
 ### A real bug this caught: loudness-progress-line vs. Summary-block parsing
 
@@ -68,6 +71,20 @@ of the Voice Studio pipeline, not by the original (too-loose) automated
 test -- the regression test added afterward asserts both a plausible
 loudness range and that normalization measurably moves the reading, so a
 similar regression can't pass silently again.
+
+### Caption burn-in reuses the same drawtext approach as Phase 6's mock image labels
+
+`renderFinalExport()`'s caption burn-in and Phase 6's `MockProvider.generateImage()`
+both burn text onto video/image frames via ffmpeg's `drawtext` filter rather
+than the `subtitles` filter (which needs libass and a real `.srt`/`.ass`
+file on disk). Chaining one `drawtext` per caption directly in the
+filtergraph, each gated by its own `enable='between(t,start,end)'` window,
+avoids a round-trip through a subtitle file and keeps caption timing
+expressed in the same seconds-based units as everything else in the
+timeline data model. The one wrinkle: `between(t,start,end)`'s commas have
+to be escaped (`between(t\,start\,end)`) because the surrounding
+filtergraph syntax also uses commas to separate a filter's own options --
+an unescaped comma would be parsed as ending the `enable=` value early.
 
 ## Security: no shell, no string interpolation
 
@@ -91,11 +108,11 @@ verifying it is a Phase 8 packaging task.
 
 ## What's NOT implemented yet
 
-- No delivery-quality export encoding -- Phase 5's `concatVideoClips()`
-  produces a video-only quick preview render (fixed default resolution,
-  no audio, always re-encoded to a single codec) for confirming a timeline
-  edit, not a project-level export. Full export encoding/transcoding for
-  delivery is Phase 7.
+- Delivery export (`renderFinalExport()`, Phase 7) composites the primary
+  video track, audio tracks, and captions, but not the graphics/titles/
+  overlays tracks -- those aren't burned into the final export, only shown
+  live in the Timeline Editor's preview. Secondary-video, character-
+  animation, and screen-capture tracks also aren't composited.
 - No proxy (lower-resolution preview) generation.
 - No progress reporting for long-running ffmpeg operations -- everything
   Phases 3-4 do completes in a few seconds per file even for short
