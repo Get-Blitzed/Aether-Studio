@@ -53,6 +53,16 @@ mac:
   # runner) -- electron-builder cannot produce a working dmg from Windows.
   hardenedRuntime: true
   gatekeeperAssess: false
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  category: AudioVideo
+  artifactName: Aether-Studio-Suite-${arch}.AppImage
+  # AppImage is a single self-contained executable -- no installer, no
+  # signing, no distro-specific packaging (deb/rpm) to maintain. It runs
+  # directly on any modern Linux desktop after `chmod +x`.
 asar: true
 asarUnpack:
   - "**/node_modules/ffmpeg-static/**"

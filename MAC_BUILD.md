@@ -59,11 +59,33 @@ Open bypasses it) unless you sign + notarize (see below).
 
 1. Push this repo to GitHub (see the "New repository" steps below if you
    don't have one yet).
-2. Push a tag matching `v*` (e.g. `git tag v0.1.0 && git push origin v0.1.0`),
+2. Push a tag matching `v*` (e.g. `git tag v0.2.0 && git push origin v0.2.0`),
    or trigger the workflow manually from the Actions tab
    ("Build installers" -> "Run workflow").
-3. The workflow builds on both `windows-latest` and `macos-latest` and
-   uploads the `.exe` and `.dmg` as downloadable build artifacts.
+3. The workflow builds on `windows-latest`, `macos-latest`, and
+   `ubuntu-latest` (Windows `.exe`, macOS `.dmg`, Linux `.AppImage`).
+
+### How to verify you're looking at a fresh build
+
+**Pushing commits to `master` alone never triggers this workflow** -- it
+only runs on a pushed `v*` tag or a manual "Run workflow" click. This is
+easy to miss: if you push a bunch of feature commits and then check the
+Actions tab expecting a new build, you won't see one until you also cut a
+new tag. To check whether a given commit actually has a build:
+
+1. **Actions tab** (`Actions` -> "Build installers"): find the run whose
+   commit SHA (shown under the run title) matches `git log -1 --format=%H`
+   locally. If the newest run's SHA is older than your latest commit, no
+   build has happened for your latest changes yet -- push a new tag.
+2. **Releases page** (repo homepage -> `Releases`, or `/releases`): each
+   tagged build publishes a real, permanent GitHub Release here (not just
+   a 90-day workflow artifact) with the `.exe`/`.dmg`/`.AppImage` attached
+   as release assets, one Release per tag, each showing its actual publish
+   date -- the most reliable "is this current" check, since Releases don't
+   expire the way run artifacts do.
+3. **Tag-to-commit check**: `git log -1 --format=%H vX.Y.Z` shows exactly
+   which commit a given tag (and therefore Release) was built from;
+   compare that SHA against your latest commits.
 
 ## Signing and notarizing (optional, needed for real distribution)
 
