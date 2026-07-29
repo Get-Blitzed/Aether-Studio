@@ -403,3 +403,15 @@ languages, and only the Windows binary is bundled even though Piper also
 ships Linux/macOS binaries -- extending either would mean re-running the
 same license-vetting-and-download process done here for the initial four
 voices, not a config change.
+
+## Music Library is CC-BY, not CC0 -- attribution travels with imported tracks
+
+Unlike the sound-effects library, the 10 bundled background-music tracks
+are CC-BY 4.0 (Kevin MacLeod / incompetech.com), which requires
+attribution rather than being fully unrestricted. The app surfaces each
+track's required credit string in the Music Library screen and copies it
+into the imported Asset's notes, but it's still the user's responsibility
+to actually include that credit somewhere reasonable in a finished
+production that uses one of these tracks (e.g. video description, credits
+roll) -- the app does not currently enforce or auto-insert attribution
+into exports.

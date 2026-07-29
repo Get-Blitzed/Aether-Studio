@@ -28,3 +28,7 @@ export function getSoundLibraryDir(): string {
 export function getPiperDir(): string {
   return path.join(getBundledResourcesDir(), "piper");
 }
+
+export function getMusicLibraryDir(): string {
+  return path.join(getBundledResourcesDir(), "music-library");
+}

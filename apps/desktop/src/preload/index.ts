@@ -29,6 +29,16 @@ interface SoundLibraryEntryPayload {
   originalFileName: string;
 }
 
+interface MusicLibraryEntryPayload {
+  id: string;
+  title: string;
+  filePath: string;
+  mood: string;
+  moodLabel: string;
+  durationSeconds: number | null;
+  attribution: string;
+}
+
 interface ExportPresetPayload {
   id: string;
   name: string;
@@ -273,6 +283,17 @@ const api = {
       >,
     import: (args: { projectDir: string; entryIds: string[] }) =>
       ipcRenderer.invoke("sound-library:import", args) as Promise<
+        { ok: true; manifest: ProjectManifest; added: number; duplicates: string[] } | { ok: false; error?: AppErrorPayload }
+      >,
+  },
+
+  musicLibrary: {
+    list: () =>
+      ipcRenderer.invoke("music-library:list") as Promise<
+        { ok: true; entries: (MusicLibraryEntryPayload & { absolutePath: string })[] } | { ok: false; error?: AppErrorPayload }
+      >,
+    import: (args: { projectDir: string; entryIds: string[] }) =>
+      ipcRenderer.invoke("music-library:import", args) as Promise<
         { ok: true; manifest: ProjectManifest; added: number; duplicates: string[] } | { ok: false; error?: AppErrorPayload }
       >,
   },

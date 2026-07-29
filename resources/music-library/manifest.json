@@ -1,0 +1,92 @@
+[
+  {
+    "id": "upbeat-cheery-monday",
+    "title": "Cheery Monday",
+    "filePath": "upbeat-cheery-monday.mp3",
+    "mood": "upbeat",
+    "moodLabel": "Upbeat & Bright",
+    "durationSeconds": 80.22,
+    "attribution": "\"Cheery Monday\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "ambient-deliberate-thought",
+    "title": "Deliberate Thought",
+    "filePath": "ambient-deliberate-thought.mp3",
+    "mood": "ambient",
+    "moodLabel": "Calm & Ambient",
+    "durationSeconds": 177.46,
+    "attribution": "\"Deliberate Thought\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "ambient-wallpaper",
+    "title": "Wallpaper",
+    "filePath": "ambient-wallpaper.mp3",
+    "mood": "ambient",
+    "moodLabel": "Calm & Ambient",
+    "durationSeconds": 220.06,
+    "attribution": "\"Wallpaper\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "playful-life-of-riley",
+    "title": "Life of Riley",
+    "filePath": "playful-life-of-riley.mp3",
+    "mood": "playful",
+    "moodLabel": "Playful & Light",
+    "durationSeconds": 235.36,
+    "attribution": "\"Life of Riley\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "corporate-local-forecast-elevator",
+    "title": "Local Forecast - Elevator",
+    "filePath": "corporate-local-forecast-elevator.mp3",
+    "mood": "corporate",
+    "moodLabel": "Corporate & Waiting",
+    "durationSeconds": 189.2,
+    "attribution": "\"Local Forecast - Elevator\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "motivational-inspired",
+    "title": "Inspired",
+    "filePath": "motivational-inspired.mp3",
+    "mood": "motivational",
+    "moodLabel": "Motivational & Uplifting",
+    "durationSeconds": 286.07,
+    "attribution": "\"Inspired\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "uplifting-bright-wish",
+    "title": "Bright Wish",
+    "filePath": "uplifting-bright-wish.mp3",
+    "mood": "motivational",
+    "moodLabel": "Motivational & Uplifting",
+    "durationSeconds": 40.88,
+    "attribution": "\"Bright Wish\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "motivational-move-forward",
+    "title": "Move Forward",
+    "filePath": "motivational-move-forward.mp3",
+    "mood": "motivational",
+    "moodLabel": "Motivational & Uplifting",
+    "durationSeconds": 69.25,
+    "attribution": "\"Move Forward\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "playful-sneaky-adventure",
+    "title": "Sneaky Adventure",
+    "filePath": "playful-sneaky-adventure.mp3",
+    "mood": "playful",
+    "moodLabel": "Playful & Light",
+    "durationSeconds": 73.4,
+    "attribution": "\"Sneaky Adventure\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/"
+  },
+  {
+    "id": "curious-investigations",
+    "title": "Investigations",
+    "filePath": "curious-investigations.mp3",
+    "mood": "curious",
+    "moodLabel": "Curious & Suspenseful",
+    "durationSeconds": 93.54,
+    "attribution": "\"Investigations\" Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/"
+  }
+]

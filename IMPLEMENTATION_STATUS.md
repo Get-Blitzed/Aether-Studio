@@ -441,3 +441,47 @@ native binary, making it a genuine bundle candidate.
   All 156 tests pass; `npx tsc --noEmit` clean; `npm run build -w
   apps/desktop` succeeds; the packaged app launches cleanly with the new
   provider kind present in the Providers screen's dropdown.
+
+## Music Library: bundled background music + "Add Your Own Music"
+
+A background-music sibling to the Sound Library, added after the user
+asked what else could be bundled for free creative use. A local folder
+of "background music samples" the user offered as a source turned out to
+be actual commercial recordings (Tears for Fears, House of Pain, Jay-Z,
+etc.) -- real copyrighted masters, not royalty-free content -- so that
+folder was declined outright and the library was built from a properly
+licensed source instead.
+
+- **Source**: incompetech.com (Kevin MacLeod), CC-BY 4.0 -- explicitly
+  permits commercial use, modification, and redistribution, with
+  attribution as the only condition. Ten tracks were curated across
+  moods relevant to product-training/onboarding video (upbeat, ambient,
+  playful, corporate/waiting, motivational, curious), verified downloadable
+  and confirmed under the catalog's blanket CC-BY 4.0 terms. Bundled at
+  `resources/music-library/` (flat `.mp3` files + `manifest.json` +
+  `ATTRIBUTIONS.md`), ~52MB total -- picked up automatically by the
+  existing `extraResources` config.
+- **Attribution handling**: unlike the sound effects (which needed no
+  attribution), CC-BY requires it. Each manifest entry carries an
+  `attribution` string in the exact format incompetech's FAQ specifies;
+  it's shown under every track in the Music Library screen and copied
+  into the imported Asset's `notes` field so the credit travels with the
+  asset even after import.
+- **New IPC** (`musicLibraryIpc.ts`): `music-library:list` /
+  `music-library:import`, structurally identical to the Sound Library's
+  handlers (same checksum-dedup import into the `music` asset category).
+- **"Add Your Own Music"**: the Music Library screen also has a button
+  that reuses the *existing*, already-proven `assets:choose-files` /
+  `assets:import` IPC (the same generic file-picker-to-Asset-Library flow
+  used elsewhere) so users with their own licensed tracks -- a music
+  subscription, something they wrote, anything they hold the rights to --
+  can add it straight into their project. This deliberately does not
+  route through the bundled-library pipeline: user-supplied music is
+  never copied into `resources/`, only into the user's own project.
+- **Verified**: 156/156 tests still pass (no new automated tests were
+  needed since both IPC handlers reuse code paths -- `buildAssetFromFile`
+  + checksum dedup -- already covered by the Sound Library's tests and
+  the pre-existing `assets:import` tests); `npx tsc --noEmit` clean for
+  both apps/desktop configs; `npm run build -w apps/desktop` succeeds;
+  the packaged app launches cleanly with the new Music Library nav item
+  and route present.
