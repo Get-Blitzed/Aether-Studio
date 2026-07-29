@@ -1,0 +1,53 @@
+[
+  {
+    "id": "inter",
+    "family": "Inter",
+    "label": "Inter (Clean Sans)",
+    "style": "sans-general",
+    "weights": [{ "weight": "regular", "filePath": "Inter.ttf" }],
+    "license": "SIL Open Font License 1.1"
+  },
+  {
+    "id": "poppins",
+    "family": "Poppins",
+    "label": "Poppins (Bold Titles)",
+    "style": "sans-display",
+    "weights": [
+      { "weight": "regular", "filePath": "Poppins-Regular.ttf" },
+      { "weight": "bold", "filePath": "Poppins-Bold.ttf" }
+    ],
+    "license": "SIL Open Font License 1.1"
+  },
+  {
+    "id": "jetbrains-mono",
+    "family": "JetBrains Mono",
+    "label": "JetBrains Mono (Technical)",
+    "style": "monospace",
+    "weights": [{ "weight": "regular", "filePath": "JetBrainsMono.ttf" }],
+    "license": "SIL Open Font License 1.1"
+  },
+  {
+    "id": "merriweather",
+    "family": "Merriweather",
+    "label": "Merriweather (Editorial Serif)",
+    "style": "serif",
+    "weights": [{ "weight": "regular", "filePath": "Merriweather.ttf" }],
+    "license": "SIL Open Font License 1.1"
+  },
+  {
+    "id": "quicksand",
+    "family": "Quicksand",
+    "label": "Quicksand (Friendly Rounded)",
+    "style": "sans-rounded",
+    "weights": [{ "weight": "regular", "filePath": "Quicksand.ttf" }],
+    "license": "SIL Open Font License 1.1"
+  },
+  {
+    "id": "bebas-neue",
+    "family": "Bebas Neue",
+    "label": "Bebas Neue (Condensed Display)",
+    "style": "display-condensed",
+    "weights": [{ "weight": "regular", "filePath": "BebasNeue-Regular.ttf" }],
+    "license": "SIL Open Font License 1.1"
+  }
+]

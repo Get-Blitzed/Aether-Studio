@@ -39,6 +39,13 @@ interface MusicLibraryEntryPayload {
   attribution: string;
 }
 
+interface IconLibraryEntryPayload {
+  id: string;
+  title: string;
+  filePath: string;
+  tags: string[];
+}
+
 interface ExportPresetPayload {
   id: string;
   name: string;
@@ -294,6 +301,17 @@ const api = {
       >,
     import: (args: { projectDir: string; entryIds: string[] }) =>
       ipcRenderer.invoke("music-library:import", args) as Promise<
+        { ok: true; manifest: ProjectManifest; added: number; duplicates: string[] } | { ok: false; error?: AppErrorPayload }
+      >,
+  },
+
+  iconLibrary: {
+    list: () =>
+      ipcRenderer.invoke("icon-library:list") as Promise<
+        { ok: true; entries: (IconLibraryEntryPayload & { absolutePath: string })[] } | { ok: false; error?: AppErrorPayload }
+      >,
+    import: (args: { projectDir: string; entryIds: string[] }) =>
+      ipcRenderer.invoke("icon-library:import", args) as Promise<
         { ok: true; manifest: ProjectManifest; added: number; duplicates: string[] } | { ok: false; error?: AppErrorPayload }
       >,
   },

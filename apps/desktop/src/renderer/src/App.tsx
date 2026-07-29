@@ -14,6 +14,7 @@ import { PromptWorkshop } from "./screens/PromptWorkshop";
 import { AssetLibrary } from "./screens/AssetLibrary";
 import { SoundLibrary } from "./screens/SoundLibrary";
 import { MusicLibrary } from "./screens/MusicLibrary";
+import { IconLibrary } from "./screens/IconLibrary";
 import { DocumentImport } from "./screens/DocumentImport";
 import { VoiceStudio } from "./screens/VoiceStudio";
 import { ScreenCaptureStudio } from "./screens/ScreenCaptureStudio";
@@ -41,6 +42,7 @@ export function App(): JSX.Element {
         <Route path="/assets" element={<AssetLibrary />} />
         <Route path="/sound-library" element={<SoundLibrary />} />
         <Route path="/music-library" element={<MusicLibrary />} />
+        <Route path="/icon-library" element={<IconLibrary />} />
         <Route path="/documents" element={<DocumentImport />} />
         <Route path="/voice" element={<VoiceStudio />} />
         <Route path="/screen-capture" element={<ScreenCaptureStudio />} />

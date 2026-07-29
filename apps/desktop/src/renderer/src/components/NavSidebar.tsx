@@ -22,6 +22,7 @@ const NAV_ITEMS: NavItemDef[] = [
   { label: "Assets", path: "/assets" },
   { label: "Sound Library", path: "/sound-library" },
   { label: "Music Library", path: "/music-library" },
+  { label: "Icon Library", path: "/icon-library" },
   { label: "Voice", path: "/voice" },
   { label: "Animation", disabledReason: "Animation & Shot Lab is not yet scheduled in the roadmap." },
   { label: "Screen Capture", path: "/screen-capture" },

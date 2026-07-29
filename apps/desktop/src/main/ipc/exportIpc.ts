@@ -9,6 +9,7 @@ import { isAudioTrackType, isBlurTrackType } from "@aether/shared-types";
 import type { SettingsRepository } from "@aether/database";
 import type { AppError } from "./projectsIpc.js";
 import { buildAssetFromFile, resolveAssetPath } from "../assetBuilder.js";
+import { getDefaultCaptionFontPath } from "../resourcePaths.js";
 
 function toAppError(error: unknown): AppError {
   if (error instanceof ExportEngineError) return { title: "Export error", detail: error.message, code: error.code };
@@ -103,7 +104,10 @@ export function registerExportIpc({ logger, settingsRepo }: RegisterDeps): void 
         fs.mkdirSync(rendersDir, { recursive: true });
         const tempOutput = path.join(rendersDir, `export-${preset.id}-${Date.now()}.mp4`);
 
-        await renderFinalExport({ videoSegments, audioClips, captions, blurRegions, preset }, tempOutput);
+        await renderFinalExport(
+          { videoSegments, audioClips, captions, blurRegions, preset, captionFontFilePath: getDefaultCaptionFontPath() },
+          tempOutput,
+        );
 
         const asset = await buildAssetFromFile(args.projectDir, tempOutput, "exports", "managed", ffmpegOverridePath, logger);
         fs.unlinkSync(tempOutput);

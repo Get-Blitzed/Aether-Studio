@@ -79,7 +79,7 @@ See [WINDOWS_BUILD.md](WINDOWS_BUILD.md) for producing an actual
 /packages/plugin-sdk  Plugin manifest schema + validation (no runtime loader yet)
 /packages/export-engine  Quality-Control checklist, real ffmpeg final export (with blur redaction), production archive zipping
 /packages/document-engine  PDF/DOCX/PPTX text extraction, slide rendering, script/storyboard auto-generation
-/resources            Branding, sample projects (Orbit), sound-library (curated royalty-free SFX), music-library (curated CC-BY background tracks), piper (bundled offline voice engine + models), templates
+/resources            Branding, sample projects (Orbit), sound-library (curated royalty-free SFX), music-library (curated CC-BY background tracks), piper (bundled offline voice engine + models), fonts (curated OFL font families), icons (curated MIT icon set), templates
 /docs                 Architecture, format, and process documentation
 ```
 

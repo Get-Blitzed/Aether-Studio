@@ -415,3 +415,22 @@ to actually include that credit somewhere reasonable in a finished
 production that uses one of these tracks (e.g. video description, credits
 roll) -- the app does not currently enforce or auto-insert attribution
 into exports.
+
+## Font Library is metadata-only outside of the caption-burn-in default
+
+Six bundled OFL fonts are cataloged in `resources/fonts/manifest.json`
+and one of them (Inter) is wired in as ffmpeg's default caption-burn-in
+font (fixing a real bug -- see IMPLEMENTATION_STATUS.md), but there is no
+UI yet to browse the other five, pick a non-default caption font, or
+apply a bundled font to overlay/title text. The manifest is ready for
+that UI; it just hasn't been built.
+
+## Icon Library previews are recolored via CSS invert, not true theming
+
+The Icon Library screen renders Feather Icons SVGs via `<img>` tags with
+a CSS `invert` filter to make their black `stroke="currentColor"` visible
+on the dark UI. This is a display-only trick for the browsing grid --
+imported icon assets keep their original black stroke color in the
+`.svg` file itself (Feather Icons ship as `stroke="currentColor"` with no
+fill, so they render at whatever color the video-editing/compositing
+context ends up applying, which currently is not configurable in-app).

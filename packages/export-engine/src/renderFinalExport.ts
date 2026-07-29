@@ -44,6 +44,15 @@ export interface RenderFinalExportOptions {
   blurRegions?: ExportBlurRegion[];
   preset: ExportPreset;
   ffmpegOverridePath?: string;
+  /**
+   * Absolute path to a .ttf/.otf file used for burned-in captions. Without
+   * this, ffmpeg's drawtext filter falls back to fontconfig's default font
+   * lookup, which isn't guaranteed to resolve to anything on a fresh
+   * Windows install -- passing a bundled font here (see
+   * resources/fonts/) makes caption rendering deterministic on every
+   * machine instead of relying on undocumented system font discovery.
+   */
+  captionFontFilePath?: string;
 }
 
 function escapeDrawtext(text: string): string {
@@ -52,6 +61,11 @@ function escapeDrawtext(text: string): string {
     .replace(/:/g, "\\:")
     .replace(/'/g, "’")
     .replace(/\r?\n/g, " ");
+}
+
+/** Escapes a filesystem path for use as a drawtext filter option value (forward slashes avoid Windows backslash-escaping, then the drive-letter colon is escaped). */
+function escapeFilterPath(filePath: string): string {
+  return filePath.replace(/\\/g, "/").replace(/:/g, "\\:");
 }
 
 function totalVideoDuration(segments: ExportVideoSegment[]): number {
@@ -101,12 +115,13 @@ export async function renderFinalExport(options: RenderFinalExportOptions, outpu
   }
   filters.push(`${videoLabels.join("")}concat=n=${videoSegments.length}:v=1:a=0[vconcat]`);
 
+  const fontfileClause = options.captionFontFilePath ? `fontfile='${escapeFilterPath(options.captionFontFilePath)}':` : "";
   let videoOutLabel = "vconcat";
   captions.forEach((caption, i) => {
     const nextLabel = `vcap${i}`;
     const text = escapeDrawtext(caption.text);
     filters.push(
-      `[${videoOutLabel}]drawtext=text='${text}':fontcolor=white:fontsize=${Math.max(18, Math.round(height / 20))}:` +
+      `[${videoOutLabel}]drawtext=${fontfileClause}text='${text}':fontcolor=white:fontsize=${Math.max(18, Math.round(height / 20))}:` +
         `box=1:boxcolor=black@0.6:boxborderw=10:x=(w-text_w)/2:y=h-text_h-${Math.round(height * 0.06)}:` +
         `enable='between(t\\,${caption.startSeconds}\\,${caption.endSeconds})'[${nextLabel}]`,
     );

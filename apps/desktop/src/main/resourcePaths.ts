@@ -32,3 +32,16 @@ export function getPiperDir(): string {
 export function getMusicLibraryDir(): string {
   return path.join(getBundledResourcesDir(), "music-library");
 }
+
+export function getFontsDir(): string {
+  return path.join(getBundledResourcesDir(), "fonts");
+}
+
+export function getIconsDir(): string {
+  return path.join(getBundledResourcesDir(), "icons");
+}
+
+/** The bundled font ffmpeg uses to burn in captions -- see resources/fonts/manifest.json for the full curated set. */
+export function getDefaultCaptionFontPath(): string {
+  return path.join(getFontsDir(), "Inter.ttf");
+}

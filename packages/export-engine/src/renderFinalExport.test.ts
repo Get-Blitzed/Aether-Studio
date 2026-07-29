@@ -62,6 +62,27 @@ describe("renderFinalExport (against the real bundled ffmpeg)", () => {
     expect(probe.videoCodec).toBeTruthy();
   }, 30_000);
 
+  it("renders captions using an explicit bundled font file without erroring", async () => {
+    const output = path.join(workDir, "final-with-font.mp4");
+    const preset = getExportPreset("youtube-720p")!;
+    const fontPath = path.resolve(__dirname, "..", "..", "..", "resources", "fonts", "Inter.ttf");
+    expect(fs.existsSync(fontPath)).toBe(true);
+
+    await renderFinalExport(
+      {
+        videoSegments: [{ filePath: videoClip, startSeconds: 0, endSeconds: 3 }],
+        audioClips: [],
+        captions: [{ startSeconds: 0, endSeconds: 2, text: "Hello, world!" }],
+        preset,
+        captionFontFilePath: fontPath,
+      },
+      output,
+    );
+
+    const probe = await probeMedia(output);
+    expect(probe.videoCodec).toBeTruthy();
+  }, 30_000);
+
   it("still produces a (silent) audio track when there are no audio clips", async () => {
     const output = path.join(workDir, "video-only.mp4");
     const preset = getExportPreset("square-1080x1080")!;

@@ -485,3 +485,48 @@ licensed source instead.
   both apps/desktop configs; `npm run build -w apps/desktop` succeeds;
   the packaged app launches cleanly with the new Music Library nav item
   and route present.
+
+## Font Library + fixed caption-burn-in fontfile, and an Icon Library
+
+The last two "open license additions" from the creative-possibilities
+list (background music was built first; a bundled offline LLM was
+deliberately skipped as too large/heavy a commitment for now).
+
+**Fonts** (`resources/fonts/`, ~6MB): six SIL Open Font License 1.1
+(Google Fonts) families covering distinct visual styles -- Inter (general
+sans), Poppins Regular+Bold (bold titles), JetBrains Mono (technical/code
+content), Merriweather (editorial serif), Quicksand (friendly rounded),
+Bebas Neue (condensed display) -- plus a `manifest.json` and each
+family's `OFL-*.txt` license text. While wiring this in, a real latent
+bug was found and fixed: `renderFinalExport.ts`'s caption burn-in used
+ffmpeg's `drawtext` filter with no `fontfile=` specified, meaning it
+depended entirely on fontconfig's undocumented default-font lookup --
+not guaranteed to resolve to anything on a fresh Windows install. Added
+`captionFontFilePath` to `RenderFinalExportOptions`, wired it through
+`drawtext=fontfile='<escaped path>':...` (with Windows-path escaping:
+backslashes to forward slashes, then the drive-letter colon escaped), and
+`exportIpc.ts` now passes `getDefaultCaptionFontPath()` (bundled Inter)
+by default. A new real-ffmpeg test
+(`renderFinalExport.test.ts`: "renders captions using an explicit bundled
+font file without erroring") exercises this against the actual bundled
+`Inter.ttf`. The rest of the font manifest is metadata-only for now --
+no UI to pick a non-default caption font or apply bundled fonts to
+overlay text yet, tracked in KNOWN_LIMITATIONS.md.
+
+**Icons** (`resources/icons/`, ~45KB): 30 curated MIT-licensed Feather
+Icons SVGs (check, x, arrows, play/pause, info/alert/help callouts,
+star/thumbs-up/award, settings, user/users, bar-chart, target, flag,
+book, clipboard, download/upload, mail/phone/calendar/clock, lock/shield,
+trending-up, zap) plus `manifest.json` (title + search tags) and Feather's
+`LICENSE.txt`. New **Icon Library** screen (`/icon-library`, new nav
+item) -- a searchable grid of `<img>` previews (rendered white via a CSS
+`invert` filter, since Feather's `stroke="currentColor"` doesn't resolve
+inside an `<img>` document context) with multi-select import into the
+Asset Library's `graphics` category, mirroring the Sound/Music Library's
+list/import IPC pattern exactly (`iconLibraryIpc.ts`,
+`getIconsDir()` in `resourcePaths.ts`).
+
+**Verified**: 157/157 tests pass (including the new real-ffmpeg
+`captionFontFilePath` test); `npx tsc --noEmit` clean for both
+apps/desktop configs; `npm run build -w apps/desktop` succeeds; the
+packaged app launches cleanly with both new nav items and routes present.
