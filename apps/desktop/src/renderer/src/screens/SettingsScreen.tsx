@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavSidebar } from "../components/NavSidebar";
 import { useAppStore } from "../state/appStore";
+import { applyAppearance } from "../lib/theme";
 import type { AppSettings } from "@aether/shared-types";
 
 interface FfmpegStatus {
@@ -20,6 +21,19 @@ export function SettingsScreen(): JSX.Element {
   const [checkingFfmpeg, setCheckingFfmpeg] = useState(false);
 
   useEffect(() => setLocal(settings), [settings]);
+
+  // Revert any unsaved Appearance preview back to the persisted value if the
+  // user navigates away without saving -- otherwise the live-previewed
+  // choice would stay applied even though it was never actually saved. A
+  // ref (rather than a `[settings]` dependency) keeps this cleanup
+  // unmount-only while still reading whatever was most recently saved.
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
+  useEffect(() => {
+    return () => {
+      if (settingsRef.current) applyAppearance(settingsRef.current.appearance);
+    };
+  }, []);
 
   async function handleTestFfmpeg() {
     setCheckingFfmpeg(true);
@@ -53,8 +67,12 @@ export function SettingsScreen(): JSX.Element {
           <Field label="Appearance">
             <select
               value={local.appearance}
-              onChange={(e) => setLocal({ ...local, appearance: e.target.value as AppSettings["appearance"] })}
-              className="w-full rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream"
+              onChange={(e) => {
+                const appearance = e.target.value as AppSettings["appearance"];
+                setLocal({ ...local, appearance });
+                applyAppearance(appearance);
+              }}
+              className="w-full rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-cream"
             >
               <option value="dark">Dark</option>
               <option value="light">Light</option>
@@ -67,12 +85,12 @@ export function SettingsScreen(): JSX.Element {
               <input
                 readOnly
                 value={local.defaultProjectFolder ?? "(Documents/Aether Studio Suite)"}
-                className="flex-1 rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-silver"
+                className="flex-1 rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-silver"
               />
               <button
                 type="button"
                 onClick={handleChooseFolder}
-                className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
+                className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5"
               >
                 Choose...
               </button>
@@ -85,7 +103,7 @@ export function SettingsScreen(): JSX.Element {
               min={10}
               value={local.autosaveIntervalSeconds}
               onChange={(e) => setLocal({ ...local, autosaveIntervalSeconds: Number(e.target.value) })}
-              className="w-32 rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream"
+              className="w-32 rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-cream"
             />
           </Field>
 
@@ -95,7 +113,7 @@ export function SettingsScreen(): JSX.Element {
               min={1}
               value={local.backupCount}
               onChange={(e) => setLocal({ ...local, backupCount: Number(e.target.value) })}
-              className="w-32 rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream"
+              className="w-32 rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-cream"
             />
           </Field>
 
@@ -110,7 +128,7 @@ export function SettingsScreen(): JSX.Element {
             </label>
           </Field>
 
-          <div className="border-t border-white/10 pt-6">
+          <div className="border-t border-hairline/10 pt-6">
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-silver">Advanced</h2>
 
             <Field
@@ -121,7 +139,7 @@ export function SettingsScreen(): JSX.Element {
                 value={local.ffmpegPath ?? ""}
                 onChange={(e) => setLocal({ ...local, ffmpegPath: e.target.value || undefined })}
                 placeholder="(using bundled FFmpeg)"
-                className="w-full rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                className="w-full rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
               />
             </Field>
 
@@ -130,7 +148,7 @@ export function SettingsScreen(): JSX.Element {
                 type="button"
                 onClick={handleTestFfmpeg}
                 disabled={checkingFfmpeg}
-                className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-cream hover:bg-white/5 disabled:opacity-50"
+                className="rounded-md border border-hairline/20 px-3 py-1.5 text-xs text-cream hover:bg-hairline/5 disabled:opacity-50"
               >
                 {checkingFfmpeg ? "Checking..." : "Test FFmpeg"}
               </button>

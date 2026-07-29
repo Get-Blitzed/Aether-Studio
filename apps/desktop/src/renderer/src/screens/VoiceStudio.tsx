@@ -209,7 +209,7 @@ export function VoiceStudio(): JSX.Element {
           <button
             type="button"
             onClick={addProfile}
-            className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
+            className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5"
           >
             + New Voice Profile
           </button>
@@ -230,7 +230,7 @@ export function VoiceStudio(): JSX.Element {
                 type="button"
                 onClick={() => setSelectedProfileId(p.id)}
                 className={`w-full rounded-md px-3 py-2 text-left text-sm ${
-                  p.id === selected?.id ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-white/5"
+                  p.id === selected?.id ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-hairline/5"
                 }`}
               >
                 {p.name}
@@ -240,7 +240,7 @@ export function VoiceStudio(): JSX.Element {
 
           {selected ? (
             <div className="flex-1 space-y-5">
-              <div className="rounded-lg border border-white/10 bg-charcoal p-4">
+              <div className="rounded-lg border border-hairline/10 bg-charcoal p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <input
                     value={selected.name}
@@ -261,7 +261,7 @@ export function VoiceStudio(): JSX.Element {
                     <select
                       value={selected.characterId ?? ""}
                       onChange={(e) => updateProfile({ characterId: e.target.value || undefined })}
-                      className="w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                      className="w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
                     >
                       <option value="">Unassigned</option>
                       {currentManifest.characters.map((c) => (
@@ -277,7 +277,7 @@ export function VoiceStudio(): JSX.Element {
                       value={selected.provider ?? ""}
                       onChange={(e) => updateProfile({ provider: e.target.value })}
                       placeholder="e.g. ElevenLabs, Cartesia"
-                      className="w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                      className="w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
                     />
                   </div>
                   <div>
@@ -285,7 +285,7 @@ export function VoiceStudio(): JSX.Element {
                     <input
                       value={selected.emotion ?? ""}
                       onChange={(e) => updateProfile({ emotion: e.target.value })}
-                      className="w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                      className="w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
                     />
                   </div>
                   <div>
@@ -293,7 +293,7 @@ export function VoiceStudio(): JSX.Element {
                     <input
                       value={selected.emphasis ?? ""}
                       onChange={(e) => updateProfile({ emphasis: e.target.value })}
-                      className="w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                      className="w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
                     />
                   </div>
                   <div className="col-span-2">
@@ -301,13 +301,13 @@ export function VoiceStudio(): JSX.Element {
                     <input
                       value={selected.pronunciationNotes ?? ""}
                       onChange={(e) => updateProfile({ pronunciationNotes: e.target.value })}
-                      className="w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                      className="w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-lg border border-white/10 bg-charcoal p-4">
+              <div className="rounded-lg border border-hairline/10 bg-charcoal p-4">
                 <h2 className="mb-3 font-medium text-cream">AI Voice Synthesis</h2>
                 {voiceProviders.length === 0 ? (
                   <p className="text-sm text-silver">
@@ -322,7 +322,7 @@ export function VoiceStudio(): JSX.Element {
                         <select
                           value={synthProviderId}
                           onChange={(e) => setSynthProviderId(e.target.value)}
-                          className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                          className="mt-1 block w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
                         >
                           {voiceProviders.map((p) => (
                             <option key={p.id} value={p.id}>
@@ -336,7 +336,7 @@ export function VoiceStudio(): JSX.Element {
                         <select
                           value={synthVoiceId}
                           onChange={(e) => setSynthVoiceId(e.target.value)}
-                          className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                          className="mt-1 block w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
                         >
                           {availableVoices.length === 0 && <option value="">No voices available</option>}
                           {availableVoices.map((v) => (
@@ -377,7 +377,7 @@ export function VoiceStudio(): JSX.Element {
                       onChange={(e) => setSynthText(e.target.value)}
                       placeholder="Text to speak..."
                       rows={3}
-                      className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                      className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                     />
                     <button
                       type="button"
@@ -475,17 +475,17 @@ function TakeCard({
   const [trimEnd, setTrimEnd] = useState(take.durationSeconds ? take.durationSeconds.toFixed(1) : "");
 
   return (
-    <div className="rounded-lg border border-white/10 bg-charcoal p-4">
+    <div className="rounded-lg border border-hairline/10 bg-charcoal p-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <input type="checkbox" checked={selected} onChange={onToggleSelect} aria-label="Select for merge" />
-          <span className="rounded bg-white/10 px-2 py-1 text-xs text-silver">Take {take.takeNumber}</span>
+          <span className="rounded bg-hairline/10 px-2 py-1 text-xs text-silver">Take {take.takeNumber}</span>
           <span className="text-sm text-cream">{take.originalFileName}</span>
         </div>
         <select
           value={take.status}
           onChange={(e) => onStatusChange(e.target.value as VoiceTake["status"])}
-          className="rounded border border-white/10 bg-navy px-2 py-1 text-xs text-cream"
+          className="rounded border border-hairline/10 bg-navy px-2 py-1 text-xs text-cream"
         >
           <option value="draft">Draft</option>
           <option value="approved">Approved</option>
@@ -518,7 +518,7 @@ function TakeCard({
           type="button"
           disabled={disabled}
           onClick={() => onProcess("normalize")}
-          className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5 disabled:opacity-50"
+          className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5 disabled:opacity-50"
         >
           Normalize
         </button>
@@ -526,7 +526,7 @@ function TakeCard({
           type="button"
           disabled={disabled}
           onClick={() => onProcess("denoise")}
-          className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5 disabled:opacity-50"
+          className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5 disabled:opacity-50"
         >
           Denoise
         </button>
@@ -534,7 +534,7 @@ function TakeCard({
           type="button"
           disabled={disabled}
           onClick={() => onProcess("remove-silence")}
-          className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5 disabled:opacity-50"
+          className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5 disabled:opacity-50"
         >
           Remove Silence
         </button>
@@ -542,7 +542,7 @@ function TakeCard({
           type="button"
           disabled={disabled}
           onClick={() => onExport("wav")}
-          className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5 disabled:opacity-50"
+          className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5 disabled:opacity-50"
         >
           Export WAV
         </button>
@@ -550,7 +550,7 @@ function TakeCard({
           type="button"
           disabled={disabled}
           onClick={() => onExport("mp3")}
-          className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5 disabled:opacity-50"
+          className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5 disabled:opacity-50"
         >
           Export MP3
         </button>
@@ -570,20 +570,20 @@ function TakeCard({
           type="number"
           value={trimStart}
           onChange={(e) => setTrimStart(e.target.value)}
-          className="w-16 rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+          className="w-16 rounded border border-hairline/10 bg-navy px-2 py-1 text-cream"
         />
         to
         <input
           type="number"
           value={trimEnd}
           onChange={(e) => setTrimEnd(e.target.value)}
-          className="w-16 rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+          className="w-16 rounded border border-hairline/10 bg-navy px-2 py-1 text-cream"
         />
         <button
           type="button"
           disabled={disabled || trimStart === "" || trimEnd === ""}
           onClick={() => onTrim(Number(trimStart), Number(trimEnd))}
-          className="rounded border border-white/20 px-2 py-1 text-cream hover:bg-white/5 disabled:opacity-50"
+          className="rounded border border-hairline/20 px-2 py-1 text-cream hover:bg-hairline/5 disabled:opacity-50"
         >
           Apply Trim
         </button>

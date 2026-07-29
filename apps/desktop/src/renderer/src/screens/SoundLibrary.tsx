@@ -122,7 +122,7 @@ export function SoundLibrary(): JSX.Element {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream"
+            className="rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-cream"
           >
             <option value="all">All categories</option>
             {categories.map(([value, label]) => (
@@ -135,7 +135,7 @@ export function SoundLibrary(): JSX.Element {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name..."
-            className="w-56 rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
+            className="w-56 rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
           />
           <span className="text-xs text-silver">
             {filtered.length} of {entries.length} effects
@@ -147,7 +147,7 @@ export function SoundLibrary(): JSX.Element {
             <div
               key={entry.id}
               className={`flex items-center gap-3 rounded-lg border p-3 ${
-                selectedIds.has(entry.id) ? "border-electric-blue bg-electric-blue/10" : "border-white/10 bg-charcoal"
+                selectedIds.has(entry.id) ? "border-electric-blue bg-electric-blue/10" : "border-hairline/10 bg-charcoal"
               }`}
             >
               <input

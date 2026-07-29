@@ -89,7 +89,7 @@ export function CaptionStudio(): JSX.Element {
           <div className="flex flex-wrap items-end gap-2">
             <label className="text-xs text-silver">
               Generate from script
-              <select value={scriptIdToGenerate} onChange={(e) => setScriptIdToGenerate(e.target.value)} className="mt-1 block rounded-md border border-white/10 bg-charcoal px-2 py-1.5 text-sm text-cream">
+              <select value={scriptIdToGenerate} onChange={(e) => setScriptIdToGenerate(e.target.value)} className="mt-1 block rounded-md border border-hairline/10 bg-charcoal px-2 py-1.5 text-sm text-cream">
                 <option value="">Choose script...</option>
                 {currentManifest.scripts.map((s) => (
                   <option key={s.id} value={s.id}>
@@ -101,16 +101,16 @@ export function CaptionStudio(): JSX.Element {
             <button type="button" disabled={!scriptIdToGenerate} onClick={handleGenerate} className="rounded-md bg-electric-blue px-3 py-2 text-sm font-medium text-navy disabled:opacity-50">
               Generate
             </button>
-            <button type="button" onClick={handleAddManual} className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5">
+            <button type="button" onClick={handleAddManual} className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5">
               + Add Caption
             </button>
-            <button type="button" onClick={() => handleExport("srt")} className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5">
+            <button type="button" onClick={() => handleExport("srt")} className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5">
               Export SRT
             </button>
-            <button type="button" onClick={() => handleExport("vtt")} className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5">
+            <button type="button" onClick={() => handleExport("vtt")} className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5">
               Export VTT
             </button>
-            <button type="button" onClick={handleImport} className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5">
+            <button type="button" onClick={handleImport} className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5">
               Import SRT/VTT
             </button>
           </div>
@@ -131,15 +131,15 @@ export function CaptionStudio(): JSX.Element {
             const warnings = captionWarnings(caption);
             const overlaps = overlapping.has(caption.id);
             return (
-              <div key={caption.id} className={`rounded-lg border p-4 ${warnings.length > 0 || overlaps ? "border-bronze/50 bg-bronze/5" : "border-white/10 bg-charcoal"}`}>
+              <div key={caption.id} className={`rounded-lg border p-4 ${warnings.length > 0 || overlaps ? "border-bronze/50 bg-bronze/5" : "border-hairline/10 bg-charcoal"}`}>
                 <div className="mb-2 flex items-center gap-3">
                   <label className="text-xs text-silver">
                     Start
-                    <input type="number" step="0.1" value={caption.startSeconds} onChange={(e) => updateCaption(caption.id, { startSeconds: Number(e.target.value) })} className="ml-1 w-20 rounded border border-white/10 bg-navy px-2 py-1 text-cream" />
+                    <input type="number" step="0.1" value={caption.startSeconds} onChange={(e) => updateCaption(caption.id, { startSeconds: Number(e.target.value) })} className="ml-1 w-20 rounded border border-hairline/10 bg-navy px-2 py-1 text-cream" />
                   </label>
                   <label className="text-xs text-silver">
                     End
-                    <input type="number" step="0.1" value={caption.endSeconds} onChange={(e) => updateCaption(caption.id, { endSeconds: Number(e.target.value) })} className="ml-1 w-20 rounded border border-white/10 bg-navy px-2 py-1 text-cream" />
+                    <input type="number" step="0.1" value={caption.endSeconds} onChange={(e) => updateCaption(caption.id, { endSeconds: Number(e.target.value) })} className="ml-1 w-20 rounded border border-hairline/10 bg-navy px-2 py-1 text-cream" />
                   </label>
                   <span className="text-xs text-silver">
                     {formatTimecode(caption.startSeconds)} → {formatTimecode(caption.endSeconds)}
@@ -156,7 +156,7 @@ export function CaptionStudio(): JSX.Element {
                   value={caption.text}
                   onChange={(e) => updateCaption(caption.id, { text: e.target.value })}
                   rows={2}
-                  className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                  className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                 />
                 {(warnings.length > 0 || overlaps) && (
                   <ul className="mt-2 list-inside list-disc text-xs text-bronze">

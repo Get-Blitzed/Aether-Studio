@@ -5,16 +5,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        charcoal: "#1B1F27",
-        navy: "#131A2B",
+        // Settings > Appearance (light/dark/system): the four surface/text
+        // tokens below resolve to CSS variables (defined in index.css for
+        // `:root` and overridden under `:root.light`) instead of fixed hex
+        // values -- every screen already references these same four names
+        // for its background/panel/text colors, so swapping the variables
+        // re-themes the whole app without touching 20+ screen files. Accent
+        // colors (bronze/electric-blue/aurora-*) stay constant across both
+        // themes on purpose -- brand hues, not surface neutrals.
+        charcoal: "rgb(var(--c-charcoal) / <alpha-value>)",
+        navy: "rgb(var(--c-navy) / <alpha-value>)",
+        silver: "rgb(var(--c-silver) / <alpha-value>)",
+        cream: "rgb(var(--c-cream) / <alpha-value>)",
+        // Was literal `white/NN` everywhere (borders, hover fills) -- also
+        // variable-backed so those hairlines/overlays stay visible against
+        // a light surface instead of vanishing as white-on-white.
+        hairline: "rgb(var(--c-hairline) / <alpha-value>)",
         // Phase 8 UI redesign: retheme the existing "bronze"/"electric-blue"
         // tokens to brighter, more saturated hues rather than renaming them
         // everywhere -- every screen already references these two names for
         // its primary/secondary accent, so brightening the values here
         // recolors the whole app without touching 20+ screen files.
         bronze: "#FFB020",
-        silver: "#C9CDD6",
-        cream: "#F4EFE6",
         "electric-blue": "#7C5CFC",
         "aurora-pink": "#FF3EA5",
         "aurora-cyan": "#22D3EE",

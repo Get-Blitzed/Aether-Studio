@@ -107,7 +107,7 @@ export function IconLibrary(): JSX.Element {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name or tag..."
-            className="w-56 rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
+            className="w-56 rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
           />
           <span className="text-xs text-silver">
             {filtered.length} of {entries.length} icons
@@ -122,7 +122,7 @@ export function IconLibrary(): JSX.Element {
               onClick={() => toggleSelected(entry.id)}
               title={entry.title}
               className={`flex flex-col items-center gap-2 rounded-lg border p-3 ${
-                selectedIds.has(entry.id) ? "border-electric-blue bg-electric-blue/10" : "border-white/10 bg-charcoal"
+                selectedIds.has(entry.id) ? "border-electric-blue bg-electric-blue/10" : "border-hairline/10 bg-charcoal"
               }`}
             >
               <img src={toAbsoluteFileUrl(entry.absolutePath)} alt={entry.title} className="h-8 w-8 invert" />

@@ -132,17 +132,17 @@ export function ProvidersScreen(): JSX.Element {
           </div>
         )}
 
-        <section className="mb-8 rounded-lg border border-white/10 bg-charcoal p-5">
+        <section className="mb-8 rounded-lg border border-hairline/10 bg-charcoal p-5">
           <h2 className="mb-3 font-medium text-cream">Configured Providers</h2>
           {providers.length === 0 && <p className="text-sm text-silver">No providers configured yet. Add one below.</p>}
           <div className="space-y-3">
             {providers.map((provider) => (
-              <div key={provider.id} className="rounded-md border border-white/10 p-4">
+              <div key={provider.id} className="rounded-md border border-hairline/10 p-4">
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-cream">{provider.name}</span>
-                    <span className="rounded bg-white/10 px-2 py-0.5 text-xs text-silver">{provider.kind}</span>
-                    <span className="rounded bg-white/10 px-2 py-0.5 text-xs text-silver">{provider.capability}</span>
+                    <span className="rounded bg-hairline/10 px-2 py-0.5 text-xs text-silver">{provider.kind}</span>
+                    <span className="rounded bg-hairline/10 px-2 py-0.5 text-xs text-silver">{provider.capability}</span>
                     {provider.isDefaultForCapability && (
                       <span className="rounded bg-electric-blue/15 px-2 py-0.5 text-xs text-electric-blue">
                         default for {provider.capability}
@@ -155,7 +155,7 @@ export function ProvidersScreen(): JSX.Element {
                       <button
                         type="button"
                         onClick={() => handleSetDefault(provider)}
-                        className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5"
+                        className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5"
                       >
                         Set as default
                       </button>
@@ -163,7 +163,7 @@ export function ProvidersScreen(): JSX.Element {
                     <button
                       type="button"
                       onClick={() => handleToggleEnabled(provider)}
-                      className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5"
+                      className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5"
                     >
                       {provider.enabled ? "Disable" : "Enable"}
                     </button>
@@ -199,7 +199,7 @@ export function ProvidersScreen(): JSX.Element {
           </div>
         </section>
 
-        <section className="mb-8 rounded-lg border border-white/10 bg-charcoal p-5">
+        <section className="mb-8 rounded-lg border border-hairline/10 bg-charcoal p-5">
           <h2 className="mb-3 font-medium text-cream">Add Provider</h2>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
             <label className="text-xs text-silver">
@@ -207,7 +207,7 @@ export function ProvidersScreen(): JSX.Element {
               <input
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                className="mt-1 block w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
               />
             </label>
             <label className="text-xs text-silver">
@@ -215,7 +215,7 @@ export function ProvidersScreen(): JSX.Element {
               <select
                 value={form.kind}
                 onChange={(e) => setForm((f) => ({ ...f, kind: e.target.value as ProviderKind }))}
-                className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                className="mt-1 block w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
               >
                 {PROVIDER_KINDS.map((k) => (
                   <option key={k} value={k}>
@@ -229,7 +229,7 @@ export function ProvidersScreen(): JSX.Element {
               <select
                 value={form.capability}
                 onChange={(e) => setForm((f) => ({ ...f, capability: e.target.value as ProviderCapability }))}
-                className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                className="mt-1 block w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
               >
                 {CAPABILITIES.map((c) => (
                   <option key={c} value={c}>
@@ -260,7 +260,7 @@ export function ProvidersScreen(): JSX.Element {
                     value={form.baseUrl}
                     onChange={(e) => setForm((f) => ({ ...f, baseUrl: e.target.value }))}
                     placeholder={form.kind === "elevenlabs" ? "https://api.elevenlabs.io/v1" : "https://api.openai.com/v1"}
-                    className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                    className="mt-1 block w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
                   />
                 </label>
                 {form.kind === "openai-compatible" && (
@@ -270,7 +270,7 @@ export function ProvidersScreen(): JSX.Element {
                       value={form.model}
                       onChange={(e) => setForm((f) => ({ ...f, model: e.target.value }))}
                       placeholder="gpt-4o-mini"
-                      className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                      className="mt-1 block w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
                     />
                   </label>
                 )}
@@ -280,7 +280,7 @@ export function ProvidersScreen(): JSX.Element {
                     type="password"
                     value={form.secret}
                     onChange={(e) => setForm((f) => ({ ...f, secret: e.target.value }))}
-                    className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                    className="mt-1 block w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
                   />
                 </label>
                 {form.kind === "generic-rest" && (
@@ -291,7 +291,7 @@ export function ProvidersScreen(): JSX.Element {
                       onChange={(e) => setForm((f) => ({ ...f, requestTemplate: e.target.value }))}
                       placeholder='{"prompt": "{{prompt}}"}'
                       rows={2}
-                      className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-xs text-cream"
+                      className="mt-1 block w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-xs text-cream"
                     />
                   </label>
                 )}
@@ -308,12 +308,12 @@ export function ProvidersScreen(): JSX.Element {
           </button>
         </section>
 
-        <section className="rounded-lg border border-white/10 bg-charcoal p-5">
+        <section className="rounded-lg border border-hairline/10 bg-charcoal p-5">
           <h2 className="mb-3 font-medium text-cream">Recent Jobs</h2>
           {jobs.length === 0 && <p className="text-sm text-silver">No AI jobs run yet.</p>}
           <div className="space-y-2">
             {jobs.map((job) => (
-              <div key={job.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-white/10 px-3 py-2 text-xs">
+              <div key={job.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-hairline/10 px-3 py-2 text-xs">
                 <div className="flex items-center gap-2">
                   <span className="text-cream">{job.jobType}</span>
                   <span className="text-silver">{job.providerName ?? job.providerId ?? "unknown provider"}</span>
@@ -323,7 +323,7 @@ export function ProvidersScreen(): JSX.Element {
                         ? "rounded bg-emerald-500/15 px-2 py-0.5 text-emerald-300"
                         : job.status === "failed"
                           ? "rounded bg-red-500/15 px-2 py-0.5 text-red-300"
-                          : "rounded bg-white/10 px-2 py-0.5 text-silver"
+                          : "rounded bg-hairline/10 px-2 py-0.5 text-silver"
                     }
                   >
                     {job.status}

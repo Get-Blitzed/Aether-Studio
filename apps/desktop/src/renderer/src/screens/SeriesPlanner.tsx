@@ -117,7 +117,7 @@ export function SeriesPlanner(): JSX.Element {
             <button
               type="button"
               onClick={handleNewSeries}
-              className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
+              className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5"
             >
               New Series
             </button>
@@ -146,7 +146,7 @@ export function SeriesPlanner(): JSX.Element {
                 type="button"
                 onClick={() => setSelectedId(s.id)}
                 className={`w-full rounded-md px-3 py-2 text-left text-sm ${
-                  s.id === selectedId ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-white/5"
+                  s.id === selectedId ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-hairline/5"
                 }`}
               >
                 {s.title}
@@ -157,7 +157,7 @@ export function SeriesPlanner(): JSX.Element {
 
           {selected ? (
             <div className="flex-1 space-y-4">
-              <div className="flex items-center justify-between rounded-lg border border-white/10 bg-charcoal p-4">
+              <div className="flex items-center justify-between rounded-lg border border-hairline/10 bg-charcoal p-4">
                 <input
                   value={selected.title}
                   onChange={(e) => void persist({ ...selected, title: e.target.value })}
@@ -177,7 +177,7 @@ export function SeriesPlanner(): JSX.Element {
                 <button
                   type="button"
                   onClick={addEpisode}
-                  className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-cream hover:bg-white/5"
+                  className="rounded-md border border-hairline/20 px-3 py-1.5 text-xs text-cream hover:bg-hairline/5"
                 >
                   + Add Episode
                 </button>
@@ -185,7 +185,7 @@ export function SeriesPlanner(): JSX.Element {
 
               <div className="space-y-3">
                 {selected.episodes.map((episode, index) => (
-                  <div key={episode.id} className="rounded-lg border border-white/10 bg-charcoal p-4">
+                  <div key={episode.id} className="rounded-lg border border-hairline/10 bg-charcoal p-4">
                     <div className="mb-2 flex items-start justify-between gap-3">
                       <input
                         value={episode.title}
@@ -193,7 +193,7 @@ export function SeriesPlanner(): JSX.Element {
                         className="flex-1 bg-transparent font-medium text-cream focus-visible:outline-none"
                       />
                       <div className="flex flex-shrink-0 items-center gap-1">
-                        <span className="mr-2 rounded bg-white/5 px-2 py-1 text-xs text-silver">
+                        <span className="mr-2 rounded bg-hairline/5 px-2 py-1 text-xs text-silver">
                           {episode.status}
                         </span>
                         <button
@@ -201,7 +201,7 @@ export function SeriesPlanner(): JSX.Element {
                           aria-label="Move up"
                           disabled={index === 0}
                           onClick={() => moveEpisode(index, -1)}
-                          className="rounded px-2 py-1 text-xs text-silver hover:bg-white/10 disabled:opacity-30"
+                          className="rounded px-2 py-1 text-xs text-silver hover:bg-hairline/10 disabled:opacity-30"
                         >
                           ↑
                         </button>
@@ -210,7 +210,7 @@ export function SeriesPlanner(): JSX.Element {
                           aria-label="Move down"
                           disabled={index === selected.episodes.length - 1}
                           onClick={() => moveEpisode(index, 1)}
-                          className="rounded px-2 py-1 text-xs text-silver hover:bg-white/10 disabled:opacity-30"
+                          className="rounded px-2 py-1 text-xs text-silver hover:bg-hairline/10 disabled:opacity-30"
                         >
                           ↓
                         </button>
@@ -229,7 +229,7 @@ export function SeriesPlanner(): JSX.Element {
                       onChange={(e) => updateEpisode(episode.id, { objective: e.target.value })}
                       placeholder="Learning objective"
                       rows={2}
-                      className="mb-2 w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                      className="mb-2 w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                     />
                     <div className="flex flex-wrap gap-3 text-xs text-silver">
                       <label className="flex items-center gap-1">
@@ -239,7 +239,7 @@ export function SeriesPlanner(): JSX.Element {
                           onChange={(e) =>
                             updateEpisode(episode.id, { difficulty: e.target.value as EpisodePlan["difficulty"] })
                           }
-                          className="rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+                          className="rounded border border-hairline/10 bg-navy px-2 py-1 text-cream"
                         >
                           <option value="beginner">Beginner</option>
                           <option value="intermediate">Intermediate</option>
@@ -253,7 +253,7 @@ export function SeriesPlanner(): JSX.Element {
                           onChange={(e) =>
                             updateEpisode(episode.id, { status: e.target.value as EpisodePlan["status"] })
                           }
-                          className="rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+                          className="rounded border border-hairline/10 bg-navy px-2 py-1 text-cream"
                         >
                           <option value="idea">Idea</option>
                           <option value="in-progress">In Progress</option>

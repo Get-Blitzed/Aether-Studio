@@ -83,7 +83,7 @@ export function StoryboardStudio(): JSX.Element {
             <p className="text-sm text-silver">Convert scripts into a visual production plan.</p>
           </div>
           <div className="flex gap-2">
-            <div className="flex rounded-md border border-white/10 text-xs">
+            <div className="flex rounded-md border border-hairline/10 text-xs">
               <button
                 type="button"
                 onClick={() => setView("grid")}
@@ -102,7 +102,7 @@ export function StoryboardStudio(): JSX.Element {
             <button
               type="button"
               onClick={addFrame}
-              className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
+              className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5"
             >
               + Add Shot
             </button>
@@ -126,7 +126,7 @@ export function StoryboardStudio(): JSX.Element {
             ))}
           </div>
         ) : (
-          <div className="divide-y divide-white/10 rounded-lg border border-white/10 bg-charcoal">
+          <div className="divide-y divide-hairline/10 rounded-lg border border-hairline/10 bg-charcoal">
             {frames.map((frame) => (
               <div key={frame.id} className="flex items-center justify-between px-4 py-3 text-sm">
                 <span className="text-cream">
@@ -200,7 +200,7 @@ function FrameCard({
   }
 
   return (
-    <div className="rounded-lg border border-white/10 bg-charcoal p-4">
+    <div className="rounded-lg border border-hairline/10 bg-charcoal p-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <label className="text-xs text-silver">
@@ -209,7 +209,7 @@ function FrameCard({
               type="number"
               value={frame.sceneNumber}
               onChange={(e) => onChange({ sceneNumber: Number(e.target.value) })}
-              className="ml-1 w-12 rounded border border-white/10 bg-navy px-1 py-0.5 text-cream"
+              className="ml-1 w-12 rounded border border-hairline/10 bg-navy px-1 py-0.5 text-cream"
             />
           </label>
           <label className="text-xs text-silver">
@@ -218,14 +218,14 @@ function FrameCard({
               type="number"
               value={frame.shotNumber}
               onChange={(e) => onChange({ shotNumber: Number(e.target.value) })}
-              className="ml-1 w-12 rounded border border-white/10 bg-navy px-1 py-0.5 text-cream"
+              className="ml-1 w-12 rounded border border-hairline/10 bg-navy px-1 py-0.5 text-cream"
             />
           </label>
         </div>
-        <span className="rounded bg-white/10 px-2 py-0.5 text-xs text-silver">{frame.productionStatus}</span>
+        <span className="rounded bg-hairline/10 px-2 py-0.5 text-xs text-silver">{frame.productionStatus}</span>
       </div>
 
-      <div className="mb-2 flex h-24 items-center justify-center overflow-hidden rounded-md border border-dashed border-white/15 text-xs text-silver/50">
+      <div className="mb-2 flex h-24 items-center justify-center overflow-hidden rounded-md border border-dashed border-hairline/15 text-xs text-silver/50">
         {frame.thumbnailPath ? (
           <img src={toFileUrl(projectDir, frame.thumbnailPath)} alt="" className="h-full w-full object-cover" />
         ) : (
@@ -247,7 +247,7 @@ function FrameCard({
       <select
         value={frame.shotType}
         onChange={(e) => onChange({ shotType: e.target.value as ShotType })}
-        className="mb-2 w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-xs text-cream"
+        className="mb-2 w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-xs text-cream"
       >
         {SHOT_TYPES.map((t) => (
           <option key={t} value={t}>
@@ -261,13 +261,13 @@ function FrameCard({
         onChange={(e) => onChange({ sceneDescription: e.target.value })}
         placeholder="Scene description"
         rows={2}
-        className="mb-2 w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-xs text-cream focus-visible:outline-none"
+        className="mb-2 w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-xs text-cream focus-visible:outline-none"
       />
 
       <select
         value={frame.linkedScriptSegmentId ?? ""}
         onChange={(e) => onChange({ linkedScriptSegmentId: e.target.value || undefined })}
-        className="mb-2 w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-xs text-cream"
+        className="mb-2 w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-xs text-cream"
       >
         <option value="">Not linked to a scene</option>
         {segments.map((seg) => (
@@ -283,28 +283,28 @@ function FrameCard({
         onChange={(e) => onChange({ generationPrompt: e.target.value })}
         placeholder="Generation prompt"
         rows={2}
-        className="mb-2 w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-xs text-cream focus-visible:outline-none"
+        className="mb-2 w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-xs text-cream focus-visible:outline-none"
       />
       <textarea
         value={frame.negativePrompt ?? ""}
         onChange={(e) => onChange({ negativePrompt: e.target.value })}
         placeholder="Negative prompt"
         rows={1}
-        className="mb-2 w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-xs text-cream focus-visible:outline-none"
+        className="mb-2 w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-xs text-cream focus-visible:outline-none"
       />
 
       <div className="flex items-center justify-between">
         <select
           value={frame.productionStatus}
           onChange={(e) => onChange({ productionStatus: e.target.value as StoryboardFrame["productionStatus"] })}
-          className="rounded border border-white/10 bg-navy px-2 py-1 text-xs text-cream"
+          className="rounded border border-hairline/10 bg-navy px-2 py-1 text-xs text-cream"
         >
           <option value="draft">Draft</option>
           <option value="in-progress">In Progress</option>
           <option value="approved">Approved</option>
         </select>
         <div className="flex gap-1">
-          <button type="button" onClick={onDuplicate} className="rounded px-2 py-1 text-xs text-silver hover:bg-white/10">
+          <button type="button" onClick={onDuplicate} className="rounded px-2 py-1 text-xs text-silver hover:bg-hairline/10">
             Duplicate
           </button>
           <button type="button" onClick={onRemove} className="rounded px-2 py-1 text-xs text-red-300 hover:bg-red-500/10">

@@ -15,7 +15,7 @@ export function TagListEditor({
       <label className="mb-1 block text-sm font-medium text-cream">{label}</label>
       <div className="mb-2 flex flex-wrap gap-2">
         {values.map((v, i) => (
-          <span key={i} className="flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-xs text-cream">
+          <span key={i} className="flex items-center gap-1 rounded-full bg-hairline/10 px-3 py-1 text-xs text-cream">
             {v}
             <button
               type="button"
@@ -40,7 +40,7 @@ export function TagListEditor({
             }
           }}
           placeholder="Type and press Enter"
-          className="flex-1 rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+          className="flex-1 rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
         />
       </div>
     </div>

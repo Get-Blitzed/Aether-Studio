@@ -102,7 +102,7 @@ export function DocumentImport(): JSX.Element {
           </div>
         )}
 
-        <div className="max-w-xl rounded-lg border border-white/10 bg-charcoal p-6">
+        <div className="max-w-xl rounded-lg border border-hairline/10 bg-charcoal p-6">
           <p className="mb-3 text-sm text-silver">
             Supported: PDF, DOCX, PPTX (auto-generates narration script + storyboard + timeline) and MP4, MKV, MOV,
             WEBM, AVI (imported directly as a video asset).
@@ -111,13 +111,13 @@ export function DocumentImport(): JSX.Element {
           <button
             type="button"
             onClick={handleChooseFile}
-            className="rounded-md border border-white/20 px-4 py-2 text-sm text-cream hover:bg-white/5"
+            className="rounded-md border border-hairline/20 px-4 py-2 text-sm text-cream hover:bg-hairline/5"
           >
             Choose File...
           </button>
 
           {fileName && (
-            <div className="mt-4 rounded-md border border-white/10 bg-navy px-4 py-3">
+            <div className="mt-4 rounded-md border border-hairline/10 bg-navy px-4 py-3">
               <p className="break-all text-sm text-cream">{fileName}</p>
               <p className="mt-1 text-xs text-silver">
                 {isDocument

@@ -389,7 +389,7 @@ export function TimelineEditor(): JSX.Element {
             <select
               value={selectedTimelineId ?? ""}
               onChange={(e) => setSelectedTimelineId(e.target.value || null)}
-              className="rounded-md border border-white/10 bg-charcoal px-2 py-1.5 text-sm text-cream"
+              className="rounded-md border border-hairline/10 bg-charcoal px-2 py-1.5 text-sm text-cream"
             >
               <option value="">Select a timeline...</option>
               {timelines.map((t) => (
@@ -398,7 +398,7 @@ export function TimelineEditor(): JSX.Element {
                 </option>
               ))}
             </select>
-            <button type="button" onClick={handleAddTimeline} className="rounded-md border border-white/20 px-3 py-1.5 text-sm text-cream hover:bg-white/5">
+            <button type="button" onClick={handleAddTimeline} className="rounded-md border border-hairline/20 px-3 py-1.5 text-sm text-cream hover:bg-hairline/5">
               + New Timeline
             </button>
             <button type="button" onClick={handleLoadStandardOverlays} className="rounded-md border border-bronze/40 px-3 py-1.5 text-sm text-bronze hover:bg-bronze/10">
@@ -424,7 +424,7 @@ export function TimelineEditor(): JSX.Element {
           <>
             {/* Preview stage */}
             <div className="mb-4 flex gap-4">
-              <div className="relative flex aspect-video w-96 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-black">
+              <div className="relative flex aspect-video w-96 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-hairline/10 bg-black">
                 {activeVideoAsset ? (
                   <video ref={videoRef} src={toFileUrl(currentProjectDir, activeVideoAsset.filePath)} className="h-full w-full object-contain" muted={false} />
                 ) : (
@@ -490,21 +490,21 @@ export function TimelineEditor(): JSX.Element {
                   </button>
                   <span className="font-mono text-sm text-cream">{formatTimecode(playheadSeconds)}</span>
                   <span className="text-xs text-silver">/ {formatTimecode(totalDuration)}</span>
-                  <button type="button" onClick={handleUndo} disabled={undoStack.length === 0} className="rounded-md border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5 disabled:opacity-30">
+                  <button type="button" onClick={handleUndo} disabled={undoStack.length === 0} className="rounded-md border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5 disabled:opacity-30">
                     Undo
                   </button>
-                  <button type="button" onClick={handleRedo} disabled={redoStack.length === 0} className="rounded-md border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5 disabled:opacity-30">
+                  <button type="button" onClick={handleRedo} disabled={redoStack.length === 0} className="rounded-md border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5 disabled:opacity-30">
                     Redo
                   </button>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button type="button" onClick={() => setPixelsPerSecondIndex((i) => Math.max(0, i - 1))} className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5">
+                  <button type="button" onClick={() => setPixelsPerSecondIndex((i) => Math.max(0, i - 1))} className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5">
                     Zoom −
                   </button>
-                  <button type="button" onClick={() => setPixelsPerSecondIndex((i) => Math.min(PIXELS_PER_SECOND_STEPS.length - 1, i + 1))} className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5">
+                  <button type="button" onClick={() => setPixelsPerSecondIndex((i) => Math.min(PIXELS_PER_SECOND_STEPS.length - 1, i + 1))} className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5">
                     Zoom +
                   </button>
-                  <button type="button" onClick={handleAddMarker} className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5">
+                  <button type="button" onClick={handleAddMarker} className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5">
                     + Marker at Playhead
                   </button>
                   <button
@@ -522,7 +522,7 @@ export function TimelineEditor(): JSX.Element {
 
             {/* Ruler */}
             <div
-              className="relative mb-1 h-6 cursor-pointer border-b border-white/10"
+              className="relative mb-1 h-6 cursor-pointer border-b border-hairline/10"
               style={{ width: totalDuration * pixelsPerSecond }}
               onClick={(e) => {
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -583,14 +583,14 @@ function AddTrackControl({ onAdd }: { onAdd: (type: TimelineTrackType) => void }
   const [type, setType] = useState<TimelineTrackType>("secondary-video");
   return (
     <div className="flex items-center gap-2">
-      <select value={type} onChange={(e) => setType(e.target.value as TimelineTrackType)} className="rounded border border-white/10 bg-charcoal px-2 py-1 text-xs text-cream">
+      <select value={type} onChange={(e) => setType(e.target.value as TimelineTrackType)} className="rounded border border-hairline/10 bg-charcoal px-2 py-1 text-xs text-cream">
         {TRACK_TYPES.map((t) => (
           <option key={t} value={t}>
             {t.replace(/-/g, " ")}
           </option>
         ))}
       </select>
-      <button type="button" onClick={() => onAdd(type)} className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5">
+      <button type="button" onClick={() => onAdd(type)} className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5">
         + Add Track
       </button>
     </div>
@@ -627,8 +627,8 @@ function TrackRow({
   const compatibleAssets = assets.filter((a) => assetMatchesTrack(a.originalFileName, track.type));
 
   return (
-    <div className="mb-2 flex border-b border-white/5">
-      <div className="w-56 flex-shrink-0 border-r border-white/10 pr-2">
+    <div className="mb-2 flex border-b border-hairline/5">
+      <div className="w-56 flex-shrink-0 border-r border-hairline/10 pr-2">
         <div className="flex items-center justify-between">
           <input
             value={track.name}
@@ -641,18 +641,18 @@ function TrackRow({
         </div>
         <p className="mb-1 text-[10px] text-silver/60">{track.type.replace(/-/g, " ")}</p>
         <div className="mb-1 flex gap-1">
-          <button type="button" onClick={() => onUpdateTrack({ muted: !track.muted })} className={`rounded px-1.5 py-0.5 text-[10px] ${track.muted ? "bg-red-500/30 text-red-200" : "border border-white/15 text-silver"}`}>
+          <button type="button" onClick={() => onUpdateTrack({ muted: !track.muted })} className={`rounded px-1.5 py-0.5 text-[10px] ${track.muted ? "bg-red-500/30 text-red-200" : "border border-hairline/15 text-silver"}`}>
             Mute
           </button>
-          <button type="button" onClick={() => onUpdateTrack({ solo: !track.solo })} className={`rounded px-1.5 py-0.5 text-[10px] ${track.solo ? "bg-electric-blue/30 text-electric-blue" : "border border-white/15 text-silver"}`}>
+          <button type="button" onClick={() => onUpdateTrack({ solo: !track.solo })} className={`rounded px-1.5 py-0.5 text-[10px] ${track.solo ? "bg-electric-blue/30 text-electric-blue" : "border border-hairline/15 text-silver"}`}>
             Solo
           </button>
-          <button type="button" onClick={() => onUpdateTrack({ locked: !track.locked })} className={`rounded px-1.5 py-0.5 text-[10px] ${track.locked ? "bg-bronze/30 text-bronze" : "border border-white/15 text-silver"}`}>
+          <button type="button" onClick={() => onUpdateTrack({ locked: !track.locked })} className={`rounded px-1.5 py-0.5 text-[10px] ${track.locked ? "bg-bronze/30 text-bronze" : "border border-hairline/15 text-silver"}`}>
             Lock
           </button>
         </div>
         {isBlur ? (
-          <button type="button" onClick={onAddBlurClip} className="w-full rounded border border-white/20 px-1.5 py-1 text-[10px] text-cream hover:bg-white/5">
+          <button type="button" onClick={onAddBlurClip} className="w-full rounded border border-hairline/20 px-1.5 py-1 text-[10px] text-cream hover:bg-hairline/5">
             + Add Blur Region
           </button>
         ) : kind === "overlay" ? (
@@ -674,7 +674,7 @@ function TrackRow({
               type="button"
               onClick={() => onSelectClip(clip.id)}
               className={`absolute top-1 flex h-14 items-center overflow-hidden rounded border px-2 text-left text-[11px] ${
-                clip.id === selectedClipId ? "border-electric-blue bg-electric-blue/20 text-electric-blue" : "border-white/15 bg-white/5 text-cream hover:border-white/40"
+                clip.id === selectedClipId ? "border-electric-blue bg-electric-blue/20 text-electric-blue" : "border-hairline/15 bg-hairline/5 text-cream hover:border-hairline/40"
               }`}
               style={{ left: clip.timelineStartSeconds * pixelsPerSecond, width: Math.max(20, clip.timelineDurationSeconds * pixelsPerSecond) }}
               title={label}
@@ -698,7 +698,7 @@ function AssetAddControl({
   const [assetId, setAssetId] = useState("");
   return (
     <div className="flex flex-col gap-1">
-      <select value={assetId} onChange={(e) => setAssetId(e.target.value)} className="w-full rounded border border-white/10 bg-navy px-1 py-1 text-[10px] text-cream">
+      <select value={assetId} onChange={(e) => setAssetId(e.target.value)} className="w-full rounded border border-hairline/10 bg-navy px-1 py-1 text-[10px] text-cream">
         <option value="">Choose asset...</option>
         {assets.map((a) => (
           <option key={a.id} value={a.id}>
@@ -714,7 +714,7 @@ function AssetAddControl({
           if (asset) onAdd(assetId, "asset", asset.durationSeconds ?? 5);
           setAssetId("");
         }}
-        className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] text-cream hover:bg-white/5 disabled:opacity-40"
+        className="rounded border border-hairline/20 px-1.5 py-0.5 text-[10px] text-cream hover:bg-hairline/5 disabled:opacity-40"
       >
         + Add Clip
       </button>
@@ -732,7 +732,7 @@ function OverlayAddControl({
   const [templateId, setTemplateId] = useState("");
   return (
     <div className="flex flex-col gap-1">
-      <select value={templateId} onChange={(e) => setTemplateId(e.target.value)} className="w-full rounded border border-white/10 bg-navy px-1 py-1 text-[10px] text-cream">
+      <select value={templateId} onChange={(e) => setTemplateId(e.target.value)} className="w-full rounded border border-hairline/10 bg-navy px-1 py-1 text-[10px] text-cream">
         <option value="">Choose overlay...</option>
         {templates.map((t) => (
           <option key={t.id} value={t.id}>
@@ -748,7 +748,7 @@ function OverlayAddControl({
           if (template) onAdd(templateId, "overlay", template.suggestedDurationSeconds);
           setTemplateId("");
         }}
-        className="rounded border border-white/20 px-1.5 py-0.5 text-[10px] text-cream hover:bg-white/5 disabled:opacity-40"
+        className="rounded border border-hairline/20 px-1.5 py-0.5 text-[10px] text-cream hover:bg-hairline/5 disabled:opacity-40"
       >
         + Add Overlay
       </button>
@@ -770,14 +770,14 @@ function ClipInspector({
   onSplit: () => void;
 }): JSX.Element {
   return (
-    <div className="mt-4 rounded-lg border border-white/10 bg-charcoal p-4">
+    <div className="mt-4 rounded-lg border border-hairline/10 bg-charcoal p-4">
       <div className="mb-3 flex items-center justify-between">
         <p className="font-medium text-cream">Clip Inspector</p>
         <div className="flex gap-2">
-          <button type="button" onClick={onSplit} className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5">
+          <button type="button" onClick={onSplit} className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5">
             Split at Playhead
           </button>
-          <button type="button" onClick={onDuplicate} className="rounded border border-white/20 px-2 py-1 text-xs text-cream hover:bg-white/5">
+          <button type="button" onClick={onDuplicate} className="rounded border border-hairline/20 px-2 py-1 text-xs text-cream hover:bg-hairline/5">
             Duplicate
           </button>
           <button type="button" onClick={onRemove} className="rounded border border-red-500/40 px-2 py-1 text-xs text-red-300 hover:bg-red-500/10">
@@ -788,27 +788,27 @@ function ClipInspector({
       <div className="grid grid-cols-3 gap-3 text-xs text-silver md:grid-cols-6">
         <label>
           Start (s)
-          <input type="number" value={clip.timelineStartSeconds} onChange={(e) => onChange({ timelineStartSeconds: Number(e.target.value) })} className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream" />
+          <input type="number" value={clip.timelineStartSeconds} onChange={(e) => onChange({ timelineStartSeconds: Number(e.target.value) })} className="mt-1 w-full rounded border border-hairline/10 bg-navy px-2 py-1 text-cream" />
         </label>
         <label>
           Duration (s)
-          <input type="number" value={clip.timelineDurationSeconds} onChange={(e) => onChange({ timelineDurationSeconds: Number(e.target.value) })} className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream" />
+          <input type="number" value={clip.timelineDurationSeconds} onChange={(e) => onChange({ timelineDurationSeconds: Number(e.target.value) })} className="mt-1 w-full rounded border border-hairline/10 bg-navy px-2 py-1 text-cream" />
         </label>
         <label>
           Source In (s)
-          <input type="number" value={clip.sourceInSeconds} onChange={(e) => onChange({ sourceInSeconds: Number(e.target.value) })} className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream" />
+          <input type="number" value={clip.sourceInSeconds} onChange={(e) => onChange({ sourceInSeconds: Number(e.target.value) })} className="mt-1 w-full rounded border border-hairline/10 bg-navy px-2 py-1 text-cream" />
         </label>
         <label>
           Volume
-          <input type="number" step="0.1" min="0" max="2" value={clip.volume} onChange={(e) => onChange({ volume: Number(e.target.value) })} className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream" />
+          <input type="number" step="0.1" min="0" max="2" value={clip.volume} onChange={(e) => onChange({ volume: Number(e.target.value) })} className="mt-1 w-full rounded border border-hairline/10 bg-navy px-2 py-1 text-cream" />
         </label>
         <label>
           Fade In (s)
-          <input type="number" min="0" value={clip.fadeInSeconds} onChange={(e) => onChange({ fadeInSeconds: Number(e.target.value) })} className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream" />
+          <input type="number" min="0" value={clip.fadeInSeconds} onChange={(e) => onChange({ fadeInSeconds: Number(e.target.value) })} className="mt-1 w-full rounded border border-hairline/10 bg-navy px-2 py-1 text-cream" />
         </label>
         <label>
           Fade Out (s)
-          <input type="number" min="0" value={clip.fadeOutSeconds} onChange={(e) => onChange({ fadeOutSeconds: Number(e.target.value) })} className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream" />
+          <input type="number" min="0" value={clip.fadeOutSeconds} onChange={(e) => onChange({ fadeOutSeconds: Number(e.target.value) })} className="mt-1 w-full rounded border border-hairline/10 bg-navy px-2 py-1 text-cream" />
         </label>
       </div>
       {clip.overlayTemplateId && (
@@ -818,7 +818,7 @@ function ClipInspector({
             value={clip.overlayText ?? ""}
             onChange={(e) => onChange({ overlayText: e.target.value })}
             placeholder="(uses template default text)"
-            className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-sm text-cream"
+            className="mt-1 w-full rounded border border-hairline/10 bg-navy px-2 py-1 text-sm text-cream"
           />
         </div>
       )}
@@ -836,7 +836,7 @@ function ClipInspector({
                 max={100}
                 value={clip.blurRegion.xPercent}
                 onChange={(e) => onChange({ blurRegion: { ...clip.blurRegion!, xPercent: Number(e.target.value) } })}
-                className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+                className="mt-1 w-full rounded border border-hairline/10 bg-navy px-2 py-1 text-cream"
               />
             </label>
             <label>
@@ -847,7 +847,7 @@ function ClipInspector({
                 max={100}
                 value={clip.blurRegion.yPercent}
                 onChange={(e) => onChange({ blurRegion: { ...clip.blurRegion!, yPercent: Number(e.target.value) } })}
-                className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+                className="mt-1 w-full rounded border border-hairline/10 bg-navy px-2 py-1 text-cream"
               />
             </label>
             <label>
@@ -858,7 +858,7 @@ function ClipInspector({
                 max={100}
                 value={clip.blurRegion.widthPercent}
                 onChange={(e) => onChange({ blurRegion: { ...clip.blurRegion!, widthPercent: Number(e.target.value) } })}
-                className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+                className="mt-1 w-full rounded border border-hairline/10 bg-navy px-2 py-1 text-cream"
               />
             </label>
             <label>
@@ -869,7 +869,7 @@ function ClipInspector({
                 max={100}
                 value={clip.blurRegion.heightPercent}
                 onChange={(e) => onChange({ blurRegion: { ...clip.blurRegion!, heightPercent: Number(e.target.value) } })}
-                className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+                className="mt-1 w-full rounded border border-hairline/10 bg-navy px-2 py-1 text-cream"
               />
             </label>
             <label>
@@ -880,7 +880,7 @@ function ClipInspector({
                 max={50}
                 value={clip.blurRegion.blurStrength}
                 onChange={(e) => onChange({ blurRegion: { ...clip.blurRegion!, blurStrength: Number(e.target.value) } })}
-                className="mt-1 w-full rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+                className="mt-1 w-full rounded border border-hairline/10 bg-navy px-2 py-1 text-cream"
               />
             </label>
           </div>

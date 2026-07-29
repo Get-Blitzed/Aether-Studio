@@ -226,7 +226,7 @@ export function ScreenCaptureStudio(): JSX.Element {
             </div>
           </section>
 
-          <section className="rounded-lg border border-white/10 bg-charcoal p-5">
+          <section className="rounded-lg border border-hairline/10 bg-charcoal p-5">
             <h2 className="mb-3 font-medium text-cream">Capture Source</h2>
             <div className="mb-3 grid grid-cols-2 gap-2">
               {sources.map((s) => (
@@ -235,7 +235,7 @@ export function ScreenCaptureStudio(): JSX.Element {
                   type="button"
                   onClick={() => setSelectedSourceId(s.id)}
                   className={`rounded-md border p-1 text-left ${
-                    s.id === selectedSourceId ? "border-electric-blue" : "border-white/10 hover:border-white/30"
+                    s.id === selectedSourceId ? "border-electric-blue" : "border-hairline/10 hover:border-hairline/30"
                   }`}
                 >
                   <img src={s.thumbnailDataUrl} alt={s.name} className="mb-1 h-16 w-full rounded object-cover" />
@@ -280,7 +280,7 @@ export function ScreenCaptureStudio(): JSX.Element {
                   <span className="flex items-center gap-2 text-sm text-red-300">
                     <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /> Recording
                   </span>
-                  <button type="button" onClick={pauseRecording} className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-cream hover:bg-white/5">
+                  <button type="button" onClick={pauseRecording} className="rounded-md border border-hairline/20 px-3 py-1.5 text-xs text-cream hover:bg-hairline/5">
                     Pause
                   </button>
                   <button type="button" onClick={stopRecording} className="rounded-md border border-red-500/40 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/10">
@@ -291,7 +291,7 @@ export function ScreenCaptureStudio(): JSX.Element {
               {recordingState === "paused" && (
                 <>
                   <span className="text-sm text-silver">Paused</span>
-                  <button type="button" onClick={resumeRecording} className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-cream hover:bg-white/5">
+                  <button type="button" onClick={resumeRecording} className="rounded-md border border-hairline/20 px-3 py-1.5 text-xs text-cream hover:bg-hairline/5">
                     Resume
                   </button>
                   <button type="button" onClick={stopRecording} className="rounded-md border border-red-500/40 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/10">
@@ -340,23 +340,23 @@ function RecordingCard({
   const [speed, setSpeed] = useState("1");
 
   return (
-    <div className="rounded-lg border border-white/10 bg-charcoal p-3">
+    <div className="rounded-lg border border-hairline/10 bg-charcoal p-3">
       <video controls src={toFileUrl(projectDir, asset.filePath)} className="mb-2 h-32 w-full rounded bg-navy object-contain" />
       <p className="mb-1 truncate text-xs text-cream">{asset.originalFileName}</p>
       {asset.durationSeconds !== undefined && <p className="mb-2 text-xs text-silver">{asset.durationSeconds.toFixed(1)}s</p>}
       <div className="mb-2 flex items-center gap-1 text-xs text-silver">
         Trim
-        <input value={start} onChange={(e) => setStart(e.target.value)} className="w-14 rounded border border-white/10 bg-navy px-1 py-0.5 text-cream" />
+        <input value={start} onChange={(e) => setStart(e.target.value)} className="w-14 rounded border border-hairline/10 bg-navy px-1 py-0.5 text-cream" />
         to
-        <input value={end} onChange={(e) => setEnd(e.target.value)} className="w-14 rounded border border-white/10 bg-navy px-1 py-0.5 text-cream" />
-        <button type="button" onClick={() => onTrim(Number(start), Number(end))} className="rounded border border-white/20 px-2 py-0.5 text-cream hover:bg-white/5">
+        <input value={end} onChange={(e) => setEnd(e.target.value)} className="w-14 rounded border border-hairline/10 bg-navy px-1 py-0.5 text-cream" />
+        <button type="button" onClick={() => onTrim(Number(start), Number(end))} className="rounded border border-hairline/20 px-2 py-0.5 text-cream hover:bg-hairline/5">
           Apply
         </button>
       </div>
       <div className="flex items-center gap-1 text-xs text-silver">
         Speed
-        <input value={speed} onChange={(e) => setSpeed(e.target.value)} className="w-14 rounded border border-white/10 bg-navy px-1 py-0.5 text-cream" />
-        <button type="button" onClick={() => onSpeed(Number(speed))} className="rounded border border-white/20 px-2 py-0.5 text-cream hover:bg-white/5">
+        <input value={speed} onChange={(e) => setSpeed(e.target.value)} className="w-14 rounded border border-hairline/10 bg-navy px-1 py-0.5 text-cream" />
+        <button type="button" onClick={() => onSpeed(Number(speed))} className="rounded border border-hairline/20 px-2 py-0.5 text-cream hover:bg-hairline/5">
           Apply
         </button>
       </div>

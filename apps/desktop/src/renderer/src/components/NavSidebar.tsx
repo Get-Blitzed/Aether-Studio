@@ -41,11 +41,11 @@ export function NavSidebar(): JSX.Element {
   const location = useLocation();
 
   return (
-    <nav className="flex w-56 flex-shrink-0 flex-col gap-1 border-r border-white/10 bg-charcoal p-3" aria-label="Primary">
+    <nav className="flex w-56 flex-shrink-0 flex-col gap-1 border-r border-hairline/10 bg-charcoal p-3" aria-label="Primary">
       <button
         type="button"
         onClick={() => navigate("/home")}
-        className="mb-3 flex items-center gap-2 rounded-full px-2 py-1.5 hover:bg-white/5"
+        className="mb-3 flex items-center gap-2 rounded-full px-2 py-1.5 hover:bg-hairline/5"
         aria-label="Aether Studio Suite home"
       >
         <Wordmark size="sm" compact />
@@ -75,7 +75,7 @@ export function NavSidebar(): JSX.Element {
             className={`flex w-full items-center gap-2 rounded-full px-3 py-2 text-left text-sm transition-colors ${
               isActive
                 ? "bg-gradient-to-r from-electric-blue/25 to-aurora-pink/15 text-cream"
-                : "text-silver hover:bg-white/5 hover:text-cream"
+                : "text-silver hover:bg-hairline/5 hover:text-cream"
             }`}
           >
             <span

@@ -24,7 +24,7 @@ const CATEGORIES: PromptCategory[] = [
 ];
 
 const STATUS_STYLES: Record<string, string> = {
-  draft: "bg-white/10 text-silver",
+  draft: "bg-hairline/10 text-silver",
   approved: "bg-emerald-500/15 text-emerald-300",
   deprecated: "bg-red-500/15 text-red-300",
 };
@@ -90,7 +90,7 @@ export function PromptWorkshop(): JSX.Element {
           <button
             type="button"
             onClick={addPrompt}
-            className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
+            className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5"
           >
             + New Prompt
           </button>
@@ -105,7 +105,7 @@ export function PromptWorkshop(): JSX.Element {
                 type="button"
                 onClick={() => setSelectedId(p.id)}
                 className={`w-full rounded-md px-3 py-2 text-left text-sm ${
-                  p.id === selected?.id ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-white/5"
+                  p.id === selected?.id ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-hairline/5"
                 }`}
               >
                 <p>{p.label}</p>
@@ -118,7 +118,7 @@ export function PromptWorkshop(): JSX.Element {
 
           {selected ? (
             <div className="flex-1 space-y-4">
-              <div className="flex items-center justify-between rounded-lg border border-white/10 bg-charcoal p-4">
+              <div className="flex items-center justify-between rounded-lg border border-hairline/10 bg-charcoal p-4">
                 <input
                   value={selected.label}
                   onChange={(e) => updatePrompt({ label: e.target.value })}
@@ -142,13 +142,13 @@ export function PromptWorkshop(): JSX.Element {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 rounded-lg border border-white/10 bg-charcoal p-5">
+              <div className="grid grid-cols-2 gap-4 rounded-lg border border-hairline/10 bg-charcoal p-5">
                 <div>
                   <label className="mb-1 block text-xs text-silver">Category</label>
                   <select
                     value={selected.category}
                     onChange={(e) => updatePrompt({ category: e.target.value as PromptCategory })}
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream"
                   >
                     {CATEGORIES.map((c) => (
                       <option key={c} value={c}>
@@ -162,7 +162,7 @@ export function PromptWorkshop(): JSX.Element {
                   <select
                     value={selected.status}
                     onChange={(e) => updatePrompt({ status: e.target.value as Prompt["status"] })}
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream"
                   >
                     <option value="draft">Draft</option>
                     <option value="approved">Approved</option>
@@ -175,7 +175,7 @@ export function PromptWorkshop(): JSX.Element {
                     value={selected.provider ?? ""}
                     onChange={(e) => updatePrompt({ provider: e.target.value })}
                     placeholder="e.g. Runway, Kling, Stability AI"
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream"
                   />
                 </div>
                 <div>
@@ -183,12 +183,12 @@ export function PromptWorkshop(): JSX.Element {
                   <input
                     value={selected.model ?? ""}
                     onChange={(e) => updatePrompt({ model: e.target.value })}
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 rounded-lg border border-white/10 bg-charcoal p-5">
+              <div className="grid grid-cols-2 gap-3 rounded-lg border border-hairline/10 bg-charcoal p-5">
                 {(
                   [
                     ["subject", "Subject"],
@@ -208,7 +208,7 @@ export function PromptWorkshop(): JSX.Element {
                     <input
                       value={(selected[key] as string) ?? ""}
                       onChange={(e) => updatePrompt({ [key]: e.target.value })}
-                      className="w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                      className="w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
                     />
                   </div>
                 ))}
@@ -217,7 +217,7 @@ export function PromptWorkshop(): JSX.Element {
                   <input
                     value={selected.continuityRequirements ?? ""}
                     onChange={(e) => updatePrompt({ continuityRequirements: e.target.value })}
-                    className="w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
                   />
                 </div>
                 <div className="col-span-2">
@@ -226,25 +226,25 @@ export function PromptWorkshop(): JSX.Element {
                     value={selected.negativePrompt ?? ""}
                     onChange={(e) => updatePrompt({ negativePrompt: e.target.value })}
                     rows={2}
-                    className="w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream focus-visible:outline-none"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream focus-visible:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="rounded-lg border border-white/10 bg-charcoal p-5">
+              <div className="rounded-lg border border-hairline/10 bg-charcoal p-5">
                 <p className="mb-2 text-xs text-silver">Assembled prompt preview</p>
                 <p className="whitespace-pre-wrap rounded-md bg-navy p-3 text-sm text-cream">
                   {assemblePromptText(selected) || "Fill in fields above to build a prompt."}
                 </p>
               </div>
 
-              <div className="rounded-lg border border-white/10 bg-charcoal p-5">
+              <div className="rounded-lg border border-hairline/10 bg-charcoal p-5">
                 <label className="mb-1 block text-xs text-silver">Notes</label>
                 <textarea
                   value={selected.notes ?? ""}
                   onChange={(e) => updatePrompt({ notes: e.target.value })}
                   rows={2}
-                  className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                  className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                 />
               </div>
               {isSaving && <p className="text-xs text-silver">Saving...</p>}

@@ -130,7 +130,7 @@ export function MusicLibrary(): JSX.Element {
               type="button"
               onClick={handleAddOwnMusic}
               disabled={addingOwn}
-              className="rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-cream disabled:opacity-50"
+              className="rounded-full border border-hairline/20 px-4 py-2 text-sm font-medium text-cream disabled:opacity-50"
             >
               {addingOwn ? "Adding..." : "Add Your Own Music"}
             </button>
@@ -166,7 +166,7 @@ export function MusicLibrary(): JSX.Element {
           <select
             value={moodFilter}
             onChange={(e) => setMoodFilter(e.target.value)}
-            className="rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream"
+            className="rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-cream"
           >
             <option value="all">All moods</option>
             {moods.map(([value, label]) => (
@@ -179,7 +179,7 @@ export function MusicLibrary(): JSX.Element {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name..."
-            className="w-56 rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
+            className="w-56 rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
           />
           <span className="text-xs text-silver">
             {filtered.length} of {entries.length} tracks
@@ -191,7 +191,7 @@ export function MusicLibrary(): JSX.Element {
             <div
               key={entry.id}
               className={`flex flex-col gap-2 rounded-lg border p-3 ${
-                selectedIds.has(entry.id) ? "border-electric-blue bg-electric-blue/10" : "border-white/10 bg-charcoal"
+                selectedIds.has(entry.id) ? "border-electric-blue bg-electric-blue/10" : "border-hairline/10 bg-charcoal"
               }`}
             >
               <div className="flex items-center gap-3">

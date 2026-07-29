@@ -78,7 +78,7 @@ export function ProductionOverview(): JSX.Element {
             <button
               type="button"
               onClick={handleOpenFolder}
-              className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
+              className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5"
             >
               Open Folder
             </button>
@@ -135,14 +135,14 @@ export function ProductionOverview(): JSX.Element {
               key={link.path}
               type="button"
               onClick={() => navigate(link.path)}
-              className="rounded-md border border-white/15 px-3 py-1.5 text-xs text-silver hover:border-electric-blue/50 hover:text-electric-blue"
+              className="rounded-md border border-hairline/15 px-3 py-1.5 text-xs text-silver hover:border-electric-blue/50 hover:text-electric-blue"
             >
               {link.label} →
             </button>
           ))}
         </section>
 
-        <section className="mb-6 rounded-lg border border-white/10 bg-charcoal p-5">
+        <section className="mb-6 rounded-lg border border-hairline/10 bg-charcoal p-5">
           <label htmlFor="desc" className="mb-2 block text-sm font-medium text-cream">
             Project Notes
           </label>
@@ -151,15 +151,15 @@ export function ProductionOverview(): JSX.Element {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+            className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
           />
         </section>
 
         {characters.length > 0 && (
-          <section className="mb-6 rounded-lg border border-white/10 bg-charcoal p-5">
+          <section className="mb-6 rounded-lg border border-hairline/10 bg-charcoal p-5">
             <h2 className="mb-3 font-medium text-cream">Characters</h2>
             {characters.map((c) => (
-              <div key={c.id} className="mb-3 rounded-md border border-white/10 p-4 last:mb-0">
+              <div key={c.id} className="mb-3 rounded-md border border-hairline/10 p-4 last:mb-0">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-cream">
@@ -188,7 +188,7 @@ export function ProductionOverview(): JSX.Element {
         )}
 
         {scripts.length > 0 && (
-          <section className="rounded-lg border border-white/10 bg-charcoal p-5">
+          <section className="rounded-lg border border-hairline/10 bg-charcoal p-5">
             <h2 className="mb-3 font-medium text-cream">Scripts</h2>
             {scripts.map((s) => (
               <div key={s.id} className="mb-2 text-sm text-silver">
@@ -215,11 +215,11 @@ function StatCard({ label, value, onClick }: { label: string; value: number; onC
       <button
         type="button"
         onClick={onClick}
-        className="rounded-lg border border-white/10 bg-charcoal p-4 text-center hover:border-electric-blue/40"
+        className="rounded-lg border border-hairline/10 bg-charcoal p-4 text-center hover:border-electric-blue/40"
       >
         {content}
       </button>
     );
   }
-  return <div className="rounded-lg border border-white/10 bg-charcoal p-4 text-center">{content}</div>;
+  return <div className="rounded-lg border border-hairline/10 bg-charcoal p-4 text-center">{content}</div>;
 }

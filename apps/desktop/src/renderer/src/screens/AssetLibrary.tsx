@@ -128,7 +128,7 @@ export function AssetLibrary(): JSX.Element {
               <select
                 value={importCategory}
                 onChange={(e) => setImportCategory(e.target.value as AssetCategory)}
-                className="mt-1 block rounded-md border border-white/10 bg-charcoal px-2 py-1.5 text-sm text-cream"
+                className="mt-1 block rounded-md border border-hairline/10 bg-charcoal px-2 py-1.5 text-sm text-cream"
               >
                 {ASSET_CATEGORIES.map((c) => (
                   <option key={c} value={c}>
@@ -142,7 +142,7 @@ export function AssetLibrary(): JSX.Element {
               <select
                 value={importStorageMode}
                 onChange={(e) => setImportStorageMode(e.target.value as "managed" | "linked")}
-                className="mt-1 block rounded-md border border-white/10 bg-charcoal px-2 py-1.5 text-sm text-cream"
+                className="mt-1 block rounded-md border border-hairline/10 bg-charcoal px-2 py-1.5 text-sm text-cream"
               >
                 <option value="managed">Copy into project</option>
                 <option value="linked">Link to original</option>
@@ -174,7 +174,7 @@ export function AssetLibrary(): JSX.Element {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value as "all" | AssetCategory)}
-            className="rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream"
+            className="rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-cream"
           >
             <option value="all">All categories</option>
             {ASSET_CATEGORIES.map((c) => (
@@ -187,7 +187,7 @@ export function AssetLibrary(): JSX.Element {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search name or tag..."
-            className="w-56 rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
+            className="w-56 rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
           />
           <label className="flex items-center gap-2 text-sm text-silver">
             <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)} />
@@ -216,7 +216,7 @@ export function AssetLibrary(): JSX.Element {
           </div>
 
           {selected && (
-            <aside className="w-80 flex-shrink-0 space-y-4 rounded-lg border border-white/10 bg-charcoal p-4">
+            <aside className="w-80 flex-shrink-0 space-y-4 rounded-lg border border-hairline/10 bg-charcoal p-4">
               <div className="flex items-start justify-between">
                 <p className="break-all font-medium text-cream">{selected.originalFileName}</p>
                 <button type="button" onClick={() => setSelectedId(null)} className="text-silver hover:text-cream">
@@ -274,7 +274,7 @@ export function AssetLibrary(): JSX.Element {
                   value={selected.sourceAttribution ?? ""}
                   onChange={(e) => updateAsset(selected.id, { sourceAttribution: e.target.value })}
                   rows={2}
-                  className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-xs text-cream focus-visible:outline-none"
+                  className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-xs text-cream focus-visible:outline-none"
                 />
               </div>
 
@@ -282,7 +282,7 @@ export function AssetLibrary(): JSX.Element {
                 <button
                   type="button"
                   onClick={() => handleReveal(selected.id)}
-                  className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-cream hover:bg-white/5"
+                  className="rounded-md border border-hairline/20 px-3 py-1.5 text-xs text-cream hover:bg-hairline/5"
                 >
                   Reveal in Folder
                 </button>
@@ -323,7 +323,7 @@ function AssetCard({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-lg border p-2 text-left ${isSelected ? "border-electric-blue bg-electric-blue/10" : "border-white/10 bg-charcoal hover:border-white/30"}`}
+      className={`rounded-lg border p-2 text-left ${isSelected ? "border-electric-blue bg-electric-blue/10" : "border-hairline/10 bg-charcoal hover:border-hairline/30"}`}
     >
       <div className="mb-2 flex h-24 items-center justify-center overflow-hidden rounded bg-navy">
         {isMissing ? (

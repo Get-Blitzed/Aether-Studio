@@ -150,7 +150,7 @@ export function ScriptStudio(): JSX.Element {
           <button
             type="button"
             onClick={addScript}
-            className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
+            className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5"
           >
             + New Script
           </button>
@@ -165,7 +165,7 @@ export function ScriptStudio(): JSX.Element {
                 type="button"
                 onClick={() => setSelectedId(s.id)}
                 className={`w-full rounded-md px-3 py-2 text-left text-sm ${
-                  s.id === selected?.id ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-white/5"
+                  s.id === selected?.id ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-hairline/5"
                 }`}
               >
                 {s.title}
@@ -175,7 +175,7 @@ export function ScriptStudio(): JSX.Element {
 
           {selected ? (
             <div className="flex-1 space-y-4">
-              <div className="rounded-lg border border-white/10 bg-charcoal p-4">
+              <div className="rounded-lg border border-hairline/10 bg-charcoal p-4">
                 <div className="mb-3 flex items-center justify-between">
                   <input
                     value={selected.title}
@@ -197,7 +197,7 @@ export function ScriptStudio(): JSX.Element {
                     <select
                       value={selected.narrationSpeedWpm}
                       onChange={(e) => updateScript({ narrationSpeedWpm: Number(e.target.value) })}
-                      className="rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+                      className="rounded border border-hairline/10 bg-navy px-2 py-1 text-cream"
                     >
                       {NARRATION_SPEED_PRESETS.map((p) => (
                         <option key={p.value} value={p.value}>
@@ -212,7 +212,7 @@ export function ScriptStudio(): JSX.Element {
                       type="number"
                       value={selected.targetDurationSeconds ?? ""}
                       onChange={(e) => updateScript({ targetDurationSeconds: Number(e.target.value) || undefined })}
-                      className="w-20 rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+                      className="w-20 rounded border border-hairline/10 bg-navy px-2 py-1 text-cream"
                     />
                   </label>
                 </div>
@@ -231,7 +231,7 @@ export function ScriptStudio(): JSX.Element {
                       max={20}
                       value={outlineSceneCount}
                       onChange={(e) => setOutlineSceneCount(Number(e.target.value) || 5)}
-                      className="w-14 rounded border border-white/10 bg-navy px-2 py-1 text-cream"
+                      className="w-14 rounded border border-hairline/10 bg-navy px-2 py-1 text-cream"
                     />
                   </label>
                   <button
@@ -245,7 +245,7 @@ export function ScriptStudio(): JSX.Element {
                   <button
                     type="button"
                     onClick={addSegment}
-                    className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-cream hover:bg-white/5"
+                    className="rounded-md border border-hairline/20 px-3 py-1.5 text-xs text-cream hover:bg-hairline/5"
                   >
                     + Add Scene
                   </button>
@@ -285,7 +285,7 @@ function ScriptStats({ script }: { script: Script }): JSX.Element {
   const delta = target ? estimated - target : null;
 
   return (
-    <div className="mt-3 flex flex-wrap gap-4 border-t border-white/10 pt-3 text-xs text-silver">
+    <div className="mt-3 flex flex-wrap gap-4 border-t border-hairline/10 pt-3 text-xs text-silver">
       <span>{script.segments.length} scenes</span>
       <span>{words} words</span>
       <span>Estimated: {formatDuration(estimated)}</span>
@@ -349,10 +349,10 @@ function SegmentCard({
   }
 
   return (
-    <div className={`rounded-lg border p-4 ${segment.unverifiedClaim ? "border-bronze/50 bg-bronze/5" : "border-white/10 bg-charcoal"}`}>
+    <div className={`rounded-lg border p-4 ${segment.unverifiedClaim ? "border-bronze/50 bg-bronze/5" : "border-hairline/10 bg-charcoal"}`}>
       <div className="mb-2 flex items-start justify-between gap-3">
         <div className="flex flex-1 items-center gap-2">
-          <span className="rounded bg-white/10 px-2 py-1 text-xs text-silver">Scene {segment.sceneNumber}</span>
+          <span className="rounded bg-hairline/10 px-2 py-1 text-xs text-silver">Scene {segment.sceneNumber}</span>
           <input
             value={segment.sceneTitle ?? ""}
             onChange={(e) => onChange({ sceneTitle: e.target.value })}
@@ -364,14 +364,14 @@ function SegmentCard({
           <select
             value={segment.approvalStatus}
             onChange={(e) => onChange({ approvalStatus: e.target.value as ScriptSegment["approvalStatus"] })}
-            className="rounded border border-white/10 bg-navy px-2 py-1 text-xs text-cream"
+            className="rounded border border-hairline/10 bg-navy px-2 py-1 text-xs text-cream"
           >
             <option value="draft">Draft</option>
             <option value="in-review">In Review</option>
             <option value="approved">Approved</option>
           </select>
-          <button type="button" disabled={index === 0} onClick={() => onMove(-1)} className="rounded px-2 py-1 text-xs text-silver hover:bg-white/10 disabled:opacity-30">↑</button>
-          <button type="button" disabled={index === total - 1} onClick={() => onMove(1)} className="rounded px-2 py-1 text-xs text-silver hover:bg-white/10 disabled:opacity-30">↓</button>
+          <button type="button" disabled={index === 0} onClick={() => onMove(-1)} className="rounded px-2 py-1 text-xs text-silver hover:bg-hairline/10 disabled:opacity-30">↑</button>
+          <button type="button" disabled={index === total - 1} onClick={() => onMove(1)} className="rounded px-2 py-1 text-xs text-silver hover:bg-hairline/10 disabled:opacity-30">↓</button>
           <button type="button" onClick={onRemove} className="rounded px-2 py-1 text-xs text-red-300 hover:bg-red-500/10">Remove</button>
         </div>
       </div>
@@ -381,7 +381,7 @@ function SegmentCard({
         onChange={(e) => onChange({ narration: e.target.value })}
         placeholder="Narration"
         rows={2}
-        className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+        className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
       />
       <div className="mb-2 flex items-center justify-between">
         <button
@@ -399,13 +399,13 @@ function SegmentCard({
           value={segment.onScreenAction ?? ""}
           onChange={(e) => onChange({ onScreenAction: e.target.value })}
           placeholder="On-screen action"
-          className="rounded-md border border-white/10 bg-navy px-3 py-2 text-xs text-cream focus-visible:outline-none"
+          className="rounded-md border border-hairline/10 bg-navy px-3 py-2 text-xs text-cream focus-visible:outline-none"
         />
         <input
           value={segment.overlayText ?? ""}
           onChange={(e) => onChange({ overlayText: e.target.value })}
           placeholder="Overlay text"
-          className="rounded-md border border-white/10 bg-navy px-3 py-2 text-xs text-cream focus-visible:outline-none"
+          className="rounded-md border border-hairline/10 bg-navy px-3 py-2 text-xs text-cream focus-visible:outline-none"
         />
       </div>
 

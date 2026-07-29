@@ -133,7 +133,7 @@ export function CharacterStudio(): JSX.Element {
           <button
             type="button"
             onClick={addCharacter}
-            className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
+            className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5"
           >
             + New Character
           </button>
@@ -154,7 +154,7 @@ export function CharacterStudio(): JSX.Element {
                 type="button"
                 onClick={() => setSelectedId(c.id)}
                 className={`w-full rounded-md px-3 py-2 text-left text-sm ${
-                  c.id === selected?.id ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-white/5"
+                  c.id === selected?.id ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-hairline/5"
                 }`}
               >
                 {c.name}
@@ -164,7 +164,7 @@ export function CharacterStudio(): JSX.Element {
 
           {selected ? (
             <div className="flex-1 space-y-5">
-              <div className="flex items-center justify-between rounded-lg border border-white/10 bg-charcoal p-4">
+              <div className="flex items-center justify-between rounded-lg border border-hairline/10 bg-charcoal p-4">
                 <input
                   value={selected.name}
                   onChange={(e) => updateCharacter({ name: e.target.value })}
@@ -179,13 +179,13 @@ export function CharacterStudio(): JSX.Element {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 rounded-lg border border-white/10 bg-charcoal p-5">
+              <div className="grid grid-cols-2 gap-4 rounded-lg border border-hairline/10 bg-charcoal p-5">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-cream">Role</label>
                   <input
                     value={selected.role ?? ""}
                     onChange={(e) => updateCharacter({ role: e.target.value })}
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                   />
                 </div>
                 <div>
@@ -193,7 +193,7 @@ export function CharacterStudio(): JSX.Element {
                   <input
                     value={selected.characterType ?? ""}
                     onChange={(e) => updateCharacter({ characterType: e.target.value })}
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                   />
                 </div>
                 <div className="col-span-2">
@@ -201,7 +201,7 @@ export function CharacterStudio(): JSX.Element {
                   <input
                     value={selected.personality ?? ""}
                     onChange={(e) => updateCharacter({ personality: e.target.value })}
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                   />
                 </div>
                 <div className="col-span-2">
@@ -209,7 +209,7 @@ export function CharacterStudio(): JSX.Element {
                   <input
                     value={selected.speakingStyle ?? ""}
                     onChange={(e) => updateCharacter({ speakingStyle: e.target.value })}
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                   />
                 </div>
                 <div className="col-span-2">
@@ -218,7 +218,7 @@ export function CharacterStudio(): JSX.Element {
                     value={selected.visualDescription ?? ""}
                     onChange={(e) => updateCharacter({ visualDescription: e.target.value })}
                     rows={3}
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                   />
                 </div>
                 <label className="col-span-2 flex items-center gap-2 text-sm text-silver">
@@ -231,7 +231,7 @@ export function CharacterStudio(): JSX.Element {
                 </label>
               </div>
 
-              <div className="rounded-lg border border-white/10 bg-charcoal p-5">
+              <div className="rounded-lg border border-hairline/10 bg-charcoal p-5">
                 <p className="mb-3 text-sm font-medium text-cream">Consistency Locks</p>
                 <div className="flex flex-wrap gap-2">
                   {(Object.keys(LOCK_LABELS) as Array<keyof CharacterConsistencyLocks>).map((key) => (
@@ -242,7 +242,7 @@ export function CharacterStudio(): JSX.Element {
                       className={`rounded-full border px-3 py-1.5 text-xs ${
                         selected.locks[key]
                           ? "border-electric-blue bg-electric-blue/15 text-electric-blue"
-                          : "border-white/15 text-silver hover:border-white/30"
+                          : "border-hairline/15 text-silver hover:border-hairline/30"
                       }`}
                     >
                       {selected.locks[key] ? "🔒" : "🔓"} {LOCK_LABELS[key]}
@@ -251,7 +251,7 @@ export function CharacterStudio(): JSX.Element {
                 </div>
               </div>
 
-              <div className="rounded-lg border border-white/10 bg-charcoal p-5">
+              <div className="rounded-lg border border-hairline/10 bg-charcoal p-5">
                 <div className="mb-3 flex items-center justify-between">
                   <p className="text-sm font-medium text-cream">
                     Reference Gallery ({selected.references.length})
@@ -272,7 +272,7 @@ export function CharacterStudio(): JSX.Element {
                 ) : (
                   <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                     {selected.references.map((ref) => (
-                      <div key={ref.id} className="rounded-md border border-white/10 p-2">
+                      <div key={ref.id} className="rounded-md border border-hairline/10 p-2">
                         <img
                           src={toFileUrl(currentProjectDir, ref.filePath)}
                           alt={ref.category}
@@ -283,7 +283,7 @@ export function CharacterStudio(): JSX.Element {
                           onChange={(e) =>
                             setReferenceCategory(ref.id, e.target.value as CharacterReferenceCategory)
                           }
-                          className="mb-2 w-full rounded border border-white/10 bg-navy px-1 py-1 text-xs text-cream"
+                          className="mb-2 w-full rounded border border-hairline/10 bg-navy px-1 py-1 text-xs text-cream"
                         >
                           {REFERENCE_CATEGORIES.map((cat) => (
                             <option key={cat} value={cat}>

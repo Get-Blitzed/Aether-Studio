@@ -79,7 +79,7 @@ export function Home(): JSX.Element {
         )}
 
         <section className="mb-10 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="rounded-lg border border-white/10 bg-charcoal p-5">
+          <div className="rounded-lg border border-hairline/10 bg-charcoal p-5">
             <div className="mb-3 flex items-center gap-3">
               <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-electric-blue to-aurora-pink text-lg">
                 ✦
@@ -90,7 +90,7 @@ export function Home(): JSX.Element {
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="Production title"
-              className="mb-3 w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+              className="mb-3 w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
             />
             <button
               type="button"
@@ -102,7 +102,7 @@ export function Home(): JSX.Element {
             </button>
           </div>
 
-          <div className="rounded-lg border border-white/10 bg-charcoal p-5">
+          <div className="rounded-lg border border-hairline/10 bg-charcoal p-5">
             <div className="mb-3 flex items-center gap-3">
               <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-aurora-cyan to-electric-blue text-lg">
                 ⌾
@@ -113,7 +113,7 @@ export function Home(): JSX.Element {
             <button
               type="button"
               onClick={handleOpen}
-              className="w-full rounded-full border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
+              className="w-full rounded-full border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5"
             >
               Choose Folder...
             </button>
@@ -142,13 +142,13 @@ export function Home(): JSX.Element {
           {recentProjects.length === 0 ? (
             <p className="text-sm text-silver">No productions yet. Create one or open the sample above.</p>
           ) : (
-            <ul className="divide-y divide-white/10 rounded-lg border border-white/10 bg-charcoal">
+            <ul className="divide-y divide-hairline/10 rounded-lg border border-hairline/10 bg-charcoal">
               {recentProjects.map((p) => (
                 <li key={p.id}>
                   <button
                     type="button"
                     onClick={() => openProjectDir(p.project_dir)}
-                    className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-white/5"
+                    className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-hairline/5"
                   >
                     <div>
                       <p className="text-cream">{p.title}</p>

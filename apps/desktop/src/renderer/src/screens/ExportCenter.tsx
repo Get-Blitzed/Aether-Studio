@@ -107,14 +107,14 @@ export function ExportCenter(): JSX.Element {
           <div className="mb-6 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">{notice}</div>
         )}
 
-        <section className="mb-6 rounded-lg border border-white/10 bg-charcoal p-5">
+        <section className="mb-6 rounded-lg border border-hairline/10 bg-charcoal p-5">
           <h2 className="mb-3 font-medium text-cream">Quality-Control Checklist</h2>
           {checks.length === 0 ? (
             <p className="text-sm text-silver">Running checks...</p>
           ) : (
             <div className="space-y-2">
               {checks.map((c) => (
-                <div key={c.id} className="flex items-center justify-between rounded-md border border-white/10 px-3 py-2 text-sm">
+                <div key={c.id} className="flex items-center justify-between rounded-md border border-hairline/10 px-3 py-2 text-sm">
                   <span className="text-cream">{c.label}</span>
                   <div className="flex items-center gap-2">
                     {c.detail && <span className="text-xs text-silver">{c.detail}</span>}
@@ -129,7 +129,7 @@ export function ExportCenter(): JSX.Element {
           </p>
         </section>
 
-        <section className="mb-6 rounded-lg border border-white/10 bg-charcoal p-5">
+        <section className="mb-6 rounded-lg border border-hairline/10 bg-charcoal p-5">
           <h2 className="mb-3 font-medium text-cream">Render Final Export</h2>
           <div className="mb-4 grid grid-cols-2 gap-3">
             <label className="text-xs text-silver">
@@ -137,7 +137,7 @@ export function ExportCenter(): JSX.Element {
               <select
                 value={timelineId}
                 onChange={(e) => setTimelineId(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                className="mt-1 block w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
               >
                 {currentManifest.timelines.length === 0 && <option value="">No timelines yet</option>}
                 {currentManifest.timelines.map((t) => (
@@ -152,7 +152,7 @@ export function ExportCenter(): JSX.Element {
               <select
                 value={presetId}
                 onChange={(e) => setPresetId(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream"
+                className="mt-1 block w-full rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream"
               >
                 {presets.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -172,7 +172,7 @@ export function ExportCenter(): JSX.Element {
           </button>
         </section>
 
-        <section className="mb-6 rounded-lg border border-white/10 bg-charcoal p-5">
+        <section className="mb-6 rounded-lg border border-hairline/10 bg-charcoal p-5">
           <h2 className="mb-3 font-medium text-cream">Production Archive</h2>
           <p className="mb-3 text-xs text-silver">
             Bundles the project's manifest, assets, and renders into a single .zip in the project's "archives" folder for backup or handoff.
@@ -181,20 +181,20 @@ export function ExportCenter(): JSX.Element {
             type="button"
             onClick={handleCreateArchive}
             disabled={archiving}
-            className="rounded-md border border-white/20 px-4 py-2 text-sm text-cream hover:bg-white/5 disabled:opacity-50"
+            className="rounded-md border border-hairline/20 px-4 py-2 text-sm text-cream hover:bg-hairline/5 disabled:opacity-50"
           >
             {archiving ? "Archiving..." : "Create Production Archive (.zip)"}
           </button>
         </section>
 
-        <section className="rounded-lg border border-white/10 bg-charcoal p-5">
+        <section className="rounded-lg border border-hairline/10 bg-charcoal p-5">
           <h2 className="mb-3 font-medium text-cream">Past Exports</h2>
           {exportAssets.length === 0 ? (
             <p className="text-sm text-silver">No exports rendered yet.</p>
           ) : (
             <div className="space-y-2">
               {exportAssets.map((a) => (
-                <div key={a.id} className="flex items-center justify-between rounded-md border border-white/10 px-3 py-2 text-sm">
+                <div key={a.id} className="flex items-center justify-between rounded-md border border-hairline/10 px-3 py-2 text-sm">
                   <span className="text-cream">{a.originalFileName}</span>
                   <span className="text-xs text-silver">{a.notes ?? ""}</span>
                 </div>

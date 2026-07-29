@@ -530,3 +530,61 @@ list/import IPC pattern exactly (`iconLibraryIpc.ts`,
 `captionFontFilePath` test); `npx tsc --noEmit` clean for both
 apps/desktop configs; `npm run build -w apps/desktop` succeeds; the
 packaged app launches cleanly with both new nav items and routes present.
+
+## Appearance setting: fixed (was silently dead) and a real light theme added
+
+Reported by the user directly after a clean installer test: "changed
+Appearance from dark to light... nothing happens." Root cause was real,
+not cosmetic -- `AppSettings.appearance` round-tripped through the
+database correctly, but **no code anywhere ever read it back to apply a
+theme**. Tailwind was configured for class-based dark mode
+(`darkMode: "class"`) but no light palette existed at all; every screen
+hardcoded the same dark navy/charcoal colors directly. "Light" and
+"Match system" had never worked since the Settings screen was built.
+
+Given the choice between silently removing the dead dropdown options or
+building a real light theme, the user chose the real fix.
+
+- **Architecture**: rather than hand-editing 20+ screens to add
+  `dark:`/`light:` variant classes (error-prone, huge diff), the four
+  surface/text Tailwind tokens every screen already uses --
+  `navy`/`charcoal`/`cream`/`silver` -- were converted in
+  `tailwind.config.js` from fixed hex values to
+  `rgb(var(--c-name) / <alpha-value>)`, with the actual RGB triplets
+  defined in `index.css` for `:root` (dark, default) and overridden
+  under `:root.light`. This re-themes the entire app for free with zero
+  per-screen edits, since every screen already references these same
+  four token names. Accent colors (bronze/electric-blue/aurora-pink/
+  aurora-cyan) intentionally stay constant across both themes -- brand
+  hues, not surface neutrals.
+- **Hairline/overlay fix**: 317 occurrences of literal `white/NN`
+  (translucent borders and hover fills) across 26 files were mechanically
+  renamed to a new `hairline` token (also CSS-variable-backed: white in
+  dark mode, a dark navy tint in light mode) -- otherwise every border and
+  hover state in the app would have been invisible white-on-white in
+  light mode.
+- **Light palette**: page background `#F4F5F9`, panel/card background
+  white, primary text reuses the dark theme's navy (`#131A2B`) for
+  contrast, secondary/muted text a mid gray (`#5B6474`).
+- **Switching logic**: `lib/theme.ts`'s `applyAppearance()` toggles a
+  `light` class on `<html>`; `lib/useAppliedTheme.ts` (used in `App.tsx`)
+  applies it whenever the *saved* setting changes, and for "system" tracks
+  `prefers-color-scheme` live via a `matchMedia` listener (so switching OS
+  theme updates the app immediately, no restart needed). The Settings
+  screen's Appearance dropdown also calls `applyAppearance()` directly on
+  change for an instant preview before Save is clicked, and reverts to the
+  last-saved value if the user navigates away without saving (via a ref so
+  the revert always reads the latest persisted value, not a stale
+  snapshot).
+- **Verified**: `npx tsc --noEmit` clean for both apps/desktop configs;
+  all 157 existing tests still pass (this change is pure CSS/renderer
+  logic, out of scope for the existing packages/*-only test suite);
+  `npm run build -w apps/desktop` succeeds; confirmed both the dark
+  default (`19 26 43`) and light override (`244 245 249`) RGB triplets
+  for `--c-navy` are present in the compiled CSS output alongside the
+  `.light` selector; the packaged app launches cleanly with no console
+  errors. Full interactive click-through of the Appearance dropdown
+  wasn't screenshot-verified in this environment (no reliable way to
+  screenshot a native Electron window here, distinct from the Browser
+  pane) -- the fix is verified by root-cause diagnosis, compiled-CSS
+  inspection, and clean build/launch, not a visual screenshot.

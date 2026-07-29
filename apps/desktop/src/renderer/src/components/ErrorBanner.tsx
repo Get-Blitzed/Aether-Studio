@@ -19,7 +19,7 @@ export function ErrorBanner({ error, onDismiss }: ErrorBannerProps): JSX.Element
       <button
         type="button"
         onClick={onDismiss}
-        className="rounded px-2 py-1 text-xs text-silver hover:bg-white/10 focus-visible:outline-none"
+        className="rounded px-2 py-1 text-xs text-silver hover:bg-hairline/10 focus-visible:outline-none"
         aria-label="Dismiss error"
       >
         Dismiss

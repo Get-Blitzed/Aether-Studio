@@ -434,3 +434,16 @@ imported icon assets keep their original black stroke color in the
 `.svg` file itself (Feather Icons ship as `stroke="currentColor"` with no
 fill, so they render at whatever color the video-editing/compositing
 context ends up applying, which currently is not configurable in-app).
+
+## Light theme is a first pass, not pixel-audited
+
+The light theme (Settings > Appearance) was built by re-deriving four
+existing surface/text color tokens via CSS variables rather than
+hand-tuning every screen individually, which means it's internally
+consistent but hasn't been visually audited screen-by-screen for contrast
+or polish the way the dark theme was during the Phase 8 redesign. A few
+things known to be untouched: SVG art with hardcoded fill colors (e.g.
+the Nova character sheet, the Wordmark logo) doesn't adapt to the theme;
+a couple of floating dark tooltips/overlays (e.g. the Timeline Editor's
+scrub tooltip) intentionally stay dark-styled in both themes since
+they're transient overlays, not surfaces.

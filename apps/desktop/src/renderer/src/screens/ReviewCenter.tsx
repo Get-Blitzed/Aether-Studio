@@ -54,7 +54,7 @@ export function ReviewCenter(): JSX.Element {
         </header>
 
         {checks.length > 0 && (
-          <section className="mb-6 rounded-lg border border-white/10 bg-charcoal p-5">
+          <section className="mb-6 rounded-lg border border-hairline/10 bg-charcoal p-5">
             <h2 className="mb-3 font-medium text-cream">Quality-Control Summary</h2>
             <div className="flex flex-wrap gap-2">
               {checks.map((c) => (
@@ -66,7 +66,7 @@ export function ReviewCenter(): JSX.Element {
           </section>
         )}
 
-        <section className="mb-6 rounded-lg border border-white/10 bg-charcoal p-5">
+        <section className="mb-6 rounded-lg border border-hairline/10 bg-charcoal p-5">
           <h2 className="mb-3 font-medium text-cream">Scenes</h2>
           {currentManifest.scripts.length === 0 ? (
             <p className="text-sm text-silver">No scripts yet.</p>
@@ -79,7 +79,7 @@ export function ReviewCenter(): JSX.Element {
           )}
         </section>
 
-        <section className="rounded-lg border border-white/10 bg-charcoal p-5">
+        <section className="rounded-lg border border-hairline/10 bg-charcoal p-5">
           <h2 className="mb-3 font-medium text-cream">Storyboard Frames</h2>
           {currentManifest.storyboardFrames.length === 0 ? (
             <p className="text-sm text-silver">No storyboard frames yet.</p>
@@ -88,7 +88,7 @@ export function ReviewCenter(): JSX.Element {
               {[...currentManifest.storyboardFrames]
                 .sort((a, b) => a.sceneNumber - b.sceneNumber || a.shotNumber - b.shotNumber)
                 .map((frame) => (
-                  <div key={frame.id} className="rounded-md border border-white/10 p-3">
+                  <div key={frame.id} className="rounded-md border border-hairline/10 p-3">
                     <div className="mb-2 flex items-center justify-between">
                       <span className="text-sm text-cream">
                         Scene {frame.sceneNumber}, Shot {frame.shotNumber} -- {frame.shotType.replace(/-/g, " ")}
@@ -96,7 +96,7 @@ export function ReviewCenter(): JSX.Element {
                       <select
                         value={frame.productionStatus}
                         onChange={(e) => updateFrame(frame.id, { productionStatus: e.target.value as StoryboardFrame["productionStatus"] })}
-                        className="rounded border border-white/10 bg-navy px-2 py-1 text-xs text-cream"
+                        className="rounded border border-hairline/10 bg-navy px-2 py-1 text-xs text-cream"
                       >
                         <option value="draft">Draft</option>
                         <option value="in-progress">In Progress</option>
@@ -108,7 +108,7 @@ export function ReviewCenter(): JSX.Element {
                       onChange={(e) => updateFrame(frame.id, { reviewNotes: e.target.value })}
                       placeholder="Reviewer notes..."
                       rows={2}
-                      className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-xs text-cream focus-visible:outline-none"
+                      className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-xs text-cream focus-visible:outline-none"
                     />
                   </div>
                 ))}
@@ -132,7 +132,7 @@ function ScriptSegmentReviewList({
       <p className="mb-2 text-sm font-medium text-cream">{script.title}</p>
       <div className="space-y-2">
         {script.segments.map((seg) => (
-          <div key={seg.id} className={`rounded-md border p-3 ${seg.unverifiedClaim ? "border-bronze/50 bg-bronze/5" : "border-white/10"}`}>
+          <div key={seg.id} className={`rounded-md border p-3 ${seg.unverifiedClaim ? "border-bronze/50 bg-bronze/5" : "border-hairline/10"}`}>
             <div className="mb-2 flex items-center justify-between gap-2">
               <div>
                 <span className="text-sm text-cream">
@@ -144,7 +144,7 @@ function ScriptSegmentReviewList({
               <select
                 value={seg.approvalStatus}
                 onChange={(e) => onChange(seg.id, { approvalStatus: e.target.value as ScriptSegment["approvalStatus"] })}
-                className="rounded border border-white/10 bg-navy px-2 py-1 text-xs text-cream"
+                className="rounded border border-hairline/10 bg-navy px-2 py-1 text-xs text-cream"
               >
                 <option value="draft">Draft</option>
                 <option value="in-review">In Review</option>
@@ -157,7 +157,7 @@ function ScriptSegmentReviewList({
               onChange={(e) => onChange(seg.id, { reviewNotes: e.target.value })}
               placeholder="Reviewer notes..."
               rows={2}
-              className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-xs text-cream focus-visible:outline-none"
+              className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-xs text-cream focus-visible:outline-none"
             />
           </div>
         ))}

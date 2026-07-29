@@ -3,6 +3,30 @@
 @tailwind utilities;
 
 @layer base {
+  /*
+   * Settings > Appearance theme variables. Dark is the default (no class
+   * needed on <html>); `.light` overrides every value for the light theme.
+   * App.tsx applies/removes the `light` class based on settings.appearance
+   * (resolving "system" via prefers-color-scheme). Values are "R G B"
+   * triplets (no commas, no rgb()) so Tailwind's `rgb(var(--x) / <alpha-value>)`
+   * color definitions in tailwind.config.js can still apply opacity modifiers
+   * like `bg-navy/50`.
+   */
+  :root {
+    --c-navy: 19 26 43; /* #131A2B */
+    --c-charcoal: 27 31 39; /* #1B1F27 */
+    --c-cream: 244 239 230; /* #F4EFE6 -- primary text on dark surfaces */
+    --c-silver: 201 205 214; /* #C9CDD6 -- secondary/muted text on dark surfaces */
+    --c-hairline: 255 255 255; /* was literal white/NN borders and hover fills */
+  }
+  :root.light {
+    --c-navy: 244 245 249; /* page background */
+    --c-charcoal: 255 255 255; /* panel/card background */
+    --c-cream: 19 26 43; /* primary text -- reuses dark navy for contrast */
+    --c-silver: 91 100 116; /* secondary/muted text */
+    --c-hairline: 19 26 43; /* borders/hover fills as a dark tint, not invisible white-on-white */
+  }
+
   html,
   body,
   #root {

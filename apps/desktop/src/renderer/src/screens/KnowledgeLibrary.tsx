@@ -8,12 +8,12 @@ import type { KnowledgeSource } from "@aether/shared-types";
 const STATUS_OPTIONS = ["unreviewed", "verified", "partially-verified", "outdated", "conflicting", "archived"];
 
 const STATUS_COLORS: Record<string, string> = {
-  unreviewed: "bg-white/10 text-silver",
+  unreviewed: "bg-hairline/10 text-silver",
   verified: "bg-emerald-500/15 text-emerald-300",
   "partially-verified": "bg-bronze/20 text-bronze",
   outdated: "bg-red-500/15 text-red-300",
   conflicting: "bg-red-500/25 text-red-200",
-  archived: "bg-white/5 text-silver/60",
+  archived: "bg-hairline/5 text-silver/60",
 };
 
 export function KnowledgeLibrary(): JSX.Element {
@@ -76,7 +76,7 @@ export function KnowledgeLibrary(): JSX.Element {
           <button
             type="button"
             onClick={addSource}
-            className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
+            className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5"
           >
             + Add Source
           </button>
@@ -86,7 +86,7 @@ export function KnowledgeLibrary(): JSX.Element {
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Search sources..."
-          className="mb-4 w-full max-w-sm rounded-md border border-white/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
+          className="mb-4 w-full max-w-sm rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-sm text-cream focus-visible:outline-none"
         />
 
         <div className="flex gap-6">
@@ -98,7 +98,7 @@ export function KnowledgeLibrary(): JSX.Element {
                 type="button"
                 onClick={() => setSelectedId(s.id)}
                 className={`w-full rounded-md border p-3 text-left text-sm ${
-                  s.id === selected?.id ? "border-electric-blue bg-electric-blue/10" : "border-white/10 hover:border-white/30"
+                  s.id === selected?.id ? "border-electric-blue bg-electric-blue/10" : "border-hairline/10 hover:border-hairline/30"
                 }`}
               >
                 <p className="text-cream">{s.title}</p>
@@ -110,7 +110,7 @@ export function KnowledgeLibrary(): JSX.Element {
           </div>
 
           {selected ? (
-            <div className="flex-1 space-y-4 rounded-lg border border-white/10 bg-charcoal p-5">
+            <div className="flex-1 space-y-4 rounded-lg border border-hairline/10 bg-charcoal p-5">
               <div className="flex items-center justify-between">
                 <input
                   value={selected.title}
@@ -132,7 +132,7 @@ export function KnowledgeLibrary(): JSX.Element {
                   <input
                     value={selected.sourceType}
                     onChange={(e) => updateSource(selected.id, { sourceType: e.target.value })}
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream"
                   />
                 </div>
                 <div>
@@ -140,7 +140,7 @@ export function KnowledgeLibrary(): JSX.Element {
                   <select
                     value={selected.status}
                     onChange={(e) => updateSource(selected.id, { status: e.target.value })}
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream"
                   >
                     {STATUS_OPTIONS.map((opt) => (
                       <option key={opt} value={opt}>
@@ -154,7 +154,7 @@ export function KnowledgeLibrary(): JSX.Element {
                   <input
                     value={selected.productVersion ?? ""}
                     onChange={(e) => updateSource(selected.id, { productVersion: e.target.value })}
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream"
                   />
                 </div>
                 <div>
@@ -162,7 +162,7 @@ export function KnowledgeLibrary(): JSX.Element {
                   <input
                     value={selected.originalLocation ?? ""}
                     onChange={(e) => updateSource(selected.id, { originalLocation: e.target.value })}
-                    className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream"
+                    className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream"
                   />
                 </div>
               </div>
@@ -173,7 +173,7 @@ export function KnowledgeLibrary(): JSX.Element {
                   value={selected.bodyText ?? ""}
                   onChange={(e) => updateSource(selected.id, { bodyText: e.target.value })}
                   rows={8}
-                  className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                  className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                 />
               </div>
 
@@ -183,7 +183,7 @@ export function KnowledgeLibrary(): JSX.Element {
                   value={selected.notes ?? ""}
                   onChange={(e) => updateSource(selected.id, { notes: e.target.value })}
                   rows={2}
-                  className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                  className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                 />
               </div>
 

@@ -89,7 +89,7 @@ export function Onboarding(): JSX.Element {
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="rounded-md border border-white/10 bg-charcoal px-3 py-2 text-cream focus-visible:outline-none"
+            className="rounded-md border border-hairline/10 bg-charcoal px-3 py-2 text-cream focus-visible:outline-none"
           />
           <button
             type="button"
@@ -143,7 +143,7 @@ function OnboardingCard({
       type="button"
       onClick={onClick}
       className={`rounded-lg border p-5 text-left transition-colors ${
-        selected ? "border-electric-blue bg-electric-blue/10" : "border-white/10 bg-charcoal hover:border-white/30"
+        selected ? "border-electric-blue bg-electric-blue/10" : "border-hairline/10 bg-charcoal hover:border-hairline/30"
       }`}
     >
       <p className="font-semibold text-cream">{title}</p>

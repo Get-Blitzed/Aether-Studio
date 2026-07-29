@@ -28,9 +28,9 @@ brands, clients, and production types.
 > multitrack Timeline Editor with blur/redaction, AI provider integration
 > (mock/OpenAI-compatible/generic REST/native Windows voice/bundled offline
 > Piper voice/ElevenLabs), a real Quality-Control +
-> Export + Archive pipeline, and a one-step Document Import wizard
-> (PDF/DOCX/PPTX/video/audio -> a full narrated video project) are all real
-> and working. Phase 9 (template system, Learning Center, accessibility/
+> Export + Archive pipeline, a one-step Document Import wizard
+> (PDF/DOCX/PPTX/video/audio -> a full narrated video project), and a real
+> dark/light/system Appearance theme (Settings) are all real and working. Phase 9 (template system, Learning Center, accessibility/
 > performance pass, signed installer) is not yet built -- this is a real,
 > running application, not a mockup, at every stage.
 

@@ -72,7 +72,7 @@ export function BrandStudio(): JSX.Element {
           <button
             type="button"
             onClick={addBrand}
-            className="rounded-md border border-white/20 px-3 py-2 text-sm text-cream hover:bg-white/5"
+            className="rounded-md border border-hairline/20 px-3 py-2 text-sm text-cream hover:bg-hairline/5"
           >
             + New Brand Profile
           </button>
@@ -87,7 +87,7 @@ export function BrandStudio(): JSX.Element {
                 type="button"
                 onClick={() => setSelectedId(b.id)}
                 className={`w-full rounded-md px-3 py-2 text-left text-sm ${
-                  b.id === selected?.id ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-white/5"
+                  b.id === selected?.id ? "bg-electric-blue/15 text-electric-blue" : "text-silver hover:bg-hairline/5"
                 }`}
               >
                 {b.name}
@@ -97,7 +97,7 @@ export function BrandStudio(): JSX.Element {
 
           {selected ? (
             <div className="flex-1 space-y-5">
-              <div className="flex items-center justify-between rounded-lg border border-white/10 bg-charcoal p-4">
+              <div className="flex items-center justify-between rounded-lg border border-hairline/10 bg-charcoal p-4">
                 <input
                   value={selected.name}
                   onChange={(e) => updateBrand({ name: e.target.value })}
@@ -123,29 +123,29 @@ export function BrandStudio(): JSX.Element {
                 </div>
               )}
 
-              <div className="rounded-lg border border-white/10 bg-charcoal p-5">
+              <div className="rounded-lg border border-hairline/10 bg-charcoal p-5">
                 <label className="mb-1 block text-sm font-medium text-cream">Company / Product Name</label>
                 <input
                   value={selected.companyOrProductName ?? ""}
                   onChange={(e) => updateBrand({ companyOrProductName: e.target.value })}
-                  className="mb-4 w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                  className="mb-4 w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                 />
                 <label className="mb-1 block text-sm font-medium text-cream">Voice and Tone</label>
                 <textarea
                   value={selected.voiceAndTone ?? ""}
                   onChange={(e) => updateBrand({ voiceAndTone: e.target.value })}
                   rows={2}
-                  className="w-full rounded-md border border-white/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
+                  className="w-full rounded-md border border-hairline/10 bg-navy px-3 py-2 text-sm text-cream focus-visible:outline-none"
                 />
               </div>
 
-              <div className="rounded-lg border border-white/10 bg-charcoal p-5">
+              <div className="rounded-lg border border-hairline/10 bg-charcoal p-5">
                 <p className="mb-2 text-sm font-medium text-cream">Color Palette</p>
                 <div className="mb-3 flex flex-wrap gap-2">
                   {selected.colorPalette.map((c, i) => (
-                    <div key={i} className="flex items-center gap-2 rounded-md border border-white/10 px-2 py-1">
+                    <div key={i} className="flex items-center gap-2 rounded-md border border-hairline/10 px-2 py-1">
                       <span
-                        className="h-4 w-4 rounded-full border border-white/20"
+                        className="h-4 w-4 rounded-full border border-hairline/20"
                         style={{ backgroundColor: c.hex }}
                       />
                       <span className="text-xs text-cream">{c.name}</span>
@@ -167,7 +167,7 @@ export function BrandStudio(): JSX.Element {
                 />
               </div>
 
-              <div className="rounded-lg border border-white/10 bg-charcoal p-5 space-y-4">
+              <div className="rounded-lg border border-hairline/10 bg-charcoal p-5 space-y-4">
                 <TagListEditor
                   label="Approved Terminology"
                   values={selected.approvedTerminology}
@@ -210,7 +210,7 @@ function ColorAdder({ onAdd }: { onAdd: (name: string, hex: string) => void }): 
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="rounded-md border border-white/10 bg-navy px-2 py-1.5 text-sm text-cream focus-visible:outline-none"
+          className="rounded-md border border-hairline/10 bg-navy px-2 py-1.5 text-sm text-cream focus-visible:outline-none"
         />
       </div>
       <div>
@@ -219,7 +219,7 @@ function ColorAdder({ onAdd }: { onAdd: (name: string, hex: string) => void }): 
           type="color"
           value={hex}
           onChange={(e) => setHex(e.target.value)}
-          className="h-9 w-14 rounded-md border border-white/10 bg-navy"
+          className="h-9 w-14 rounded-md border border-hairline/10 bg-navy"
         />
       </div>
       <button
@@ -229,7 +229,7 @@ function ColorAdder({ onAdd }: { onAdd: (name: string, hex: string) => void }): 
           onAdd(name.trim(), hex);
           setName("");
         }}
-        className="rounded-md border border-white/20 px-3 py-1.5 text-sm text-cream hover:bg-white/5 disabled:opacity-40"
+        className="rounded-md border border-hairline/20 px-3 py-1.5 text-sm text-cream hover:bg-hairline/5 disabled:opacity-40"
       >
         Add Color
       </button>

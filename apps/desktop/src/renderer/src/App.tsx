@@ -1,4 +1,5 @@
 import { HashRouter, Routes, Route } from "react-router-dom";
+import { useAppliedTheme } from "./lib/useAppliedTheme";
 import { Splash } from "./screens/Splash";
 import { Onboarding } from "./screens/Onboarding";
 import { Home } from "./screens/Home";
@@ -25,6 +26,7 @@ import { ReviewCenter } from "./screens/ReviewCenter";
 import { ExportCenter } from "./screens/ExportCenter";
 
 export function App(): JSX.Element {
+  useAppliedTheme();
   return (
     <HashRouter>
       <Routes>
