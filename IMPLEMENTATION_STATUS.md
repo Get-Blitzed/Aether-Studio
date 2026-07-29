@@ -583,8 +583,12 @@ building a real light theme, the user chose the real fix.
   default (`19 26 43`) and light override (`244 245 249`) RGB triplets
   for `--c-navy` are present in the compiled CSS output alongside the
   `.light` selector; the packaged app launches cleanly with no console
-  errors. Full interactive click-through of the Appearance dropdown
-  wasn't screenshot-verified in this environment (no reliable way to
-  screenshot a native Electron window here, distinct from the Browser
-  pane) -- the fix is verified by root-cause diagnosis, compiled-CSS
-  inspection, and clean build/launch, not a visual screenshot.
+  errors. Live-preview switching was screenshotted directly against the
+  real running app (via a Win32 window capture, not the Browser pane) and
+  confirmed working -- selecting "Light" instantly re-themes the whole
+  app, and navigating away without saving correctly reverts to the
+  last-saved value. The Save-then-restart persistence round trip couldn't
+  be automated end-to-end here (the native OS-rendered `<select>` popup
+  wasn't reliably drivable via synthetic input), so the user manually
+  verified it after rebuilding: Appearance > Light, Save, restart --
+  confirmed the app now boots directly into light mode.
